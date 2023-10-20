@@ -44,10 +44,15 @@ table {
     width: 100%;
 }
 
-th, td {
+td {
     border: 1px solid white;
     color: white;
+}
+
+th {
     text-align: center;
+    border: 1px solid white;
+    color: white;
 }
 
 #network {
@@ -68,6 +73,25 @@ th, td {
     left: 50%;
     transform: translateX(-50%);
     z-index: 2;
-    text-align: center;
     padding-bottom: 500px;
+    text-align: center;
+}
+
+#projects {
+    scroll-margin-top: 100px;
+    position: absolute;
+    top: 210%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    padding-bottom: 500px;
+    text-align: left;
+}
+
+#projects th{
+    padding: 10px;
+}
+
+#projects th, #projects td{
+    padding: 10px;
 }

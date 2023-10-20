@@ -65,6 +65,24 @@ function connectDots() {
     }
 }
 
+function areAllDotsConnected() {
+    for (let i = 0; i < dots.length; i++) {
+        for (let j = 0; j < dots.length; j++) {
+            if (i !== j) {
+                const dx = dots[i].x - dots[j].x;
+                const dy = dots[i].y - dots[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance >= 80) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+let allConnected = false;
+
 function animate() {
     requestAnimationFrame(animate);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -74,6 +92,11 @@ function animate() {
     });
 
     connectDots();
+
+    if (areAllDotsConnected()) {
+        allConnected = true;
+        titleElement.textContent = "You did it!!";
+    }
 }
 
 canvas.addEventListener('mousemove', (event) => {
@@ -98,16 +121,16 @@ const titleText = "Hello there...";
 let i = 0;
 let isTyping = true;
 
-function typeOrUnTypeTitle() {
+function animateTitle() {
     if (isTyping) {
         titleElement.textContent = titleText.slice(0, i);
         i++;
         if (i > titleText.length) {
             isTyping = false;
             i = titleText.length;
-            setTimeout(typeOrUnTypeTitle, 1000); // Wait for a few seconds before untyping
+            setTimeout(animateTitle, 1000); // Wait for a few seconds before untyping
         } else {
-            setTimeout(typeOrUnTypeTitle, 100); // Adjust typing speed by changing the timeout
+            setTimeout(animateTitle, 100); // Adjust typing speed by changing the timeout
         }
     } else {
         titleElement.textContent = titleText.slice(0, i);
@@ -115,12 +138,12 @@ function typeOrUnTypeTitle() {
         if (i < 0) {
             isTyping = true;
             i = 0;
-            setTimeout(typeOrUnTypeTitle, 1000); // Wait for a few seconds before typing
+            setTimeout(animateTitle, 1000); // Wait for a few seconds before typing
         } else {
-            setTimeout(typeOrUnTypeTitle, 100); // Adjust untyping speed by changing the timeout
+            setTimeout(animateTitle, 100); // Adjust untyping speed by changing the timeout
         }
     }
 }
 
 animate();
-typeOrUnTypeTitle();
+animateTitle();

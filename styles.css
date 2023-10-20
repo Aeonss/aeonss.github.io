@@ -1,0 +1,73 @@
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background-color: #000;
+    font-family: 'Montserrat', sans-serif;
+    overflow-x: hidden; /* Hide horizontal scrollbar */
+    overflow-y: -moz-scrollbars-none; /* Hide scrollbar for Firefox */
+}
+
+body::-webkit-scrollbar {
+    width: 0.5em;
+}
+
+h1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2em; /* Adjust the font size as needed */
+    color: #fff;
+    text-align: center;
+}
+
+.menu {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 3;
+}
+
+.menu a {
+    margin: 10px;
+    text-decoration: none;
+    color: #fff;
+    font-size: 1.5em;
+}
+
+table {
+    border-collapse: collapse;
+    background-color: #000;
+    width: 100%;
+}
+
+th, td {
+    border: 1px solid white;
+    color: white;
+    text-align: center;
+}
+
+#network {
+    position:fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.invert-image {
+    filter: invert(1);
+}
+
+#skills {
+    scroll-margin-top: 100px;
+    position: absolute;
+    top: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    text-align: center;
+    padding-bottom: 500px;
+}

@@ -95,7 +95,7 @@ function animate() {
 
     if (areAllDotsConnected()) {
         allConnected = true;
-        titleElement.textContent = "You did it!!";
+        titleElement.textContent = "Yay you did it!";
     }
 }
 
@@ -117,7 +117,7 @@ canvas.addEventListener('mousemove', (event) => {
 
 // Typing effect for the title
 const titleElement = document.querySelector('.title');
-const titleText = "Hello there...";
+const titleText = "I'm Aeon, I make stuff.";
 let i = 0;
 let isTyping = true;
 
@@ -130,7 +130,7 @@ function animateTitle() {
             i = titleText.length;
             setTimeout(animateTitle, 1000); // Wait for a few seconds before untyping
         } else {
-            setTimeout(animateTitle, 100); // Adjust typing speed by changing the timeout
+            setTimeout(animateTitle, 50); // Adjust typing speed by changing the timeout
         }
     } else {
         titleElement.textContent = titleText.slice(0, i);

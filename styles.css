@@ -4,8 +4,8 @@ html {
 
 body {
     margin: 0;
-    background-color: #000;
-    font-family: 'Montserrat', sans-serif;
+    background-color: #151514;
+    font-family: 'MS UI Gothic', sans-serif;
     overflow-x: hidden; /* Hide horizontal scrollbar */
     overflow-y: -moz-scrollbars-none; /* Hide scrollbar for Firefox */
 }
@@ -40,7 +40,7 @@ h1 {
 
 table {
     border-collapse: collapse;
-    background-color: #000;
+    background-color: #151514;
     width: 100%;
 }
 
@@ -69,8 +69,9 @@ th {
 #skills {
     scroll-margin-top: 100px;
     position: absolute;
-    top: 210%;
+    top: 110%;
     left: 50%;
+    width: 600px;
     transform: translateX(-50%);
     z-index: 2;
     padding-bottom: 500px;
@@ -80,7 +81,8 @@ th {
 #projects {
     scroll-margin-top: 100px;
     position: absolute;
-    top: 410%;
+    top: 200%;
+    width: 500px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 2;

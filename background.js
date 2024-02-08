@@ -12,8 +12,8 @@ function Dot(x, y, radius) {
     this.y = y;
     this.radius = radius;
     this.velocity = {
-        x: (Math.random() - 0.5) * 1,  // Reduced velocity
-        y: (Math.random() - 0.5) * 1   // Reduced velocity
+        x: (Math.random() - 0.5) * 1,
+        y: (Math.random() - 0.5) * 1
     };
 }
 

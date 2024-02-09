@@ -100,7 +100,7 @@
     <center><h1>Nearby Grocery Deals</h1></center>
     <div id="searchBar">
         <input type="text" id="zipCodeInput" placeholder="Enter Zip Code">
-        <input type="text" id="searchInput" placeholder="Enter your search query">
+        <input type="text" id="searchInput" placeholder="Search for Groceries">
         <button onclick="searchImages()">Search</button>
     </div>
 
@@ -130,7 +130,14 @@
                     const currentPrice = item.current_price;
                     const store = item.merchant_name;
                     const itemName = item.name;
-                    const expire = item.valid_to;
+                    const start = item.valid_from.substring(0, 10);
+                    const expire = item.valid_to.substring(0, 10);
+
+                    var startDate = new Date(start);
+                    var startDateString = startDate.toLocaleString('default', { month: 'short' }) + " " + startDate.getDate() + ", " + startDate.getFullYear();
+                    
+                    var expireDate = new Date(expire);
+                    var expireDateString = expireDate.toLocaleString('default', { month: 'short' }) + " " + expireDate.getDate() + ", " + expireDate.getFullYear();
 
                     if (!uniqueImages.has(imageUrl)) {
                         const imageContainer = document.createElement("div");
@@ -146,7 +153,7 @@
                             <p><strong>Name:</strong> ${itemName}</p>
                             <p><strong>Store:</strong> ${store}</p>
                             <p><strong>Current Price:</strong> ${currentPrice}</p>
-                            <p><strong>Expires:</strong> ${expire}</p>
+                            <p><strong>Date:</strong> ${startDateString} - ${expireDateString}</p>
                         `;
 
                         imageContainer.appendChild(image);

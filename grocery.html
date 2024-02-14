@@ -125,6 +125,16 @@
                 const imageGrid = document.getElementById("imageGrid");
                 imageGrid.innerHTML = '';
 
+                if (items.length == 0) {
+                    const itemInfo = document.createElement("div");
+                        itemInfo.classList.add("itemInfo");
+                        itemInfo.innerHTML = `
+                            <p><strong>No results</p>
+                        `;
+
+                    imageGrid.append(itemInfo);
+                }
+
                 items.forEach(item => {
                     const imageUrl = item.clean_image_url;
                     const currentPrice = item.current_price;

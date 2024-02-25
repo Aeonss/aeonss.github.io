@@ -157,7 +157,7 @@
                                     var expireDate = new Date(expire);
                                     var expireDateString = expireDate.toLocaleString('default', { month: 'short' }) + " " + expireDate.getDate() + ", " + expireDate.getFullYear();
         
-                                    if (!uniqueImages.has(imageUrl) && address != null) {
+                                    if (!uniqueImages.has(imageUrl)) {
                                         const imageContainer = document.createElement("div");
                                         imageContainer.classList.add("imageContainer");
         
@@ -213,13 +213,7 @@
                     const province = store.province;
                     const postalCode = store.postal_code;
 
-                    if (postalCode <= Number(zipcode) + 10 && postalCode >= Number(zipcode) - 10) {
-                        return address + ", " + city + " " + province + " " + postalCode;
-                    }
-                    else {
-                        return null;
-                    }
-                    
+                    return address + ", " + city + " " + province + " " + postalCode;
                 })
                 .catch(error => {
                     console.error("Error fetching address:", error);

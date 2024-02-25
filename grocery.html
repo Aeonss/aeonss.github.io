@@ -107,76 +107,124 @@
     <div id="imageGrid"></div>
 
     <script>
-        async function searchImages() {
+        function searchImages() {
             try {
                 const zipCodeInput = document.getElementById("zipCodeInput");
                 const searchInput = document.getElementById("searchInput");
-
+        
                 const zipCode = zipCodeInput.value;
                 const searchQuery = searchInput.value;
                 const apiUrl = `https://cdn-gateflipp.flippback.com/bf/flipp/items/search?locale=en-us&postal_code=${zipCode}&sid=&q=${searchQuery}`;
-                
-                const response = await fetch(apiUrl);
-                const data = await response.json();
-                const items = data.items;
-
-                const uniqueImages = new Set();
-
-                const imageGrid = document.getElementById("imageGrid");
-                imageGrid.innerHTML = '';
-
-                if (items.length == 0) {
-                    const itemInfo = document.createElement("div");
-                        itemInfo.classList.add("itemInfo");
-                        itemInfo.innerHTML = `
-                            <p><strong>No results</p>
-                        `;
-
-                    imageGrid.append(itemInfo);
-                }
-
-                items.forEach(item => {
-                    const imageUrl = item.clean_image_url;
-                    const currentPrice = item.current_price;
-                    const store = item.merchant_name;
-                    const itemName = item.name;
-                    const start = item.valid_from.substring(0, 10);
-                    const expire = item.valid_to.substring(0, 10);
-
-                    var startDate = new Date(start);
-                    var startDateString = startDate.toLocaleString('default', { month: 'short' }) + " " + startDate.getDate() + ", " + startDate.getFullYear();
-                    
-                    var expireDate = new Date(expire);
-                    var expireDateString = expireDate.toLocaleString('default', { month: 'short' }) + " " + expireDate.getDate() + ", " + expireDate.getFullYear();
-
-                    if (!uniqueImages.has(imageUrl)) {
-                        const imageContainer = document.createElement("div");
-                        imageContainer.classList.add("imageContainer");
-
-                        const image = document.createElement("img");
-                        image.src = imageUrl;
-                        image.alt = "Item Image";
-
-                        const itemInfo = document.createElement("div");
-                        itemInfo.classList.add("itemInfo");
-                        itemInfo.innerHTML = `
-                            <p><strong>Name:</strong> ${itemName}</p>
-                            <p><strong>Store:</strong> ${store}</p>
-                            <p><strong>Current Price:</strong> ${currentPrice}</p>
-                            <p><strong>Date:</strong> ${startDateString} - ${expireDateString}</p>
-                        `;
-
-                        imageContainer.appendChild(image);
-                        imageContainer.appendChild(itemInfo);
-                        imageGrid.appendChild(imageContainer);
-
-                        uniqueImages.add(imageUrl);
-                    }
-                });
-
+        
+                fetch(apiUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const items = data.items;
+                        const uniqueImages = new Set();
+                        const imageGrid = document.getElementById("imageGrid");
+                        imageGrid.innerHTML = '';
+        
+                        if (items.length == 0) {
+                            const itemInfo = document.createElement("div");
+                            itemInfo.classList.add("itemInfo");
+                            itemInfo.innerHTML = `
+                                <p><strong>No results</p>
+                            `;
+        
+                            imageGrid.append(itemInfo);
+                        }
+        
+                        items.forEach(item => {
+                            const imageUrl = item.clean_image_url;
+                            const currentPrice = Number(item.current_price).toFixed(2);
+                            const store = item.merchant_name;
+                            const itemName = item.name;
+                            const start = item.valid_from.substring(0, 10);
+                            const expire = item.valid_to.substring(0, 10);
+                            const flyerId = item.flyer_id;
+        
+                            // Fetch address using getAddressFromFlyerId
+                            getAddressFromFlyerId(flyerId, zipCode)
+                                .then(address => {
+                                    var startDate = new Date(start);
+                                    var startDateString = startDate.toLocaleString('default', { month: 'short' }) + " " + startDate.getDate() + ", " + startDate.getFullYear();
+        
+                                    var expireDate = new Date(expire);
+                                    var expireDateString = expireDate.toLocaleString('default', { month: 'short' }) + " " + expireDate.getDate() + ", " + expireDate.getFullYear();
+        
+                                    if (!uniqueImages.has(imageUrl) && address != null) {
+                                        const imageContainer = document.createElement("div");
+                                        imageContainer.classList.add("imageContainer");
+        
+                                        const image = document.createElement("img");
+                                        image.src = imageUrl;
+                                        image.alt = "Item Image";
+        
+                                        const itemInfo = document.createElement("div");
+                                        itemInfo.classList.add("itemInfo");
+                                        itemInfo.innerHTML = `
+                                            <p><strong>Store:</strong> ${store}</p>
+                                            <p><strong>Address:</strong> ${address}</p>
+                                            <p><strong>Name:</strong> ${itemName}</p>
+                                            <p><strong>Current Price:</strong> $${currentPrice}</p>
+                                            <p><strong>Date:</strong> ${startDateString} - ${expireDateString}</p>
+                                            `;
+        
+                                        imageContainer.appendChild(image);
+                                        imageContainer.appendChild(itemInfo);
+                                        imageGrid.appendChild(imageContainer);
+        
+                                        uniqueImages.add(imageUrl);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error("Error fetching address:", error);
+                                });
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Error fetching data:", error);
+                    });
             } catch (error) {
-                console.error("Error fetching data:", error);
+                console.error("Error:", error);
             }
+        }
+        
+
+        function getAddressFromFlyerId(flyerId, zipcode) {
+            const url = "https://cdn-gateflipp.flippback.com/bf/flipp/flyers/" + flyerId + "/info?locale=en-us&postal_code=" + zipcode;
+        
+            return fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const store = data.info.select_stores[0];
+                    const address = store.address;
+                    const city = store.city;
+                    const province = store.province;
+                    const postalCode = store.postal_code;
+
+                    if (postalCode <= Number(zipcode) + 10 && postalCode >= Number(zipcode) - 10) {
+                        return address + ", " + city + " " + province + " " + postalCode;
+                    }
+                    else {
+                        return null;
+                    }
+                    
+                })
+                .catch(error => {
+                    console.error("Error fetching address:", error);
+                    throw error;
+                });
         }
 
         function handleKeyDown(event) {

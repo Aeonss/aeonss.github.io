@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f5f5f5;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+        color: #002366;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .station-input {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    select {
+        padding: 8px;
+        width: 300px;
+        font-size: 16px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin: 10px 0;
+    }
+
+    button {
+        background-color: #002366;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
+
+    button:hover {
+        background-color: #001a4d;
+    }
+
+    table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #002366;
+        color: white;
+    }
+
+    tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    .no-trains {
+        color: #666;
+        font-style: italic;
+    }
+
+    @media (max-width: 600px) {
+        .container {
+            padding: 10px;
+        }
+        
+        select {
+            width: 100%;
+        }
+    }
+</style>
+<body>
+    <h1>WMATA Live Train Predictions</h1>
+    <label for="station">Enter Station Code:</label>
+    <select id="station"></select>
+    <button onclick="getTrainPredictions()">Get Train Predictions</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Destination</th>
+                <th>Line</th>
+                <th>Minutes</th>
+                <th>Arrival Time</th>
+            </tr>
+        </thead>
+        <tbody id="train-data">
+            <tr><td colspan="3">Enter a station code</td></tr>
+        </tbody>
+    </table>
+
+    <br><br><br>
+    <img width="100%" src="https://washington.org/sites/default/files/2023-09/Screen%20Shot%202023-09-12%20at%2011.48.18%20AM_0.png"></img>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const stations = {
+                "A01": "Metro Center (Red)",
+                "A02": "Farragut North",
+                "A03": "Dupont Circle",
+                "A04": "Woodley Park-Zoo/Adams Morgan",
+                "A05": "Cleveland Park",
+                "A06": "Van Ness-UDC",
+                "A07": "Tenleytown-AU",
+                "A08": "Friendship Heights",
+                "A09": "Bethesda",
+                "A10": "Medical Center",
+                "A11": "Grosvenor-Strathmore",
+                "A12": "North Bethesda",
+                "A13": "Twinbrook",
+                "A14": "Rockville",
+                "A15": "Shady Grove",
+                "B01": "Gallery Pl-Chinatown (Red)",
+                "B02": "Judiciary Square",
+                "B03": "Union Station",
+                "B04": "Rhode Island Ave-Brentwood",
+                "B05": "Brookland-CUA",
+                "B06": "Fort Totten (Red)",
+                "B07": "Takoma",
+                "B08": "Silver Spring",
+                "B09": "Forest Glen",
+                "B10": "Wheaton",
+                "B11": "Glenmont",
+                "B35": "NoMa-Gallaudet U",
+                "C01": "Metro Center (Orange / Silver / Blue)",
+                "C02": "McPherson Square",
+                "C03": "Farragut West",
+                "C04": "Foggy Bottom-GWU",
+                "C05": "Rosslyn",
+                "C06": "Arlington Cemetery",
+                "C07": "Pentagon",
+                "C08": "Pentagon City",
+                "C09": "Crystal City",
+                "C10": "Ronald Reagan Washington National Airport",
+                "C11": "Potomac Yard",
+                "C12": "Braddock Road",
+                "C13": "King St-Old Town",
+                "C14": "Eisenhower Avenue",
+                "C15": "Huntington",
+                "D01": "Federal Triangle",
+                "D02": "Smithsonian",
+                "D03": "L'Enfant Plaza (Orange / Silver / Blue)",
+                "D04": "Federal Center SW",
+                "D05": "Capitol South",
+                "D06": "Eastern Market",
+                "D07": "Potomac Ave",
+                "D08": "Stadium-Armory",
+                "D09": "Minnesota Ave",
+                "D10": "Deanwood",
+                "D11": "Cheverly",
+                "D12": "Landover",
+                "D13": "New Carrollton",
+                "E01": "Mt Vernon Sq 7th St-Convention Center",
+                "E02": "Shaw-Howard U",
+                "E03": "U Street/African-Amer Civil War Memorial/Cardozo",
+                "E04": "Columbia Heights",
+                "E05": "Georgia Ave-Petworth",
+                "E06": "Fort Totten (Green)",
+                "E07": "West Hyattsville",
+                "E08": "Hyattsville Crossing",
+                "E09": "College Park-U of Md",
+                "E10": "Greenbelt",
+                "F01": "Gallery Pl-Chinatown (Green / Yellow)",
+                "F02": "Archives-Navy Memorial-Penn Quarter",
+                "F03": "L'Enfant Plaza (Green / Yellow)",
+                "F04": "Waterfront",
+                "F05": "Navy Yard-Ballpark",
+                "F06": "Anacostia",
+                "F07": "Congress Heights",
+                "F08": "Southern Avenue",
+                "F09": "Naylor Road",
+                "F10": "Suitland",
+                "F11": "Branch Ave",
+                "G01": "Benning Road",
+                "G02": "Capitol Heights",
+                "G03": "Addison Road-Seat Pleasant",
+                "G04": "Morgan Boulevard",
+                "G05": "Downtown Largo",
+                "J02": "Van Dorn Street",
+                "J03": "Franconia-Springfield",
+                "K01": "Court House",
+                "K02": "Clarendon",
+                "K03": "Virginia Square-GMU",
+                "K04": "Ballston-MU",
+                "K05": "East Falls Church",
+                "K06": "West Falls Church",
+                "K07": "Dunn Loring-Merrifield",
+                "K08": "Vienna/Fairfax-GMU",
+                "N01": "McLean",
+                "N02": "Tysons",
+                "N03": "Greensboro",
+                "N04": "Spring Hill",
+                "N06": "Wiehle-Reston East",
+                "N07": "Reston Town Center",
+                "N08": "Herndon",
+                "N09": "Innovation Center",
+                "N10": "Washington Dulles International Airport",
+                "N11": "Loudoun Gateway",
+                "N12": "Ashburn"
+            };
+
+            const stationDropdown = document.getElementById("station");
+            const sortedStations = Object.entries(stations).sort((a, b) => a[1].localeCompare(b[1]))
+            sortedStations.forEach(([code, name]) => {
+                const option = document.createElement("option");
+                option.value = code;
+                option.textContent = name;
+                stationDropdown.appendChild(option);
+            });
+        });
+        
+
+        async function getTrainPredictions() {
+            const stationCode = document.getElementById('station').value.trim();
+            if (!stationCode) {
+                console.log("No station code")
+                alert('Please enter a station code')
+                return;
+            }
+
+            const apiKey = '2445dcc06eee4693b358c5a8dd302086';
+            const url = `https://api.wmata.com/StationPrediction.svc/json/GetPrediction/${stationCode}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'api_key' : apiKey
+                    }
+                });
+                if (!response.ok) {
+                    
+                    alert("Network error")
+                    return;
+                }
+                const data = await response.json();
+                console.log(data);
+                displayTrains(data.Trains);
+
+            } catch (error) {
+                alert("Error fetching")
+            }
+        }
+
+        function displayTrains(trains) {
+            const tableBody = document.getElementById('train-data');
+            tableBody.innerHTML = '';
+            
+            if (trains.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="3">No trains available.</td></tr>';
+                return;
+            }
+
+            trains.forEach(train => {
+                const arrivalTime = calculateArrivalTime(train.Min);
+                const row = `<tr>
+                    <td>${train.Destination}</td>
+                    <td>${train.Line}</td>
+                    <td>${train.Min}</td>
+                    <td>${arrivalTime}</td>
+                    </tr>`;
+                    tableBody.innerHTML += row;
+            });
+        }
+
+        function calculateArrivalTime(minutes) {
+            if (minutes === "ARR" || minutes === "BRD") {
+                return "Arriving Now";
+            }
+
+            const min = parseInt(minutes)
+            if (isNaN(min)) {
+                return "N/A";
+            }
+
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + min);
+
+            let hours = now.getHours();
+            const minutesFormatted = now.getMinutes().toString().padStart(2, "0");
+            const amPm = hours >= 12 ? "PM" : "AM";
+
+            if (hours > 12) hours -= 12;
+            if (hours === 0) hours = 12;
+            
+            return `${hours}:${minutesFormatted} ${amPm}`;
+        }
+    </script>
+</body>
+</html>

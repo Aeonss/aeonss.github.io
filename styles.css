@@ -1,0 +1,68 @@
+/* ── CSS CUSTOM PROPERTIES ── */
+:root {
+  --bg: #0a0a0b;
+  --bg1: #111113;
+  --bg2: #161618;
+  --bg3: #1c1c1f;
+  --border: #2a2a2e;
+  --bord2: #333338;
+  --red: #e03333;
+  --red-d: rgba(224, 51, 51, 0.12);
+  --red-g: rgba(224, 51, 51, 0.06);
+  --text: #e8e8ec;
+  --text2: #9494a0;
+  --text3: #70707c;
+  --font-sans: "Barlow", sans-serif;
+  --font-display: "Barlow Condensed", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Line colors */
+  --line-RD: #bf0d3e;
+  --line-BL: #009cde;
+  --line-OR: #ed8b00;
+  --line-SV: #919d9d;
+  --line-GR: #00b140;
+  --line-YL: #ffd100;
+}
+
+/* ── RESET ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Barlow", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── GRAIN OVERLAY (pseudo-element — cannot be Tailwind) ── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.3;
+  z-index: 9999;
+}
+
+/* ── SCROLLBAR (vendor-specific — cannot be Tailwind) ── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bord2);
+  border-radius: 2px;
+}

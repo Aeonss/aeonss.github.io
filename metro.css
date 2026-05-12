@@ -1,0 +1,145 @@
+/* ── SELECT (custom arrow via background-image + -webkit-appearance) ── */
+.station-select {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2355555f' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s;
+}
+.station-select:focus {
+  outline: none;
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(224, 51, 51, 0.1);
+}
+
+/* ── DOTS LOADER (keyframe animation) ── */
+@keyframes dotPulse {
+  0%,
+  80%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.7);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.dots-loader {
+  display: none;
+  align-items: center;
+  gap: 5px;
+}
+.dots-loader span {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--red);
+  animation: dotPulse 1.2s ease-in-out infinite;
+}
+.dots-loader span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.dots-loader span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* ── TRAIN ROW (keyframe animation + CSS-var colors) ── */
+@keyframes trainIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.train-row {
+  animation: trainIn 0.3s ease both;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+.train-row:hover {
+  border-color: var(--bord2);
+  background: var(--bg3);
+}
+
+/* Dynamic animation-delay set inline by JS — no Tailwind equivalent */
+
+/* ── FETCH BUTTON (CSS-var color + box-shadow on hover) ── */
+.fetch-btn {
+  background: var(--red);
+  transition:
+    background 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+.fetch-btn:hover {
+  background: #c82828;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(224, 51, 51, 0.25);
+}
+.fetch-btn:active {
+  transform: none;
+}
+
+/* ── CONTROL PANEL / ERROR BAR (CSS-var colors) ── */
+.control-panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+}
+.error-bar {
+  display: none;
+  background: rgba(224, 51, 51, 0.08);
+  border: 1px solid rgba(224, 51, 51, 0.2);
+  color: var(--red);
+}
+
+/* ── MAP IMAGE (filter — no Tailwind standard value) ── */
+.map-section-img {
+  filter: brightness(0.82) saturate(0.9);
+  transition: filter 0.3s;
+}
+.map-section-img:hover {
+  filter: brightness(0.92) saturate(1);
+}
+
+/* ── LINE PILL (color set dynamically inline by JS) ── */
+.line-pill {
+  color: #fff;
+}
+
+/* ── STATUS TEXT ── */
+#status-text strong {
+  color: var(--text);
+}
+
+/* ── TRAIN MIN STATES ── */
+.train-min.arriving {
+  color: var(--red);
+}
+.train-min.boarding {
+  color: #5fe8a0;
+}
+
+/* ── MAP SECTION BORDER/BG ── */
+.map-section {
+  border: 1px solid var(--border);
+}
+.map-label {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  color: var(--text3);
+}

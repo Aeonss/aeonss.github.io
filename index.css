@@ -1,0 +1,156 @@
+/* ── ANIMATIONS (keyframes + opacity:0 initial state) ── */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.main-eyebrow {
+  opacity: 0;
+  animation: fadeUp 0.6s ease 0.2s forwards;
+}
+.main-title {
+  opacity: 0;
+  animation: fadeUp 0.6s ease 0.4s forwards;
+}
+.main-scroll {
+  opacity: 0;
+  animation: fadeUp 0.6s ease 1.2s forwards;
+}
+
+/* Blinking cursor pseudo-element */
+.cursor-bar::after {
+  content: "|";
+  color: var(--red);
+  animation: blink 1s step-end infinite;
+  font-weight: 300;
+}
+
+/* Scroll indicator line (pseudo-element) */
+.main-scroll::after {
+  content: "";
+  width: 1px;
+  height: 36px;
+  background: linear-gradient(to bottom, var(--text3), transparent);
+}
+
+/* ── SECTION DIVIDER (gradient — no Tailwind equivalent) ── */
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, var(--red) 0%, transparent 60%);
+}
+
+/* ── SKILL GROUP LABEL (::after flex rule) ── */
+.skill-group-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── SKILL CARD (CSS-var border/bg + hover transform) ── */
+.skill-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  transition:
+    border-color 0.2s,
+    transform 0.2s,
+    background 0.2s;
+}
+.skill-card:hover {
+  border-color: var(--red);
+  background: var(--bg3);
+  transform: translateY(-2px);
+}
+
+/* ── PROJECT CARD (CSS-var colors + box-shadow on hover) ── */
+.project-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: inherit;
+  transition:
+    border-color 0.22s,
+    transform 0.22s,
+    box-shadow 0.22s;
+}
+.project-card:hover {
+  border-color: var(--red);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Top accent bar fade-in on card hover */
+.project-card-topbar {
+  background: linear-gradient(90deg, var(--red), #ff7070);
+  opacity: 0;
+  transition: opacity 0.22s;
+}
+.project-card:hover .project-card-topbar {
+  opacity: 1;
+}
+
+/* Project image filter */
+.project-img {
+  filter: brightness(0.85) saturate(0.9);
+  transition: filter 0.3s;
+}
+.project-card:hover .project-img {
+  filter: brightness(0.95) saturate(1);
+}
+
+/* ── PROJECT TAG (CSS-var bg/border) ── */
+.ptag {
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+/* ── MINI CARD (CSS-var bg/border) ── */
+.mini-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+}
+.mini-card-topbar {
+  background: linear-gradient(90deg, var(--red), transparent);
+}
+
+/* ── MINI ITEM (CSS-var bg/border + hover states) ── */
+.mini-item {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  transition:
+    border-color 0.18s,
+    background 0.18s;
+}
+.mini-item:hover {
+  border-color: var(--red);
+  background: var(--bg1);
+}
+.mini-item:hover .mini-label {
+  color: var(--red);
+}
+.mini-item:hover .mini-arrow {
+  opacity: 1;
+  color: var(--red);
+}
+
+.mini-label {
+  transition: color 0.18s;
+}
+.mini-arrow {
+  transition: opacity 0.18s;
+}

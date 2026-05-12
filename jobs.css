@@ -1,0 +1,259 @@
+/* ── SEARCH INPUT (::placeholder pseudo + focus box-shadow with CSS-var colors) ── */
+.search-input {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: "Barlow", sans-serif;
+  outline: none;
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s;
+}
+.search-input::placeholder {
+  color: var(--text3);
+}
+.search-input:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(224, 51, 51, 0.1);
+}
+
+/* ── SEARCH BUTTON (CSS-var red + hover box-shadow + :disabled state) ── */
+.search-btn {
+  background: var(--red);
+  transition:
+    background 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+.search-btn:hover {
+  background: #c82828;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(224, 51, 51, 0.25);
+}
+.search-btn:active {
+  transform: none;
+}
+.search-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ── CACHE BUTTONS (CSS-var colors + .danger hover variant) ── */
+.cache-btn {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text3);
+  transition: all 0.15s;
+}
+.cache-btn:hover {
+  border-color: var(--bord2);
+  color: var(--text2);
+}
+.cache-btn.danger:hover {
+  border-color: rgba(224, 51, 51, 0.4);
+  color: var(--red);
+}
+
+/* ── ERROR BOX (display:none sentinel + CSS-var RGBA colors) ── */
+.error-box {
+  display: none;
+  background: rgba(224, 51, 51, 0.08);
+  border: 1px solid rgba(224, 51, 51, 0.2);
+  color: var(--red);
+}
+
+/* ── META LOADER (jobs-specific display:none sentinel + dotPulse reuse) ── */
+.meta-dots-loader {
+  display: none;
+  align-items: center;
+  gap: 6px;
+}
+.meta-dots-loader span {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--red);
+  animation: dotPulse 1.2s ease-in-out infinite;
+}
+.meta-dots-loader span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.meta-dots-loader span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* ── JOB CARD (keyframe + CSS-var colors + hover shadow + opacity states) ── */
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.job-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  animation: cardIn 0.35s ease both;
+  transition:
+    border-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.job-card.is-cached {
+  opacity: 0.72;
+}
+.job-card.is-cached:hover {
+  opacity: 1;
+}
+.job-card:hover {
+  border-color: var(--bord2);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.5);
+}
+.job-card:hover .card-topbar {
+  opacity: 1;
+}
+
+/* ── CARD TOP ACCENT BAR (gradient + opacity 0 → 1 on parent hover) ── */
+.card-topbar {
+  height: 2px;
+  background: linear-gradient(90deg, var(--red) 0%, #ff7070 100%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* ── CARD LOGO / FALLBACK (CSS-var bg/border/color) ── */
+.card-logo {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+}
+.card-logo-fallback {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text3);
+}
+
+/* ── ALL BADGE VARIANTS (raw RGBA + CSS-var combos — not expressible in Tailwind CDN) ── */
+.badge {
+  font-family: "JetBrains Mono", monospace;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.badge-remote {
+  color: #9d84f5;
+  border-color: rgba(157, 132, 245, 0.25);
+  background: rgba(157, 132, 245, 0.08);
+}
+.badge-hybrid {
+  color: var(--red);
+  border-color: rgba(224, 51, 51, 0.25);
+  background: rgba(224, 51, 51, 0.08);
+}
+.badge-onsite {
+  color: var(--text3);
+  border-color: var(--border);
+  background: transparent;
+}
+.badge-new {
+  color: #5fe8a0;
+  border-color: rgba(95, 232, 160, 0.3);
+  background: rgba(95, 232, 160, 0.1);
+}
+.badge-cached {
+  color: var(--text3);
+  border-color: var(--border);
+  background: transparent;
+}
+.badge-senior {
+  color: #f5c542;
+  border-color: rgba(245, 197, 66, 0.25);
+  background: rgba(245, 197, 66, 0.08);
+}
+.badge-mid {
+  color: #60c4f5;
+  border-color: rgba(96, 196, 245, 0.25);
+  background: rgba(96, 196, 245, 0.08);
+}
+.badge-junior {
+  color: #5fe8a0;
+  border-color: rgba(95, 232, 160, 0.25);
+  background: rgba(95, 232, 160, 0.08);
+}
+.badge-manager {
+  color: #c084f5;
+  border-color: rgba(192, 132, 245, 0.25);
+  background: rgba(192, 132, 245, 0.08);
+}
+.badge-generic {
+  color: var(--text3);
+  border-color: var(--border);
+  background: transparent;
+}
+
+/* ── DESC ACCORDION (grid-template-rows 0fr→1fr — no Tailwind equivalent) ── */
+.desc-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s ease;
+}
+.desc-wrap.open {
+  grid-template-rows: 1fr;
+}
+.desc-wrap > div {
+  overflow: hidden;
+}
+
+.desc-toggle-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text3);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.desc-toggle-btn:hover {
+  color: var(--red);
+}
+.desc-toggle-btn svg {
+  transition: transform 0.3s;
+}
+
+/* ── CARD COLORS / BORDERS needing CSS vars ── */
+.card-company {
+  color: var(--red);
+}
+.card-salary {
+  color: #5fe8a0;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 500;
+}
+.card-date {
+  color: var(--text3);
+}
+.card-link {
+  color: var(--text3);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.card-link:hover {
+  color: var(--red);
+}
+.desc-toggle-wrap {
+  border-top: 1px solid var(--border);
+}
+.card-footer {
+  border-top: 1px solid var(--border);
+}
+
+/* ── SECTION DIVIDER LINE (CSS-var bg) ── */
+.section-divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}

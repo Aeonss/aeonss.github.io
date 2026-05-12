@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Metro Tracker</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;900&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Barlow", "sans-serif"],
+              display: ["Barlow Condensed", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="metro.css" />
+    <script src="navbar.js"></script>
+  </head>
+  <body>
+    <!-- NAV -->
+    <site-navbar></site-navbar>
+
+    <!-- MAIN -->
+    <div class="max-w-[760px] mx-auto px-6 pt-24 pb-20">
+      <p
+        class="font-mono text-[9.5px] tracking-[0.3em] uppercase text-[color:var(--text3)] mb-2.5"
+      >
+        WMATA · Live Predictions
+      </p>
+      <h1
+        class="font-display font-bold tracking-[0.06em] uppercase leading-none text-[color:var(--text)] mb-2"
+        style="font-size: clamp(42px, 7vw, 64px)"
+      >
+        DC <em class="text-[color:var(--red)] not-italic">Metro</em
+        ><br />Tracker
+      </h1>
+      <!-- page-sub -->
+      <p
+        class="text-sm font-light text-[color:var(--text3)] mb-9 leading-relaxed"
+      >
+        Real-time train arrivals for every station on the Washington Metro
+        system.
+      </p>
+
+      <!-- Controls -->
+      <div class="control-panel rounded-md p-5 mb-6">
+        <label
+          class="font-mono text-[9.5px] tracking-[0.2em] uppercase text-[color:var(--text3)] mb-2.5 block"
+          for="station"
+          >Select Station</label
+        >
+        <div class="flex gap-2.5">
+          <!-- station-select: appearance + custom arrow stay in CSS -->
+          <select
+            id="station"
+            class="station-select flex-1 font-sans text-sm px-4 py-[11px] rounded cursor-pointer"
+          ></select>
+          <button
+            class="fetch-btn text-white font-display text-sm font-semibold tracking-[0.12em] uppercase px-7 py-[11px] rounded whitespace-nowrap cursor-pointer border-none"
+            onclick="getTrainPredictions()"
+          >
+            Get Trains
+          </button>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <!-- status-bar -->
+      <div
+        class="flex items-center gap-2 font-mono text-[10.5px] text-[color:var(--text3)] min-h-[32px] mb-2"
+      >
+        <div id="loader" class="dots-loader">
+          <span></span><span></span><span></span>
+          <span class="ml-1.5">Fetching predictions…</span>
+        </div>
+        <span id="status-text"></span>
+      </div>
+      <!-- error-bar -->
+      <div
+        id="error-bar"
+        class="error-bar font-mono text-[11px] px-3.5 py-2.5 rounded mb-3"
+      ></div>
+
+      <!-- Train list -->
+      <div class="mt-1">
+        <!-- trains-header -->
+        <div class="flex items-center justify-between mb-3">
+          <span
+            id="trains-count"
+            class="font-mono text-[10px] tracking-[0.2em] uppercase text-[color:var(--red)]"
+          ></span>
+        </div>
+        <div id="trains-list">
+          <!-- trains-empty -->
+          <div class="text-center py-14 text-[color:var(--text3)]">
+            <div class="text-4xl mb-3.5 animate-pulse">🚇</div>
+            <div
+              class="font-display text-2xl font-semibold tracking-[0.08em] uppercase text-[color:var(--text2)] mb-1.5"
+            >
+              Select a Station
+            </div>
+            <div class="text-[13px] font-light">
+              Choose a station above to see live arrivals
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metro Map -->
+      <div class="map-section mt-10 rounded-md overflow-hidden">
+        <div
+          class="map-label font-mono text-[9.5px] tracking-[0.2em] uppercase px-4 py-2.5"
+        >
+          System Map
+        </div>
+        <img
+          class="map-section-img w-full block"
+          src="https://washington.org/sites/default/files/2023-09/Screen%20Shot%202023-09-12%20at%2011.48.18%20AM_0.png"
+          alt="WMATA Metro System Map"
+        />
+      </div>
+    </div>
+    <!-- /page-wrap -->
+
+    <script>
+      /* ── STATIONS ── */
+      const STATIONS = {
+        A01: "Metro Center (Red)",
+        A02: "Farragut North",
+        A03: "Dupont Circle",
+        A04: "Woodley Park-Zoo/Adams Morgan",
+        A05: "Cleveland Park",
+        A06: "Van Ness-UDC",
+        A07: "Tenleytown-AU",
+        A08: "Friendship Heights",
+        A09: "Bethesda",
+        A10: "Medical Center",
+        A11: "Grosvenor-Strathmore",
+        A12: "North Bethesda",
+        A13: "Twinbrook",
+        A14: "Rockville",
+        A15: "Shady Grove",
+        B01: "Gallery Pl-Chinatown (Red)",
+        B02: "Judiciary Square",
+        B03: "Union Station",
+        B04: "Rhode Island Ave-Brentwood",
+        B05: "Brookland-CUA",
+        B06: "Fort Totten (Red)",
+        B07: "Takoma",
+        B08: "Silver Spring",
+        B09: "Forest Glen",
+        B10: "Wheaton",
+        B11: "Glenmont",
+        B35: "NoMa-Gallaudet U",
+        C01: "Metro Center (Blue/Orange/Silver)",
+        C02: "McPherson Square",
+        C03: "Farragut West",
+        C04: "Foggy Bottom-GWU",
+        C05: "Rosslyn",
+        C06: "Arlington Cemetery",
+        C07: "Pentagon",
+        C08: "Pentagon City",
+        C09: "Crystal City",
+        C10: "Reagan National Airport",
+        C11: "Potomac Yard",
+        C12: "Braddock Road",
+        C13: "King St-Old Town",
+        C14: "Eisenhower Avenue",
+        C15: "Huntington",
+        D01: "Federal Triangle",
+        D02: "Smithsonian",
+        D03: "L'Enfant Plaza (Blue/Orange/Silver)",
+        D04: "Federal Center SW",
+        D05: "Capitol South",
+        D06: "Eastern Market",
+        D07: "Potomac Ave",
+        D08: "Stadium-Armory",
+        D09: "Minnesota Ave",
+        D10: "Deanwood",
+        D11: "Cheverly",
+        D12: "Landover",
+        D13: "New Carrollton",
+        E01: "Mt Vernon Sq 7th St-Convention Center",
+        E02: "Shaw-Howard U",
+        E03: "U Street/African-Amer Civil War Memorial/Cardozo",
+        E04: "Columbia Heights",
+        E05: "Georgia Ave-Petworth",
+        E06: "Fort Totten (Green)",
+        E07: "West Hyattsville",
+        E08: "Hyattsville Crossing",
+        E09: "College Park-U of Md",
+        E10: "Greenbelt",
+        F01: "Gallery Pl-Chinatown (Green/Yellow)",
+        F02: "Archives-Navy Memorial-Penn Quarter",
+        F03: "L'Enfant Plaza (Green/Yellow)",
+        F04: "Waterfront",
+        F05: "Navy Yard-Ballpark",
+        F06: "Anacostia",
+        F07: "Congress Heights",
+        F08: "Southern Avenue",
+        F09: "Naylor Road",
+        F10: "Suitland",
+        F11: "Branch Ave",
+        G01: "Benning Road",
+        G02: "Capitol Heights",
+        G03: "Addison Road-Seat Pleasant",
+        G04: "Morgan Boulevard",
+        G05: "Downtown Largo",
+        J02: "Van Dorn Street",
+        J03: "Franconia-Springfield",
+        K01: "Court House",
+        K02: "Clarendon",
+        K03: "Virginia Square-GMU",
+        K04: "Ballston-MU",
+        K05: "East Falls Church",
+        K06: "West Falls Church",
+        K07: "Dunn Loring-Merrifield",
+        K08: "Vienna/Fairfax-GMU",
+        N01: "McLean",
+        N02: "Tysons",
+        N03: "Greensboro",
+        N04: "Spring Hill",
+        N06: "Wiehle-Reston East",
+        N07: "Reston Town Center",
+        N08: "Herndon",
+        N09: "Innovation Center",
+        N10: "Washington Dulles International Airport",
+        N11: "Loudoun Gateway",
+        N12: "Ashburn",
+      };
+
+      const LINE_COLORS = {
+        RD: "#BF0D3E",
+        BL: "#009CDE",
+        OR: "#ED8B00",
+        SV: "#919D9D",
+        GR: "#00B140",
+        YL: "#FFD100",
+        "--": "#333338",
+      };
+      const LINE_LABELS = {
+        RD: "RD",
+        BL: "BL",
+        OR: "OR",
+        SV: "SV",
+        GR: "GR",
+        YL: "YL",
+        "--": "?",
+      };
+
+      /* Populate dropdown */
+      window.addEventListener("DOMContentLoaded", () => {
+        const sel = document.getElementById("station");
+        Object.entries(STATIONS)
+          .sort((a, b) => a[1].localeCompare(b[1]))
+          .forEach(([code, name]) => {
+            const opt = document.createElement("option");
+            opt.value = code;
+            opt.textContent = name;
+            sel.appendChild(opt);
+          });
+      });
+
+      /* Key press on select */
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && document.activeElement.id === "station")
+          getTrainPredictions();
+      });
+
+      /* ── FETCH ── */
+      async function getTrainPredictions() {
+        const stationCode = document.getElementById("station").value;
+        if (!stationCode) return;
+
+        const loader = document.getElementById("loader");
+        const statusTxt = document.getElementById("status-text");
+        const errorBar = document.getElementById("error-bar");
+        const trainList = document.getElementById("trains-list");
+        const count = document.getElementById("trains-count");
+
+        loader.style.display = "flex";
+        statusTxt.textContent = "";
+        errorBar.style.display = "none";
+        trainList.innerHTML = "";
+        count.textContent = "";
+
+        try {
+          const res = await fetch(
+            `https://api.wmata.com/StationPrediction.svc/json/GetPrediction/${stationCode}`,
+            { headers: { api_key: "2445dcc06eee4693b358c5a8dd302086" } },
+          );
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+
+          loader.style.display = "none";
+          const trains = data.Trains || [];
+          const stationName = STATIONS[stationCode] || stationCode;
+
+          if (!trains.length) {
+            statusTxt.textContent = `No trains found for ${stationName}`;
+            trainList.innerHTML = `
+              <div class="text-center py-14 text-[color:var(--text3)]">
+                <div class="text-4xl mb-3.5">🕳️</div>
+                <div class="font-display text-2xl font-semibold tracking-[0.08em] uppercase text-[color:var(--text2)] mb-1.5">No Trains Found</div>
+                <div class="text-[13px] font-light">No upcoming arrivals at this station right now.</div>
+              </div>`;
+            return;
+          }
+
+          statusTxt.innerHTML = `Live data · <strong id="status-strong">${stationName}</strong>`;
+          count.textContent = `${trains.length} train${trains.length !== 1 ? "s" : ""}`;
+          displayTrains(trains);
+        } catch (err) {
+          loader.style.display = "none";
+          errorBar.textContent = `Error: ${err.message}`;
+          errorBar.style.display = "block";
+          trainList.innerHTML = `
+            <div class="text-center py-14 text-[color:var(--text3)]">
+              <div class="text-4xl mb-3.5">⚠️</div>
+              <div class="font-display text-2xl font-semibold tracking-[0.08em] uppercase text-[color:var(--text2)] mb-1.5">Request Failed</div>
+              <div class="text-[13px] font-light">Check network or API key and try again.</div>
+            </div>`;
+        }
+      }
+
+      function displayTrains(trains) {
+        const list = document.getElementById("trains-list");
+        list.innerHTML = "";
+        // trains-list wrapper: flex flex-col gap-1.5
+        const container = document.createElement("div");
+        container.className = "flex flex-col gap-1.5";
+
+        trains.forEach((train, i) => {
+          const lineKey = (train.Line || "--").toUpperCase();
+          const lineColor = LINE_COLORS[lineKey] || LINE_COLORS["--"];
+          const lineLabel = LINE_LABELS[lineKey] || lineKey;
+          const isArr = train.Min === "ARR";
+          const isBrd = train.Min === "BRD";
+          const minCls = isArr
+            ? "train-min arriving"
+            : isBrd
+              ? "train-min boarding"
+              : "train-min";
+          const minDisplay = isArr ? "ARR" : isBrd ? "BRD" : train.Min;
+          // Numeric minutes: colored by line; ARR/BRD: handled by CSS class
+          const minStyle = !isArr && !isBrd ? `color:${lineColor}` : "";
+          const arrTime = calcArrivalTime(train.Min);
+          const textColor = lineKey === "YL" ? "#1a1a00" : "#fff";
+
+          const row = document.createElement("div");
+          // train-row: grid layout + animation in CSS; hover + border/bg in CSS
+          row.className =
+            "train-row rounded grid items-center gap-4 px-[18px] py-3.5";
+          row.style.cssText = `grid-template-columns: auto 1fr auto auto; animation-delay: ${i * 45}ms`;
+          row.innerHTML = `
+            <div class="line-pill w-9 h-9 rounded-full flex items-center justify-center font-display text-[13px] font-bold tracking-[0.05em] flex-shrink-0"
+                 style="background:${lineColor};color:${textColor}">${lineLabel}</div>
+            <div>
+              <div class="text-[15px] font-medium text-[color:var(--text)] whitespace-nowrap overflow-hidden text-ellipsis">${train.Destination || "Unknown"}</div>
+              <div class="font-mono text-[10px] text-[color:var(--text3)] mt-0.5 tracking-[0.06em] uppercase">${train.DestinationName || "—"}</div>
+            </div>
+            <div class="${minCls} font-display text-[28px] font-bold text-right flex-shrink-0 leading-none" style="${minStyle}">${minDisplay}</div>
+            <div class="font-mono text-[11px] text-[color:var(--text3)] text-right flex-shrink-0 min-w-[60px]">${arrTime}</div>
+          `;
+          container.appendChild(row);
+        });
+
+        list.appendChild(container);
+      }
+
+      function calcArrivalTime(minutes) {
+        if (minutes === "ARR") return "Arriving";
+        if (minutes === "BRD") return "Boarding";
+        const min = parseInt(minutes);
+        if (isNaN(min)) return "—";
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + min);
+        let h = now.getHours();
+        const m = now.getMinutes().toString().padStart(2, "0");
+        const ap = h >= 12 ? "PM" : "AM";
+        if (h > 12) h -= 12;
+        if (h === 0) h = 12;
+        return `${h}:${m} ${ap}`;
+      }
+    </script>
+  </body>
+</html>

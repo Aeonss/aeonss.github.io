@@ -1,0 +1,244 @@
+/* ── SCREEN TOGGLE (.screen/.screen.active) ── */
+/* JS adds/removes .active; display:none → display:flex can't be a Tailwind toggle */
+.screen {
+  display: none;
+}
+.screen.active {
+  display: flex;
+}
+
+/* ── ANIMATIONS ── */
+/* fadeUp already defined above for index.html — shared */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes barSlide {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--bw);
+  }
+}
+.fade-up {
+  animation: fadeUp 0.42s ease both;
+}
+.fade-in {
+  animation: fadeIn 0.35s ease both;
+}
+
+/* ── MODE CARDS (CSS-var bg/border + colored hover shadows) ── */
+.mode-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  transition:
+    border-color 0.22s,
+    background 0.22s,
+    transform 0.22s,
+    box-shadow 0.22s;
+}
+.mode-card:hover {
+  transform: translateY(-3px);
+}
+.mode-card.quick:hover {
+  border-color: rgba(224, 51, 51, 0.45);
+  background: rgba(224, 51, 51, 0.05);
+  box-shadow: 0 16px 48px rgba(224, 51, 51, 0.1);
+}
+.mode-card.deep:hover {
+  border-color: rgba(157, 132, 245, 0.45);
+  background: rgba(157, 132, 245, 0.05);
+  box-shadow: 0 16px 48px rgba(157, 132, 245, 0.1);
+}
+
+/* ── PROGRESS BAR (CSS-var gradient) ── */
+.prog-track {
+  background: var(--border);
+}
+.prog-fill {
+  background: linear-gradient(90deg, var(--red) 0%, #ff7070 100%);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── OPTION BUTTONS (CSS-var colors + hover/active states) ── */
+.opt-btn {
+  width: 100%;
+  text-align: left;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-family: "Barlow", sans-serif;
+  transition:
+    border-color 0.18s,
+    color 0.18s,
+    background 0.18s,
+    transform 0.18s;
+}
+.opt-btn:not(.locked):not(.active):hover {
+  border-color: var(--bord2);
+  color: var(--text);
+  background: var(--bg3);
+  transform: translateX(4px);
+}
+.opt-btn.active {
+  border-color: var(--red);
+  color: var(--text);
+  background: rgba(224, 51, 51, 0.08);
+  transform: translateX(4px);
+}
+.opt-btn.active .opt-letter {
+  color: var(--red);
+}
+
+/* ── ARROW NAV BUTTONS (CSS-var colors) ── */
+.arr-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text3);
+  transition:
+    color 0.18s,
+    border-color 0.18s,
+    background 0.18s;
+}
+.arr-btn:not(:disabled):hover {
+  color: var(--text2);
+  border-color: var(--bord2);
+  background: var(--bg2);
+}
+.arr-btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+/* ── NAV DRAWER (CSS-var bg/border + box-shadow + transition for hidden state) ── */
+#nav-drawer {
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  transition:
+    opacity 0.22s,
+    transform 0.22s;
+}
+#nav-drawer.drawer-hidden {
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+}
+
+/* Drawer item hover */
+.d-item {
+  transition: background 0.15s;
+}
+.d-item:hover {
+  background: var(--bg2);
+}
+.d-item.d-cur {
+  background: var(--bg2);
+  outline: 1px solid var(--border);
+}
+.d-item.d-locked {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ── RESULTS BUTTON (CSS-var red + hover shadow) ── */
+.results-btn {
+  background: var(--red);
+  transition:
+    background 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+.results-btn:hover {
+  background: #c82828;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(224, 51, 51, 0.28);
+}
+
+/* ── RESULT CARDS (CSS-var bg/border + staggered animation) ── */
+@keyframes rcIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rc {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  animation: rcIn 0.5s ease both;
+}
+.rc:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.rc:nth-child(2) {
+  animation-delay: 0.18s;
+}
+.rc:nth-child(3) {
+  animation-delay: 0.31s;
+}
+
+/* ── BAR ANIMATIONS (CSS custom property --bw set inline by JS) ── */
+.rc-fill {
+  animation: barSlide 0.9s ease both;
+  animation-delay: 0.5s;
+}
+.rank-fill {
+  animation: barSlide 0.9s ease both;
+  animation-delay: 0.5s;
+}
+
+/* ── RANK TRACK (CSS-var bg) ── */
+.rank-track {
+  background: var(--border);
+}
+.rc-track {
+  background: var(--border);
+}
+
+/* ── ALL RANKINGS TOGGLE (CSS-var colors + display toggle) ── */
+.all-toggle-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text3);
+  transition:
+    color 0.18s,
+    border-color 0.18s,
+    background 0.18s;
+}
+.all-toggle-btn:hover {
+  color: var(--text2);
+  border-color: var(--bord2);
+  background: var(--bg2);
+}
+/* JS toggles .open; display:none → display:flex can't be done with Tailwind class toggling */
+.all-list {
+  display: none;
+}
+.all-list.open {
+  display: flex;
+}
+
+/* ── ACTION BUTTONS (CSS-var colors) ── */
+.action-btn {
+  color: var(--text3);
+  border: 1px solid var(--border);
+  background: transparent;
+  transition:
+    color 0.18s,
+    border-color 0.18s,
+    background 0.18s;
+}
+.action-btn:hover {
+  color: var(--text);
+  border-color: var(--bord2);
+  background: var(--bg2);
+}

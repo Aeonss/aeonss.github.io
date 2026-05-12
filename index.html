@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aeons ago...</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;900&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css"
+    />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Barlow", "sans-serif"],
+              display: ["Barlow Condensed", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="index.css" />
+    <script src="navbar.js"></script>
+  </head>
+  <body>
+    <canvas id="network" class="fixed inset-0 z-0 pointer-events-none"></canvas>
+
+    <!-- NAV -->
+    <site-navbar></site-navbar>
+
+    <!-- MAIN -->
+    <section
+      id="home"
+      class="relative z-[2] h-screen flex flex-col items-center justify-center pointer-events-none"
+    >
+      <div class="text-center pointer-events-none select-none">
+        <!-- eyebrow -->
+        <p
+          class="main-eyebrow font-mono text-[10px] tracking-[0.32em] uppercase text-[color:var(--text3)] mb-[18px]"
+        >
+          <!-- populated by JS typing effect; eyebrow text goes here if needed -->
+        </p>
+        <h1
+          id="main-title"
+          class="main-title cursor-bar font-display font-bold tracking-[0.04em] uppercase leading-[0.92] text-[color:var(--text)] min-h-[1.1em]"
+          style="font-size: clamp(32px, 6vw, 64px)"
+        ></h1>
+      </div>
+
+      <!-- scroll indicator -->
+      <div
+        class="main-scroll absolute bottom-9 left-1/2 -translate-x-1/2 font-mono text-[9px] tracking-[0.3em] uppercase text-[color:var(--text3)] flex flex-col items-center gap-2.5"
+      >
+        scroll
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section
+      id="skills"
+      class="relative z-[2] max-w-[760px] mx-auto px-6 pb-20"
+      style="padding-top: 120px"
+    >
+      <h2
+        class="font-display font-bold tracking-[0.06em] uppercase text-[color:var(--text)] mb-9 leading-[0.95]"
+        style="font-size: clamp(36px, 6vw, 56px)"
+      >
+        Skills
+      </h2>
+      <div class="section-divider mb-9"></div>
+
+      <!-- Languages -->
+      <div class="mb-8">
+        <div
+          class="skill-group-label font-mono text-[9.5px] tracking-[0.22em] uppercase text-[color:var(--text3)] mb-3.5 flex items-center gap-2.5"
+        >
+          Languages
+        </div>
+        <div
+          class="grid gap-2"
+          style="grid-template-columns: repeat(auto-fill, minmax(100px, 1fr))"
+        >
+          <div
+            class="skill-card rounded-md p-4 flex flex-col items-center gap-2.5 cursor-default"
+          >
+            <img
+              src="https://techstack-generator.vercel.app/java-icon.svg"
+              alt="Java"
+              class="w-10 h-10 object-contain"
+            />
+            <span
+              class="font-mono text-[9.5px] tracking-[0.06em] text-[color:var(--text3)] text-center"
+              >Java</span
+            >
+          </div>
+          <div
+            class="skill-card rounded-md p-4 flex flex-col items-center gap-2.5 cursor-default"
+          >
+            <img
+              src="https://techstack-generator.vercel.app/python-icon.svg"
+              alt="Python"
+              class="w-10 h-10 object-contain"
+            />
+            <span
+              class="font-mono text-[9.5px] tracking-[0.06em] text-[color:var(--text3)] text-center"
+              >Python</span
+            >
+          </div>
+          <div
+            class="skill-card rounded-md p-4 flex flex-col items-center gap-2.5 cursor-default"
+          >
+            <img
+              src="https://techstack-generator.vercel.app/ts-icon.svg"
+              alt="TypeScript"
+              class="w-10 h-10 object-contain"
+            />
+            <span
+              class="font-mono text-[9.5px] tracking-[0.06em] text-[color:var(--text3)] text-center"
+              >TypeScript</span
+            >
+          </div>
+          <div
+            class="skill-card rounded-md p-4 flex flex-col items-center gap-2.5 cursor-default"
+          >
+            <img
+              src="https://techstack-generator.vercel.app/js-icon.svg"
+              alt="JavaScript"
+              class="w-10 h-10 object-contain"
+            />
+            <span
+              class="font-mono text-[9.5px] tracking-[0.06em] text-[color:var(--text3)] text-center"
+              >JavaScript</span
+            >
+          </div>
+          <div
+            class="skill-card rounded-md p-4 flex flex-col items-center gap-2.5 cursor-default"
+          >
+            <img
+              src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/azuresqldatabase/azuresqldatabase-original.svg"
+              alt="SQL"
+              class="w-10 h-10 object-contain"
+            />
+            <span
+              class="font-mono text-[9.5px] tracking-[0.06em] text-[color:var(--text3)] text-center"
+              >SQL</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Frameworks -->
+      <div class="mb-8">
+        <div
+          class="skill-group-label font-mono text-[9.5px] tracking-[0.22em] uppercase text-[color:var(--text3)] mb-3.5 flex items-center gap-2.5"
+        >
+          Frameworks
+        </div>
+        <div
+          class="grid gap-2"
+          style="grid-template-columns: repeat(auto-fill, minmax(100px, 1fr))"
+        >
+          <div
+            class="skill-card rounded-md p-4 flex flex-col items-center gap-2.5 cursor-default"
+          >
+            <img
+              src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/angular/angular-original-wordmark.svg"
+              alt="Angular"
+              class="w-10 h-10 object-contain"
+            />
+            <span
+              class="font-mono text-[9.5px] tracking-[0.06em] text-[color:var(--text3)] text-center"
+              >Angular</span
+            >
+          </div>
+          <div
+            class="skill-card rounded-md p-4 flex flex-col items-center gap-2.5 cursor-default"
+          >
+            <img
+              src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/spring/spring-original-wordmark.svg"
+              alt="SpringBoot"
+              class="w-10 h-10 object-contain"
+            />
+            <span
+              class="font-mono text-[9.5px] tracking-[0.06em] text-[color:var(--text3)] text-center"
+              >SpringBoot</span
+            >
+          </div>
+          <div
+            class="skill-card rounded-md p-4 flex flex-col items-center gap-2.5 cursor-default"
+          >
+            <img
+              src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original-wordmark.svg"
+              alt="Tailwind"
+              class="w-10 h-10 object-contain"
+            />
+            <span
+              class="font-mono text-[9.5px] tracking-[0.06em] text-[color:var(--text3)] text-center"
+              >Tailwind</span
+            >
+          </div>
+          <div
+            class="skill-card rounded-md p-4 flex flex-col items-center gap-2.5 cursor-default"
+          >
+            <img
+              src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/junit/junit-plain-wordmark.svg"
+              alt="JUnit"
+              class="w-10 h-10 object-contain"
+            />
+            <span
+              class="font-mono text-[9.5px] tracking-[0.06em] text-[color:var(--text3)] text-center"
+              >JUnit</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Technologies -->
+      <div class="mb-8">
+        <div
+          class="skill-group-label font-mono text-[9.5px] tracking-[0.22em] uppercase text-[color:var(--text3)] mb-3.5 flex items-center gap-2.5"
+        >
+          Technologies
+        </div>
+        <div
+          class="grid gap-2"
+          style="grid-template-columns: repeat(auto-fill, minmax(100px, 1fr))"
+        >
+          <div
+            class="skill-card rounded-md p-4 flex flex-col items-center gap-2.5 cursor-default"
+          >
+            <img
+              src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original-wordmark.svg"
+              alt="PostgreSQL"
+              class="w-10 h-10 object-contain"
+            />
+            <span
+              class="font-mono text-[9.5px] tracking-[0.06em] text-[color:var(--text3)] text-center"
+              >PostgreSQL</span
+            >
+          </div>
+          <div
+            class="skill-card rounded-md p-4 flex flex-col items-center gap-2.5 cursor-default"
+          >
+            <img
+              src="https://techstack-generator.vercel.app/mysql-icon.svg"
+              alt="MySQL"
+              class="w-10 h-10 object-contain"
+            />
+            <span
+              class="font-mono text-[9.5px] tracking-[0.06em] text-[color:var(--text3)] text-center"
+              >MySQL</span
+            >
+          </div>
+          <div
+            class="skill-card rounded-md p-4 flex flex-col items-center gap-2.5 cursor-default"
+          >
+            <img
+              src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/rabbitmq/rabbitmq-original-wordmark.svg"
+              alt="RabbitMQ"
+              class="w-10 h-10 object-contain"
+            />
+            <span
+              class="font-mono text-[9.5px] tracking-[0.06em] text-[color:var(--text3)] text-center"
+              >RabbitMQ</span
+            >
+          </div>
+          <div
+            class="skill-card rounded-md p-4 flex flex-col items-center gap-2.5 cursor-default"
+          >
+            <img
+              src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg"
+              alt="Git"
+              class="w-10 h-10 object-contain"
+            />
+            <span
+              class="font-mono text-[9.5px] tracking-[0.06em] text-[color:var(--text3)] text-center"
+              >Git</span
+            >
+          </div>
+          <div
+            class="skill-card rounded-md p-4 flex flex-col items-center gap-2.5 cursor-default"
+          >
+            <img
+              src="https://techstack-generator.vercel.app/aws-icon.svg"
+              alt="Amazon S3"
+              class="w-10 h-10 object-contain"
+            />
+            <span
+              class="font-mono text-[9.5px] tracking-[0.06em] text-[color:var(--text3)] text-center"
+              >Amazon S3</span
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section
+      id="projects"
+      class="relative z-[2] max-w-[760px] mx-auto px-6 py-20"
+    >
+      <h2
+        class="font-display font-bold tracking-[0.06em] uppercase text-[color:var(--text)] mb-9 leading-[0.95]"
+        style="font-size: clamp(36px, 6vw, 56px)"
+      >
+        Projects
+      </h2>
+      <div class="section-divider mb-9"></div>
+
+      <!-- projects grid: 2-col on wide, 1-col on narrow -->
+      <div class="grid grid-cols-2 gap-2.5 max-[560px]:grid-cols-1">
+        <!-- BubbleBlaster -->
+        <a
+          href="https://github.com/Aeonss/BubbleBlaster"
+          target="_blank"
+          class="project-card rounded-md overflow-hidden flex flex-col no-underline"
+        >
+          <div class="project-card-topbar h-0.5"></div>
+          <img
+            class="project-img w-full h-[180px] object-cover object-top block"
+            src="https://i.imgur.com/jCIFmG6.png"
+            alt="BubbleBlaster"
+          />
+          <div class="project-body p-[18px] flex flex-col gap-2 flex-1">
+            <div
+              class="font-display text-xl font-semibold tracking-[0.04em] uppercase text-[color:var(--text)]"
+            >
+              BubbleBlaster
+            </div>
+            <p
+              class="text-[13px] font-light text-[color:var(--text2)] leading-[1.65] flex-1"
+            >
+              Software for removing text from comics using AI.
+            </p>
+            <div class="flex gap-1.5 flex-wrap mt-1">
+              <span
+                class="ptag inline-flex items-center gap-1 rounded-[3px] px-2 py-0.5 font-mono text-[9.5px] tracking-[0.06em] text-[color:var(--text3)]"
+              >
+                <img
+                  src="https://techstack-generator.vercel.app/python-icon.svg"
+                  class="w-3 h-3 object-contain"
+                />Python
+              </span>
+            </div>
+          </div>
+        </a>
+
+        <!-- StitchTool -->
+        <a
+          href="https://github.com/Aeonss/StitchTool"
+          target="_blank"
+          class="project-card rounded-md overflow-hidden flex flex-col no-underline"
+        >
+          <div class="project-card-topbar h-0.5"></div>
+          <img
+            class="project-img w-full h-[180px] object-cover object-top block"
+            src="https://i.imgur.com/z9Nb5EY.png"
+            alt="StitchTool"
+          />
+          <div class="project-body p-[18px] flex flex-col gap-2 flex-1">
+            <div
+              class="font-display text-xl font-semibold tracking-[0.04em] uppercase text-[color:var(--text)]"
+            >
+              StitchTool
+            </div>
+            <p
+              class="text-[13px] font-light text-[color:var(--text2)] leading-[1.65] flex-1"
+            >
+              Software for stitching, splitting, upscaling, denoising, and
+              watermarking images.
+            </p>
+            <div class="flex gap-1.5 flex-wrap mt-1">
+              <span
+                class="ptag inline-flex items-center gap-1 rounded-[3px] px-2 py-0.5 font-mono text-[9.5px] tracking-[0.06em] text-[color:var(--text3)]"
+              >
+                <img
+                  src="https://techstack-generator.vercel.app/java-icon.svg"
+                  class="w-3 h-3 object-contain"
+                />Java
+              </span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Mini Projects — full width -->
+        <div class="mini-card col-span-full rounded-md overflow-hidden">
+          <div class="mini-card-topbar h-0.5"></div>
+          <div class="p-5">
+            <div
+              class="font-display text-lg font-semibold tracking-[0.04em] uppercase text-[color:var(--text)] mb-3.5"
+            >
+              Mini Projects
+            </div>
+            <div class="grid grid-cols-2 gap-2 max-[480px]:grid-cols-1">
+              <a
+                href="jobs.html"
+                class="mini-item flex items-center gap-2.5 px-3.5 py-3 rounded no-underline"
+              >
+                <div class="flex gap-1 items-center">
+                  <img
+                    src="https://techstack-generator.vercel.app/js-icon.svg"
+                    class="w-4 h-4 object-contain"
+                  />
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg"
+                    class="w-4 h-4 object-contain"
+                  />
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg"
+                    class="w-4 h-4 object-contain"
+                  />
+                </div>
+                <span
+                  class="mini-label font-mono text-[10.5px] tracking-[0.08em] text-[color:var(--text3)]"
+                  >Job Search</span
+                >
+                <span
+                  class="mini-arrow ml-auto font-mono text-[10px] text-[color:var(--text3)] opacity-0"
+                  >→</span
+                >
+              </a>
+
+              <a
+                href="travel-card.html"
+                class="mini-item flex items-center gap-2.5 px-3.5 py-3 rounded no-underline"
+              >
+                <div class="flex gap-1 items-center">
+                  <img
+                    src="https://techstack-generator.vercel.app/js-icon.svg"
+                    class="w-4 h-4 object-contain"
+                  />
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg"
+                    class="w-4 h-4 object-contain"
+                  />
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg"
+                    class="w-4 h-4 object-contain"
+                  />
+                </div>
+                <span
+                  class="mini-label font-mono text-[10.5px] tracking-[0.08em] text-[color:var(--text3)]"
+                  >Travel Card Finder</span
+                >
+                <span
+                  class="mini-arrow ml-auto font-mono text-[10px] text-[color:var(--text3)] opacity-0"
+                  >→</span
+                >
+              </a>
+
+              <a
+                href="metro.html"
+                class="mini-item flex items-center gap-2.5 px-3.5 py-3 rounded no-underline"
+              >
+                <div class="flex gap-1 items-center">
+                  <img
+                    src="https://techstack-generator.vercel.app/js-icon.svg"
+                    class="w-4 h-4 object-contain"
+                  />
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg"
+                    class="w-4 h-4 object-contain"
+                  />
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg"
+                    class="w-4 h-4 object-contain"
+                  />
+                </div>
+                <span
+                  class="mini-label font-mono text-[10.5px] tracking-[0.08em] text-[color:var(--text3)]"
+                  >DC Metro Tracker</span
+                >
+                <span
+                  class="mini-arrow ml-auto font-mono text-[10px] text-[color:var(--text3)] opacity-0"
+                  >→</span
+                >
+              </a>
+              <a
+                href="grocery.html"
+                class="mini-item flex items-center gap-2.5 px-3.5 py-3 rounded no-underline"
+              >
+                <div class="flex gap-1 items-center">
+                  <img
+                    src="https://techstack-generator.vercel.app/js-icon.svg"
+                    class="w-4 h-4 object-contain"
+                  />
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg"
+                    class="w-4 h-4 object-contain"
+                  />
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg"
+                    class="w-4 h-4 object-contain"
+                  />
+                </div>
+                <span
+                  class="mini-label font-mono text-[10.5px] tracking-[0.08em] text-[color:var(--text3)]"
+                  >Grocery Deals</span
+                >
+                <span
+                  class="mini-arrow ml-auto font-mono text-[10px] text-[color:var(--text3)] opacity-0"
+                  >→</span
+                >
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      /* ── CANVAS NETWORK ── */
+      const canvas = document.getElementById("network");
+      const ctx = canvas.getContext("2d");
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener("resize", resize);
+
+      const NUM_DOTS = 90;
+      const dots = [];
+
+      function Dot(x, y, r) {
+        this.x = x;
+        this.y = y;
+        this.r = r;
+        this.vx = (Math.random() - 0.5) * 0.6;
+        this.vy = (Math.random() - 0.5) * 0.6;
+      }
+      Dot.prototype.update = function () {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x - this.r < 0 || this.x + this.r > canvas.width)
+          this.vx *= -1;
+        if (this.y - this.r < 0 || this.y + this.r > canvas.height)
+          this.vy *= -1;
+      };
+      Dot.prototype.draw = function () {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(224,51,51,0.55)";
+        ctx.fill();
+      };
+
+      for (let i = 0; i < NUM_DOTS; i++) {
+        const r = Math.random() * 1.5 + 0.5;
+        dots.push(
+          new Dot(
+            Math.random() * (window.innerWidth - r * 2) + r,
+            Math.random() * (window.innerHeight - r * 2) + r,
+            r,
+          ),
+        );
+      }
+
+      function connectDots() {
+        for (let i = 0; i < dots.length; i++) {
+          for (let j = i + 1; j < dots.length; j++) {
+            const dx = dots[i].x - dots[j].x;
+            const dy = dots[i].y - dots[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 110) {
+              const alpha = 0.12 * (1 - dist / 110);
+              ctx.strokeStyle = `rgba(224,51,51,${alpha})`;
+              ctx.lineWidth = 0.7;
+              ctx.beginPath();
+              ctx.moveTo(dots[i].x, dots[i].y);
+              ctx.lineTo(dots[j].x, dots[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        dots.forEach((d) => {
+          d.update();
+          d.draw();
+        });
+        connectDots();
+      }
+      animate();
+
+      window.addEventListener("mousemove", (e) => {
+        dots.forEach((dot) => {
+          const dx = e.clientX - dot.x;
+          const dy = e.clientY - dot.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 130) {
+            dot.vx = (-dx / 130) * 1.2;
+            dot.vy = (-dy / 130) * 1.2;
+          }
+        });
+      });
+
+      /* ── TYPING EFFECT ── */
+      const titleEl = document.getElementById("main-title");
+      const titleText = "Making stuff...";
+      let idx = 0,
+        typing = true;
+
+      function animateTitle() {
+        if (typing) {
+          titleEl.textContent = titleText.slice(0, idx++);
+          if (idx > titleText.length) {
+            typing = false;
+            idx = titleText.length;
+            setTimeout(animateTitle, 2200);
+          } else setTimeout(animateTitle, 65);
+        } else {
+          titleEl.textContent = titleText.slice(0, idx--);
+          if (idx < 0) {
+            typing = true;
+            idx = 0;
+            setTimeout(animateTitle, 700);
+          } else setTimeout(animateTitle, 38);
+        }
+      }
+      animateTitle();
+
+      /* ── ACTIVE NAV ON SCROLL ── */
+      const sections = document.querySelectorAll("section[id]");
+      const navLinks = document.querySelectorAll('.nav-link[href^="#"]');
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              navLinks.forEach((l) => l.classList.remove("active"));
+              const active = document.querySelector(
+                `.nav-link[href="#${entry.target.id}"]`,
+              );
+              if (active) active.classList.add("active");
+            }
+          });
+        },
+        { threshold: 0.4 },
+      );
+      sections.forEach((s) => observer.observe(s));
+    </script>
+  </body>
+</html>

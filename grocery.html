@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Find Grocery Deals</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;900&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Barlow", "sans-serif"],
+              display: ["Barlow Condensed", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="grocery.css" />
+    <script src="navbar.js"></script>
+  </head>
+  <body>
+    <site-navbar></site-navbar>
+
+    <!-- PAGE WRAP -->
+    <div class="max-w-[900px] mx-auto px-6 pt-16 pb-24 mt-8">
+      <p
+        class="font-mono text-[9.5px] tracking-[0.3em] uppercase text-[color:var(--text3)] mb-2.5"
+      >
+        Flipp API · Live Flyer Data
+      </p>
+      <h1
+        class="font-display font-bold tracking-[0.06em] uppercase leading-none text-[color:var(--text)] mb-2"
+        style="font-size: clamp(40px, 7vw, 64px)"
+      >
+        Nearby <em class="text-[color:var(--red)] not-italic">Grocery</em
+        ><br />Deals
+      </h1>
+      <p
+        class="text-sm font-light text-[color:var(--text3)] mb-9 leading-relaxed"
+      >
+        Enter your zip code and search for any grocery item to find local deals
+        near you.
+      </p>
+
+      <!-- SEARCH PANEL -->
+      <div class="grocery-panel rounded-md p-5 mb-6">
+        <label
+          class="font-mono text-[9.5px] tracking-[0.2em] uppercase text-[color:var(--text3)] mb-2.5 block"
+        >
+          Search Nearby Deals
+        </label>
+        <div class="flex gap-2.5">
+          <input
+            id="zipCodeInput"
+            class="grocery-input w-28 flex-shrink-0 font-sans text-sm px-4 py-[11px] rounded"
+            type="text"
+            placeholder="Zip Code"
+            maxlength="10"
+          />
+          <input
+            id="searchInput"
+            class="grocery-input flex-1 font-sans text-sm px-4 py-[11px] rounded"
+            type="text"
+            placeholder="Search for groceries…"
+          />
+          <button
+            class="grocery-btn font-display text-sm font-semibold tracking-[0.12em] uppercase px-7 py-[11px] rounded border-none text-white cursor-pointer whitespace-nowrap"
+            onclick="searchImages()"
+          >
+            Search
+          </button>
+        </div>
+      </div>
+
+      <!-- STATUS / META -->
+      <div
+        class="flex items-center gap-2 font-mono text-[10.5px] text-[color:var(--text3)] min-h-[32px] mb-2"
+      >
+        <div id="loader" class="grocery-loader" style="display: none">
+          <span></span><span></span><span></span>
+          <span class="ml-1.5">Fetching deals…</span>
+        </div>
+        <span id="metaText"></span>
+      </div>
+
+      <!-- ERROR -->
+      <div
+        id="errorBox"
+        class="grocery-error font-mono text-[11px] px-3.5 py-2.5 rounded mb-3"
+      ></div>
+
+      <!-- RESULTS HEADER -->
+      <div
+        id="resultsHeader"
+        class="hidden flex items-center justify-between mb-3"
+      >
+        <span
+          class="font-mono text-[10px] tracking-[0.2em] uppercase text-[color:var(--text3)]"
+          >Results</span
+        >
+        <span
+          id="resultsCount"
+          class="font-mono text-[10px] text-[color:var(--red)]"
+        ></span>
+      </div>
+
+      <!-- DEALS GRID -->
+      <div
+        id="imageGrid"
+        class="grid gap-3"
+        style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr))"
+      >
+        <!-- empty state -->
+        <div class="col-span-full text-center py-16 text-[color:var(--text3)]">
+          <div class="text-4xl mb-3.5 animate-bounce">🛒</div>
+          <div
+            class="font-display text-2xl font-semibold tracking-[0.08em] uppercase text-[color:var(--text2)] mb-1.5"
+          >
+            Find Local Deals
+          </div>
+          <div class="text-[13px] font-light">
+            Enter your zip code and a grocery item above
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /page-wrap -->
+
+    <script>
+      async function searchImages() {
+        const zipCode = document.getElementById("zipCodeInput").value.trim();
+        const searchQuery = document.getElementById("searchInput").value.trim();
+        if (!zipCode || !searchQuery) return;
+
+        const grid = document.getElementById("imageGrid");
+        const loader = document.getElementById("loader");
+        const metaText = document.getElementById("metaText");
+        const errorBox = document.getElementById("errorBox");
+        const resHeader = document.getElementById("resultsHeader");
+        const resCount = document.getElementById("resultsCount");
+
+        // Reset
+        loader.style.display = "flex";
+        metaText.textContent = "";
+        errorBox.style.display = "none";
+        errorBox.textContent = "";
+        resHeader.classList.add("hidden");
+        grid.innerHTML = "";
+
+        try {
+          const apiUrl = `https://cdn-gateflipp.flippback.com/bf/flipp/items/search?locale=en-us&postal_code=${zipCode}&sid=&q=${encodeURIComponent(searchQuery)}`;
+          const res = await fetch(apiUrl);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          const items = data.items || [];
+
+          loader.style.display = "none";
+
+          if (!items.length) {
+            metaText.textContent = `No deals found for "${searchQuery}" near ${zipCode}`;
+            grid.innerHTML = `
+              <div class="col-span-full text-center py-16 text-[color:var(--text3)]">
+                <div class="text-4xl mb-3.5">🕳️</div>
+                <div class="font-display text-2xl font-semibold tracking-[0.08em] uppercase text-[color:var(--text2)] mb-1.5">No Deals Found</div>
+                <div class="text-[13px] font-light">Try a different item or zip code.</div>
+              </div>`;
+            return;
+          }
+
+          const uniqueImages = new Set();
+          let rendered = 0;
+
+          // Fetch all addresses in parallel then render
+          const withAddresses = await Promise.all(
+            items.map((item) =>
+              getAddressFromFlyerId(item.flyer_id, zipCode)
+                .then((address) => ({ item, address }))
+                .catch(() => ({ item, address: "Address unavailable" })),
+            ),
+          );
+
+          for (const { item, address } of withAddresses) {
+            const imageUrl = item.clean_image_url;
+            if (uniqueImages.has(imageUrl)) continue;
+            uniqueImages.add(imageUrl);
+
+            const currentPrice = Number(item.current_price).toFixed(2);
+            const store = item.merchant_name || "Unknown Store";
+            const itemName = item.name || "Unknown Item";
+            const start = item.valid_from?.substring(0, 10);
+            const expire = item.valid_to?.substring(0, 10);
+            const dateStr = formatDateRange(start, expire);
+
+            // Animate in with delay
+            const delay = Math.min(rendered * 40, 500);
+            const card = document.createElement("div");
+            card.className =
+              "deal-card rounded-md overflow-hidden flex flex-col";
+            card.style.animationDelay = `${delay}ms`;
+            card.innerHTML = `
+              <div class="deal-topbar"></div>
+              ${
+                imageUrl
+                  ? `<img src="${imageUrl}" alt="${itemName}" class="deal-img w-full object-cover block" style="height:160px;object-position:center" />`
+                  : `<div class="w-full flex items-center justify-center text-[color:var(--text3)] font-display text-4xl" style="height:160px;background:var(--bg3)">🛒</div>`
+              }
+              <div class="p-4 flex flex-col gap-2 flex-1">
+                <div class="font-semibold text-[14px] leading-snug text-[color:var(--text)]">${itemName}</div>
+                <div class="deal-price font-mono font-semibold text-[18px]">$${currentPrice}</div>
+                <div class="flex flex-col gap-1 font-mono text-[10.5px] text-[color:var(--text3)]">
+                  <div class="flex items-center gap-1.5">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-50 flex-shrink-0"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    <span class="deal-store">${store}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-50 flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span class="leading-tight">${address}</span>
+                  </div>
+                  ${
+                    dateStr
+                      ? `
+                  <div class="flex items-center gap-1.5">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-50 flex-shrink-0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <span>${dateStr}</span>
+                  </div>`
+                      : ""
+                  }
+                </div>
+              </div>`;
+            grid.appendChild(card);
+            rendered++;
+          }
+
+          // Update header
+          resHeader.classList.remove("hidden");
+          resCount.textContent = `${rendered} deal${rendered !== 1 ? "s" : ""}`;
+          metaText.innerHTML = `<strong style="color:var(--text)">${rendered}</strong> deal${rendered !== 1 ? "s" : ""} for "<strong style="color:var(--text)">${searchQuery}</strong>" near <strong style="color:var(--text)">${zipCode}</strong>`;
+
+          if (!rendered) {
+            grid.innerHTML = `
+              <div class="col-span-full text-center py-16 text-[color:var(--text3)]">
+                <div class="text-4xl mb-3.5">🕳️</div>
+                <div class="font-display text-2xl font-semibold tracking-[0.08em] uppercase text-[color:var(--text2)] mb-1.5">No Deals Found</div>
+                <div class="text-[13px] font-light">Try a different item or zip code.</div>
+              </div>`;
+          }
+        } catch (err) {
+          loader.style.display = "none";
+          errorBox.textContent = `Error: ${err.message}`;
+          errorBox.style.display = "block";
+          grid.innerHTML = `
+            <div class="col-span-full text-center py-16 text-[color:var(--text3)]">
+              <div class="text-4xl mb-3.5">⚠️</div>
+              <div class="font-display text-2xl font-semibold tracking-[0.08em] uppercase text-[color:var(--text2)] mb-1.5">Request Failed</div>
+              <div class="text-[13px] font-light">Check your network and try again.</div>
+            </div>`;
+        }
+      }
+
+      async function getAddressFromFlyerId(flyerId, zipcode) {
+        const url = `https://cdn-gateflipp.flippback.com/bf/flipp/flyers/${flyerId}/info?locale=en-us&postal_code=${zipcode}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const store = data.info?.select_stores?.[0];
+        if (!store) return "Address unavailable";
+        return `${store.address}, ${store.city} ${store.province} ${store.postal_code}`;
+      }
+
+      function formatDateRange(start, expire) {
+        const fmt = (d) => {
+          if (!d) return null;
+          const dt = new Date(d);
+          return (
+            dt.toLocaleString("default", { month: "short" }) +
+            " " +
+            dt.getDate() +
+            ", " +
+            dt.getFullYear()
+          );
+        };
+        const s = fmt(start),
+          e = fmt(expire);
+        if (s && e) return `${s} – ${e}`;
+        if (s) return `From ${s}`;
+        if (e) return `Until ${e}`;
+        return null;
+      }
+
+      // Enter key support
+      ["zipCodeInput", "searchInput"].forEach((id) => {
+        document.getElementById(id).addEventListener("keydown", (e) => {
+          if (e.key === "Enter") searchImages();
+        });
+      });
+    </script>
+  </body>
+</html>

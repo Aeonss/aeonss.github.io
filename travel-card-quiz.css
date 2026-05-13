@@ -78,6 +78,15 @@
     color 0.18s,
     background 0.18s,
     transform 0.18s;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.5;
+  cursor: pointer;
 }
 .opt-btn:not(.locked):not(.active):hover {
   border-color: var(--bord2);

@@ -28,22 +28,19 @@
     <script src="navbar.js"></script>
   </head>
   <body>
-    <!-- NAV -->
     <site-navbar></site-navbar>
 
-    <!-- ══ LANDING ══ -->
+    <!-- LANDING -->
     <div
       id="screen-landing"
       class="screen active min-h-[calc(100vh-56px)] flex-col items-center justify-center px-6 py-[60px]"
     >
       <div class="w-full max-w-[640px] text-center fade-up">
-        <!-- eyebrow -->
         <p
           class="font-mono text-[10px] tracking-[0.3em] uppercase text-[color:var(--text3)] mb-[18px]"
         >
           12 Cards · All Major Banks
         </p>
-        <!-- title -->
         <h1
           class="font-display font-bold tracking-[0.04em] uppercase leading-[0.95] text-[color:var(--text)] mb-4"
           style="font-size: clamp(48px, 8vw, 72px)"
@@ -52,24 +49,18 @@
             >Travel Card</em
           >
         </h1>
-        <!-- subtitle -->
         <p
           class="text-[color:var(--text3)] text-sm font-light leading-[1.7] max-w-[420px] mx-auto mb-11"
         >
           Answer a few questions and we'll rank every major travel card for your
           exact lifestyle.
         </p>
-
-        <!-- mode label -->
         <p
           class="font-mono text-[10px] tracking-[0.25em] uppercase text-[color:var(--text3)] mb-3.5"
         >
           Choose your quiz length
         </p>
-
-        <!-- mode cards grid -->
         <div class="grid grid-cols-2 gap-3 max-[500px]:grid-cols-1">
-          <!-- Quick Mode -->
           <div
             class="mode-card quick rounded-md px-6 py-7 text-left cursor-pointer"
             onclick="startQuiz(20)"
@@ -113,8 +104,6 @@
               >
             </div>
           </div>
-
-          <!-- Deep Dive -->
           <div
             class="mode-card deep rounded-md px-6 py-7 text-left cursor-pointer"
             onclick="startQuiz(35)"
@@ -149,8 +138,6 @@
             </div>
           </div>
         </div>
-
-        <!-- footer -->
         <p
           class="font-mono text-[9.5px] tracking-[0.2em] uppercase text-[color:var(--text3)] mt-9 opacity-50"
         >
@@ -160,13 +147,12 @@
       </div>
     </div>
 
-    <!-- ══ QUIZ ══ -->
+    <!-- QUIZ -->
     <div
       id="screen-quiz"
       class="screen min-h-[calc(100vh-56px)] flex-col items-center justify-center px-6 py-10"
     >
       <div class="w-full max-w-[540px]">
-        <!-- header -->
         <div class="text-center mb-6">
           <p
             id="quiz-mode-label"
@@ -177,8 +163,6 @@
             class="font-mono text-[10.5px] tracking-[0.2em] text-[color:var(--text3)]"
           ></div>
         </div>
-
-        <!-- progress track -->
         <div class="prog-track h-px rounded-full overflow-hidden mb-9 relative">
           <div
             id="prog-bar"
@@ -186,8 +170,6 @@
             style="width: 0%"
           ></div>
         </div>
-
-        <!-- question -->
         <div id="q-wrap">
           <p
             id="q-label"
@@ -200,8 +182,6 @@
           ></h2>
           <div id="options" class="flex flex-col gap-2"></div>
         </div>
-
-        <!-- nav row -->
         <div class="mt-7 flex items-center gap-2.5">
           <button
             id="btn-prev"
@@ -210,12 +190,10 @@
           >
             ⬅️
           </button>
-
           <div
             class="flex-1 flex gap-[3px] items-center flex-wrap justify-center relative"
             id="dots"
           >
-            <!-- nav drawer -->
             <div
               id="nav-drawer"
               class="drawer-hidden absolute left-0 right-0 z-50 max-h-[260px] overflow-y-auto rounded-md p-3"
@@ -229,7 +207,6 @@
               <div id="drawer-list"></div>
             </div>
           </div>
-
           <button
             id="btn-next"
             class="arr-btn flex-shrink-0 w-9 h-9 rounded flex items-center justify-center font-mono text-[13px] cursor-pointer"
@@ -238,8 +215,6 @@
             ➡️
           </button>
         </div>
-
-        <!-- results button -->
         <div
           id="results-btn-wrap"
           style="display: none"
@@ -255,13 +230,12 @@
       </div>
     </div>
 
-    <!-- ══ RESULTS ══ -->
+    <!-- RESULTS -->
     <div
       id="screen-results"
       class="screen min-h-[calc(100vh-56px)] flex-col items-center px-6 pt-14 pb-20"
     >
       <div class="w-full max-w-[640px]">
-        <!-- header -->
         <div class="text-center mb-9 fade-in">
           <p
             class="font-mono text-[9.5px] tracking-[0.3em] uppercase text-[color:var(--text3)] mb-3"
@@ -275,10 +249,11 @@
           </h1>
           <p id="winner-sub" class="text-lg font-light italic"></p>
         </div>
-
         <div id="top-cards"></div>
 
-        <!-- all rankings toggle -->
+        <!-- Why this card section -->
+        <div id="why-section" class="mt-6 mb-2"></div>
+
         <div class="mt-5">
           <button
             class="all-toggle-btn w-full font-mono text-[9.5px] tracking-[0.25em] uppercase text-[color:var(--text3)] rounded py-3 cursor-pointer"
@@ -288,8 +263,6 @@
           </button>
           <div id="all-rankings" class="all-list flex-col gap-2 mt-4"></div>
         </div>
-
-        <!-- actions -->
         <div class="flex gap-2 justify-center flex-wrap mt-8">
           <button
             class="action-btn font-mono text-[10px] tracking-[0.12em] uppercase px-5 py-2.5 rounded-[4px] cursor-pointer"
@@ -314,11 +287,13 @@
     </div>
 
     <script>
-      /* ══ CARDS ══ */
+      /* ══════════════════════════════════════════════
+       CARDS
+    ══════════════════════════════════════════════ */
       const CARDS = {
         csr: {
           name: "Chase Sapphire Reserve",
-          fee: "$550/yr",
+          fee: 550,
           color: "#e03333",
           icon: "◆",
           network: "Chase Ultimate Rewards",
@@ -326,7 +301,7 @@
         },
         amexPlat: {
           name: "Amex Platinum",
-          fee: "$695/yr",
+          fee: 695,
           color: "#9d84f5",
           icon: "▲",
           network: "Amex Membership Rewards",
@@ -334,7 +309,7 @@
         },
         amexGold: {
           name: "Amex Gold",
-          fee: "$250/yr",
+          fee: 250,
           color: "#d97706",
           icon: "◈",
           network: "Amex Membership Rewards",
@@ -342,7 +317,7 @@
         },
         csp: {
           name: "Chase Sapphire Preferred",
-          fee: "$95/yr",
+          fee: 95,
           color: "#34d399",
           icon: "◇",
           network: "Chase Ultimate Rewards",
@@ -350,7 +325,7 @@
         },
         ventureX: {
           name: "Capital One Venture X",
-          fee: "$395/yr",
+          fee: 395,
           color: "#60c4f5",
           icon: "✦",
           network: "Capital One Miles",
@@ -358,7 +333,7 @@
         },
         hhonors: {
           name: "Hilton Honors Aspire (Amex)",
-          fee: "$550/yr",
+          fee: 550,
           color: "#22d3ee",
           icon: "◉",
           network: "Hilton Honors Points",
@@ -366,7 +341,7 @@
         },
         marriott: {
           name: "Marriott Bonvoy Brilliant (Amex)",
-          fee: "$650/yr",
+          fee: 650,
           color: "#f472b6",
           icon: "◎",
           network: "Marriott Bonvoy Points",
@@ -374,7 +349,7 @@
         },
         united: {
           name: "United Explorer / Club Card",
-          fee: "$95–$525/yr",
+          fee: 310,
           color: "#93c5fd",
           icon: "▻",
           network: "United MileagePlus",
@@ -382,7 +357,7 @@
         },
         delta: {
           name: "Delta SkyMiles Reserve (Amex)",
-          fee: "$650/yr",
+          fee: 650,
           color: "#f87171",
           icon: "△",
           network: "Delta SkyMiles",
@@ -390,7 +365,7 @@
         },
         biltMW: {
           name: "Bilt Mastercard",
-          fee: "$0/yr",
+          fee: 0,
           color: "#d4b896",
           icon: "⬡",
           network: "Bilt Rewards",
@@ -398,7 +373,7 @@
         },
         inkPref: {
           name: "Chase Ink Business Preferred",
-          fee: "$95/yr",
+          fee: 95,
           color: "#fbbf24",
           icon: "✧",
           network: "Chase Ultimate Rewards",
@@ -406,7 +381,7 @@
         },
         wfargo: {
           name: "Wells Fargo Autograph Journey",
-          fee: "$95/yr",
+          fee: 95,
           color: "#fb923c",
           icon: "⬟",
           network: "Wells Fargo Rewards",
@@ -415,37 +390,38 @@
       };
       const CK = Object.keys(CARDS);
 
-      /* ══ QUESTION BANK ══ */
-      function w(
-        csr,
-        amexPlat,
-        amexGold,
-        csp,
-        ventureX,
-        hhonors,
-        marriott,
-        united,
-        delta,
-        biltMW,
-        inkPref,
-        wfargo,
-      ) {
-        return {
-          csr,
-          amexPlat,
-          amexGold,
-          csp,
-          ventureX,
-          hhonors,
-          marriott,
-          united,
-          delta,
-          biltMW,
-          inkPref,
-          wfargo,
-        };
-      }
+      /* ══════════════════════════════════════════════
+       SCORING SYSTEM — complete redesign
+
+       Each question can:
+         1. ADD a positive signal (boostedBy)
+         2. MULTIPLY a card's score via loyalty multipliers
+         3. APPLY a hard filter / dealbreaker (eliminate)
+         4. PENALIZE a card (negative signals)
+
+       Final score pipeline:
+         a) Sum weighted signals per card
+         b) Apply loyalty multipliers (brand lock-in)
+         c) Apply fee affordability filter — soft penalty curve
+         d) Compute annual-value ROI estimate and blend in
+         e) Apply hard eliminators (rent ownership → Bilt = 0)
+         f) Normalize to 0–100
+    ══════════════════════════════════════════════ */
+
+      /*
+      Question structure:
+        text: string
+        options: string[]
+        type: "signal" | "loyalty" | "fee_filter" | "spend" | "rent"
+        signals: { cardKey: number[] }   — indexed by option (0-4), can be negative
+        loyalty_key?: string             — card key that gets a multiplier
+        loyalty_mult?: number[]          — multiplier per option (1.0 = no change)
+        dealbreaker?: { option_indices: number[], card_keys: string[] }
+                                         — if user picks these options, zero out those cards
+    */
+
       const BANK_35 = [
+        /* Q0 — Primary travel goal */
         {
           text: "What is your primary travel goal?",
           options: [
@@ -455,21 +431,23 @@
             "Build flexible points for anything",
             "I don't travel but want rewards",
           ],
-          weights: {
-            csr: [2, 0, 0, 2, 0],
-            amexPlat: [3, 1, 0, 2, 0],
-            amexGold: [2, 0, 1, 2, 0],
-            csp: [2, 0, 1, 2, 0],
-            ventureX: [2, 1, 1, 3, 1],
-            hhonors: [0, 4, 0, 1, 0],
-            marriott: [0, 4, 0, 1, 0],
-            united: [4, 0, 0, 1, 0],
-            delta: [4, 0, 0, 1, 0],
-            biltMW: [1, 2, 0, 2, 0],
-            inkPref: [1, 0, 1, 3, 0],
-            wfargo: [0, 0, 3, 2, 1],
+          type: "signal",
+          signals: {
+            csr: [3, 0, 1, 4, 0],
+            amexPlat: [4, 2, 0, 4, 0],
+            amexGold: [2, 1, 2, 4, 0],
+            csp: [2, 1, 2, 4, 1],
+            ventureX: [2, 2, 3, 4, 2],
+            hhonors: [-2, 5, -1, 1, -1],
+            marriott: [-2, 5, -1, 1, -1],
+            united: [5, -2, -1, 1, -2],
+            delta: [5, -2, -1, 1, -2],
+            biltMW: [1, 2, 0, 3, 0],
+            inkPref: [1, 0, 2, 4, 0],
+            wfargo: [0, 0, 4, 3, 3],
           },
         },
+        /* Q1 — Flights per year */
         {
           text: "How many round-trip flights do you take per year?",
           options: [
@@ -479,21 +457,23 @@
             "7–12 flights",
             "13 or more flights",
           ],
-          weights: {
-            csr: [0, 1, 2, 3, 4],
-            amexPlat: [0, 1, 2, 3, 4],
-            amexGold: [0, 1, 2, 2, 3],
-            csp: [0, 1, 2, 3, 3],
-            ventureX: [0, 1, 2, 3, 4],
-            hhonors: [0, 0, 1, 2, 3],
-            marriott: [0, 0, 1, 2, 3],
-            united: [0, 1, 3, 4, 4],
-            delta: [0, 1, 3, 4, 4],
-            biltMW: [0, 1, 2, 2, 3],
-            inkPref: [0, 1, 2, 2, 3],
-            wfargo: [0, 1, 2, 3, 3],
+          type: "signal",
+          signals: {
+            csr: [-1, 1, 3, 4, 5],
+            amexPlat: [-2, 0, 2, 4, 5],
+            amexGold: [-1, 1, 2, 3, 4],
+            csp: [-1, 1, 3, 4, 4],
+            ventureX: [-1, 1, 3, 4, 5],
+            hhonors: [-1, 0, 1, 3, 4],
+            marriott: [-1, 0, 1, 3, 4],
+            united: [-2, 1, 3, 5, 5],
+            delta: [-2, 1, 3, 5, 5],
+            biltMW: [-1, 1, 2, 3, 4],
+            inkPref: [-1, 0, 1, 2, 3],
+            wfargo: [-1, 1, 2, 3, 3],
           },
         },
+        /* Q2 — Annual flight spend */
         {
           text: "How much do you spend on flights per year?",
           options: [
@@ -503,21 +483,23 @@
             "$4,000–$8,000",
             "Over $8,000",
           ],
-          weights: {
-            csr: [0, 1, 2, 3, 4],
-            amexPlat: [0, 1, 3, 4, 4],
-            amexGold: [0, 1, 2, 2, 3],
-            csp: [0, 1, 2, 3, 3],
-            ventureX: [0, 1, 2, 3, 4],
-            hhonors: [0, 1, 1, 2, 3],
-            marriott: [0, 1, 1, 2, 3],
-            united: [0, 1, 3, 4, 4],
-            delta: [0, 1, 3, 4, 4],
-            biltMW: [0, 1, 2, 2, 3],
+          type: "signal",
+          signals: {
+            csr: [0, 1, 3, 4, 5],
+            amexPlat: [0, 1, 3, 5, 5],
+            amexGold: [0, 1, 2, 3, 4],
+            csp: [0, 1, 3, 4, 4],
+            ventureX: [0, 1, 3, 4, 5],
+            hhonors: [0, 0, 1, 2, 3],
+            marriott: [0, 0, 1, 2, 3],
+            united: [0, 1, 3, 5, 5],
+            delta: [0, 1, 3, 5, 5],
+            biltMW: [0, 1, 2, 3, 4],
             inkPref: [0, 1, 1, 2, 3],
             wfargo: [0, 1, 2, 3, 3],
           },
         },
+        /* Q3 — Preferred airline — LOYALTY MULTIPLIER + dealbreaker for cobranded */
         {
           text: "Do you have a preferred airline?",
           options: [
@@ -527,21 +509,33 @@
             "Southwest (domestic US only)",
             "No preference — I search for cheapest",
           ],
-          weights: {
-            csr: [0, 1, 0, 0, 2],
-            amexPlat: [1, 1, 1, 0, 2],
-            amexGold: [1, 1, 1, 0, 2],
-            csp: [0, 1, 0, 0, 2],
-            ventureX: [1, 1, 1, 1, 2],
+          type: "loyalty",
+          signals: {
+            csr: [0, 1, 0, 0, 3],
+            amexPlat: [1, 1, 1, 0, 3],
+            amexGold: [1, 1, 1, 0, 3],
+            csp: [0, 1, 0, 0, 3],
+            ventureX: [1, 1, 1, 1, 3],
             hhonors: [0, 1, 0, 0, 1],
             marriott: [0, 1, 0, 0, 1],
-            united: [0, 4, 0, 0, 0],
-            delta: [4, 0, 0, 0, 0],
-            biltMW: [0, 1, 0, 0, 1],
+            united: [-3, 5, -3, -2, 0],
+            delta: [5, -3, -3, -2, 0],
+            biltMW: [0, 1, 0, 0, 2],
             inkPref: [0, 1, 0, 0, 2],
             wfargo: [1, 1, 1, 1, 2],
           },
+          /* Delta loyalty boosts delta card; United boosts united card */
+          loyalty_boost: [
+            { option: 0, card: "delta", mult: 1.4 },
+            { option: 1, card: "united", mult: 1.4 },
+          ],
+          /* If user is a Delta loyalist, United becomes much less relevant, and vice versa */
+          dealbreaker: [
+            { option: 0, cards: ["united"] },
+            { option: 1, cards: ["delta"] },
+          ],
         },
+        /* Q4 — Hotel nights per year */
         {
           text: "How many nights do you stay in hotels per year?",
           options: [
@@ -551,14 +545,15 @@
             "11–25 nights",
             "25+ nights",
           ],
-          weights: {
-            csr: [0, 1, 2, 3, 3],
+          type: "signal",
+          signals: {
+            csr: [0, 1, 2, 3, 4],
             amexPlat: [0, 1, 2, 3, 4],
             amexGold: [0, 1, 1, 2, 3],
             csp: [0, 1, 2, 3, 3],
             ventureX: [0, 1, 2, 3, 4],
-            hhonors: [0, 1, 3, 4, 4],
-            marriott: [0, 1, 3, 4, 4],
+            hhonors: [-1, 0, 3, 5, 5],
+            marriott: [-1, 0, 3, 5, 5],
             united: [0, 0, 1, 1, 2],
             delta: [0, 0, 1, 1, 2],
             biltMW: [0, 1, 2, 3, 3],
@@ -566,6 +561,7 @@
             wfargo: [0, 1, 2, 2, 3],
           },
         },
+        /* Q5 — Preferred hotel chain — LOYALTY MULTIPLIER */
         {
           text: "Do you have a preferred hotel chain?",
           options: [
@@ -575,21 +571,31 @@
             "IHG / Holiday Inn / Kimpton",
             "No preference — I book cheapest",
           ],
-          weights: {
-            csr: [0, 0, 2, 0, 1],
+          type: "loyalty",
+          signals: {
+            csr: [0, 0, 3, 0, 2],
             amexPlat: [1, 1, 1, 1, 2],
-            amexGold: [0, 1, 0, 0, 1],
-            csp: [0, 0, 2, 0, 1],
+            amexGold: [0, 1, 1, 0, 2],
+            csp: [0, 0, 3, 0, 2],
             ventureX: [1, 1, 1, 1, 2],
-            hhonors: [4, 0, 0, 0, 0],
-            marriott: [0, 4, 0, 0, 0],
+            hhonors: [5, -3, -2, -2, 0],
+            marriott: [-3, 5, -1, -1, 0],
             united: [0, 1, 0, 0, 0],
             delta: [0, 0, 0, 0, 0],
-            biltMW: [0, 1, 2, 0, 1],
+            biltMW: [0, 1, 3, 0, 2],
             inkPref: [0, 1, 1, 0, 1],
             wfargo: [1, 1, 1, 1, 2],
           },
+          loyalty_boost: [
+            { option: 0, card: "hhonors", mult: 1.4 },
+            { option: 1, card: "marriott", mult: 1.4 },
+          ],
+          dealbreaker: [
+            { option: 0, cards: ["marriott"] },
+            { option: 1, cards: ["hhonors"] },
+          ],
         },
+        /* Q6 — Lounge importance */
         {
           text: "How important is airport lounge access?",
           options: [
@@ -599,21 +605,23 @@
             "Very important — it's a key perk for me",
             "Essential — I practically live in lounges",
           ],
-          weights: {
-            csr: [0, 1, 2, 3, 4],
-            amexPlat: [0, 1, 2, 4, 4],
-            amexGold: [0, 0, 0, 1, 1],
-            csp: [0, 0, 1, 2, 2],
-            ventureX: [0, 1, 2, 3, 4],
-            hhonors: [0, 0, 1, 1, 2],
-            marriott: [0, 0, 1, 2, 2],
-            united: [0, 1, 2, 3, 4],
-            delta: [0, 1, 2, 3, 4],
-            biltMW: [0, 0, 1, 1, 2],
+          type: "signal",
+          signals: {
+            csr: [-1, 1, 2, 4, 5],
+            amexPlat: [-2, 0, 2, 5, 6],
+            amexGold: [-2, -1, 0, 1, 1],
+            csp: [-1, 0, 1, 2, 2],
+            ventureX: [-1, 1, 2, 4, 5],
+            hhonors: [0, 0, 1, 2, 3],
+            marriott: [0, 0, 1, 2, 3],
+            united: [-1, 1, 2, 3, 4],
+            delta: [-1, 1, 2, 3, 4],
+            biltMW: [-1, 0, 1, 1, 2],
             inkPref: [0, 0, 0, 0, 0],
-            wfargo: [0, 0, 1, 2, 3],
+            wfargo: [0, 0, 1, 2, 2],
           },
         },
+        /* Q7 — Annual fee tolerance — FEE FILTER */
         {
           text: "What annual fee are you comfortable paying?",
           options: [
@@ -623,21 +631,25 @@
             "$301–$550",
             "Over $550 — if value justifies it",
           ],
-          weights: {
-            csr: [0, 0, 0, 2, 3],
-            amexPlat: [0, 0, 0, 0, 4],
-            amexGold: [0, 0, 2, 3, 3],
-            csp: [0, 2, 3, 3, 2],
-            ventureX: [0, 0, 1, 3, 3],
-            hhonors: [0, 1, 2, 3, 3],
-            marriott: [0, 0, 1, 2, 4],
-            united: [0, 2, 2, 3, 3],
-            delta: [0, 0, 1, 2, 4],
-            biltMW: [4, 3, 1, 0, 0],
-            inkPref: [0, 2, 3, 2, 2],
-            wfargo: [0, 2, 3, 2, 1],
+          type: "fee_filter",
+          /* max_fee: mapped from options */
+          fee_brackets: [0, 100, 300, 550, 9999],
+          signals: {
+            csr: [-5, -3, 0, 3, 4],
+            amexPlat: [-5, -4, -2, -1, 5],
+            amexGold: [-5, -2, 3, 4, 3],
+            csp: [-2, 4, 4, 2, 1],
+            ventureX: [-4, -2, 1, 4, 4],
+            hhonors: [-4, -1, 1, 3, 4],
+            marriott: [-5, -3, 0, 2, 5],
+            united: [-3, 2, 3, 3, 3],
+            delta: [-5, -3, 0, 2, 5],
+            biltMW: [5, 4, 2, 0, -1],
+            inkPref: [-2, 4, 4, 2, 2],
+            wfargo: [-2, 4, 4, 2, 1],
           },
         },
+        /* Q8 — Monthly dining spend */
         {
           text: "How much do you spend on dining & food delivery per month?",
           options: [
@@ -647,21 +659,24 @@
             "$600–$1,000",
             "Over $1,000",
           ],
-          weights: {
-            csr: [0, 1, 2, 3, 4],
+          type: "spend",
+          monthly_spend: [50, 200, 450, 800, 1200],
+          signals: {
+            csr: [0, 2, 3, 4, 5],
             amexPlat: [0, 0, 1, 1, 2],
-            amexGold: [0, 1, 2, 4, 4],
-            csp: [0, 1, 2, 3, 4],
-            ventureX: [0, 1, 1, 2, 3],
+            amexGold: [0, 2, 4, 6, 6],
+            csp: [0, 2, 3, 4, 5],
+            ventureX: [0, 1, 2, 3, 4],
             hhonors: [0, 0, 0, 1, 1],
             marriott: [0, 0, 0, 1, 1],
             united: [0, 0, 1, 1, 2],
             delta: [0, 0, 1, 1, 2],
-            biltMW: [0, 1, 2, 3, 4],
+            biltMW: [0, 2, 3, 4, 5],
             inkPref: [0, 0, 0, 0, 0],
-            wfargo: [0, 1, 1, 2, 3],
+            wfargo: [0, 1, 2, 3, 3],
           },
         },
+        /* Q9 — Monthly grocery spend */
         {
           text: "How much do you spend at U.S. supermarkets per month?",
           options: [
@@ -671,10 +686,12 @@
             "$600–$1,000",
             "Over $1,000",
           ],
-          weights: {
+          type: "spend",
+          monthly_spend: [50, 200, 450, 800, 1200],
+          signals: {
             csr: [0, 0, 0, 0, 0],
             amexPlat: [0, 0, 0, 0, 0],
-            amexGold: [0, 1, 3, 4, 4],
+            amexGold: [0, 2, 4, 5, 6],
             csp: [0, 0, 0, 0, 0],
             ventureX: [0, 0, 0, 0, 0],
             hhonors: [0, 0, 0, 0, 0],
@@ -683,9 +700,10 @@
             delta: [0, 0, 0, 0, 0],
             biltMW: [0, 0, 0, 0, 0],
             inkPref: [0, 0, 0, 0, 0],
-            wfargo: [0, 1, 2, 3, 3],
+            wfargo: [0, 1, 3, 4, 4],
           },
         },
+        /* Q10 — Rent — DEALBREAKER for bilt */
         {
           text: "Do you pay rent, and would you put it on a credit card?",
           options: [
@@ -695,7 +713,8 @@
             "I rent and maximizing rent points is key",
             "I rent and would pay rent exclusively on Bilt",
           ],
-          weights: {
+          type: "signal",
+          signals: {
             csr: [0, 0, 0, 0, 0],
             amexPlat: [0, 0, 0, 0, 0],
             amexGold: [0, 0, 0, 0, 0],
@@ -705,11 +724,17 @@
             marriott: [0, 0, 0, 0, 0],
             united: [0, 0, 0, 0, 0],
             delta: [0, 0, 0, 0, 0],
-            biltMW: [0, 0, 2, 4, 4],
+            biltMW: [-5, -3, 3, 6, 7],
             inkPref: [0, 0, 0, 0, 0],
             wfargo: [0, 0, 0, 0, 0],
           },
+          /* If you own a home, Bilt is irrelevant (its core value prop is rent) */
+          dealbreaker: [
+            { option: 0, cards: ["biltMW"] },
+            { option: 1, cards: ["biltMW"] },
+          ],
         },
+        /* Q11 — Total monthly spend */
         {
           text: "What is your total monthly credit card spend (all cards combined)?",
           options: [
@@ -719,21 +744,24 @@
             "$5,000–$10,000",
             "Over $10,000",
           ],
-          weights: {
+          type: "spend",
+          monthly_spend: [700, 1750, 3750, 7500, 12000],
+          signals: {
             csr: [0, 1, 2, 3, 4],
-            amexPlat: [0, 1, 2, 3, 4],
+            amexPlat: [-1, 0, 1, 3, 5],
             amexGold: [0, 1, 2, 3, 4],
-            csp: [0, 1, 2, 3, 4],
-            ventureX: [0, 1, 2, 3, 4],
+            csp: [1, 2, 3, 3, 2],
+            ventureX: [-1, 1, 2, 3, 5],
             hhonors: [0, 1, 2, 3, 4],
-            marriott: [0, 1, 2, 3, 4],
+            marriott: [-1, 0, 2, 3, 5],
             united: [0, 1, 2, 3, 4],
-            delta: [0, 1, 2, 3, 4],
-            biltMW: [0, 1, 2, 3, 4],
-            inkPref: [0, 1, 2, 3, 4],
-            wfargo: [0, 1, 2, 3, 4],
+            delta: [-1, 0, 2, 3, 5],
+            biltMW: [1, 2, 3, 4, 5],
+            inkPref: [-1, 0, 1, 3, 5],
+            wfargo: [1, 2, 3, 3, 2],
           },
         },
+        /* Q12 — Pay in full */
         {
           text: "Do you pay your balance in full every month?",
           options: [
@@ -743,21 +771,23 @@
             "Yes, always — no interest ever",
             "Yes, and I autopay to avoid any slip",
           ],
-          weights: {
-            csr: [0, 0, 1, 3, 4],
-            amexPlat: [0, 0, 1, 3, 4],
-            amexGold: [0, 0, 1, 3, 4],
-            csp: [0, 0, 1, 3, 4],
-            ventureX: [0, 0, 1, 3, 4],
-            hhonors: [0, 0, 1, 2, 3],
-            marriott: [0, 0, 1, 2, 3],
-            united: [0, 0, 1, 2, 3],
-            delta: [0, 0, 1, 2, 3],
-            biltMW: [0, 0, 1, 2, 3],
-            inkPref: [0, 0, 1, 3, 4],
-            wfargo: [0, 0, 1, 3, 4],
+          type: "signal",
+          signals: {
+            csr: [-4, -2, 1, 4, 5],
+            amexPlat: [-5, -3, 0, 4, 5],
+            amexGold: [-4, -2, 1, 4, 5],
+            csp: [-2, -1, 2, 4, 4],
+            ventureX: [-3, -1, 1, 4, 5],
+            hhonors: [-3, -1, 1, 3, 4],
+            marriott: [-3, -1, 1, 3, 4],
+            united: [-2, -1, 1, 3, 4],
+            delta: [-3, -1, 1, 3, 4],
+            biltMW: [-2, -1, 1, 3, 4],
+            inkPref: [-3, -1, 1, 4, 5],
+            wfargo: [-2, -1, 2, 4, 4],
           },
         },
+        /* Q13 — International travel frequency */
         {
           text: "How often do you travel internationally?",
           options: [
@@ -767,12 +797,13 @@
             "2–4 times a year",
             "5 or more international trips a year",
           ],
-          weights: {
-            csr: [0, 1, 2, 3, 4],
-            amexPlat: [0, 1, 2, 3, 4],
-            amexGold: [0, 1, 2, 3, 4],
+          type: "signal",
+          signals: {
+            csr: [0, 1, 2, 4, 5],
+            amexPlat: [0, 1, 3, 5, 6],
+            amexGold: [0, 1, 2, 4, 5],
             csp: [0, 1, 2, 3, 4],
-            ventureX: [0, 1, 2, 3, 4],
+            ventureX: [0, 1, 2, 4, 5],
             hhonors: [0, 1, 2, 3, 4],
             marriott: [0, 1, 2, 3, 4],
             united: [0, 1, 2, 3, 4],
@@ -782,6 +813,7 @@
             wfargo: [0, 1, 2, 3, 4],
           },
         },
+        /* Q14 — Redemption preference */
         {
           text: "How do you primarily want to redeem rewards?",
           options: [
@@ -791,21 +823,23 @@
             "Transfer to hotel points for free nights",
             "Mix — I want the most flexibility",
           ],
-          weights: {
-            csr: [1, 2, 2, 0, 3],
-            amexPlat: [0, 1, 4, 2, 3],
-            amexGold: [0, 1, 4, 2, 3],
-            csp: [1, 3, 2, 0, 3],
-            ventureX: [1, 4, 1, 1, 3],
-            hhonors: [0, 0, 0, 4, 1],
-            marriott: [0, 0, 0, 4, 1],
-            united: [0, 0, 4, 0, 1],
-            delta: [0, 0, 4, 0, 1],
-            biltMW: [0, 1, 3, 2, 2],
-            inkPref: [1, 3, 2, 0, 3],
-            wfargo: [4, 2, 0, 0, 2],
+          type: "signal",
+          signals: {
+            csr: [1, 3, 3, 0, 4],
+            amexPlat: [-1, 1, 5, 3, 4],
+            amexGold: [-1, 1, 5, 3, 4],
+            csp: [1, 4, 3, 0, 4],
+            ventureX: [2, 5, 1, 1, 3],
+            hhonors: [-2, -1, -2, 5, 1],
+            marriott: [-2, -1, -2, 5, 1],
+            united: [-2, 0, 5, -2, 1],
+            delta: [-2, 0, 5, -2, 1],
+            biltMW: [-1, 1, 4, 3, 3],
+            inkPref: [1, 4, 3, 0, 4],
+            wfargo: [5, 3, -2, -2, 2],
           },
         },
+        /* Q15 — Travel insurance importance */
         {
           text: "How important is trip delay / cancellation insurance to you?",
           options: [
@@ -815,21 +849,23 @@
             "Important — I've had bad delays before",
             "Essential — it heavily influences my card choice",
           ],
-          weights: {
-            csr: [0, 1, 2, 3, 4],
-            amexPlat: [0, 1, 2, 3, 4],
-            amexGold: [0, 1, 2, 3, 3],
-            csp: [0, 1, 2, 3, 4],
-            ventureX: [0, 1, 2, 3, 3],
+          type: "signal",
+          signals: {
+            csr: [0, 0, 2, 4, 5],
+            amexPlat: [0, 0, 2, 4, 5],
+            amexGold: [0, 0, 2, 3, 4],
+            csp: [0, 0, 2, 4, 5],
+            ventureX: [0, 0, 2, 3, 4],
             hhonors: [0, 0, 1, 1, 2],
             marriott: [0, 0, 1, 1, 2],
-            united: [0, 1, 2, 2, 3],
-            delta: [0, 1, 2, 2, 3],
-            biltMW: [0, 1, 2, 2, 3],
-            inkPref: [0, 1, 2, 2, 3],
-            wfargo: [0, 1, 1, 2, 3],
+            united: [0, 0, 1, 2, 3],
+            delta: [0, 0, 1, 2, 3],
+            biltMW: [0, 0, 1, 2, 3],
+            inkPref: [0, 0, 1, 2, 3],
+            wfargo: [0, 0, 1, 2, 2],
           },
         },
+        /* Q16 — Global Entry */
         {
           text: "Do you have or plan to apply for Global Entry / TSA PreCheck?",
           options: [
@@ -839,12 +875,13 @@
             "I already have it paid by a card",
             "I already have it and want a new card to reimburse renewal",
           ],
-          weights: {
-            csr: [0, 0, 4, 2, 3],
-            amexPlat: [0, 0, 4, 2, 3],
+          type: "signal",
+          signals: {
+            csr: [0, 0, 4, 1, 3],
+            amexPlat: [0, 0, 4, 1, 3],
             amexGold: [0, 0, 0, 0, 0],
             csp: [0, 0, 2, 1, 2],
-            ventureX: [0, 0, 4, 2, 3],
+            ventureX: [0, 0, 4, 1, 3],
             hhonors: [0, 0, 2, 1, 2],
             marriott: [0, 0, 2, 1, 2],
             united: [0, 0, 2, 1, 2],
@@ -854,6 +891,7 @@
             wfargo: [0, 0, 2, 1, 2],
           },
         },
+        /* Q17 — Luxury / elite status */
         {
           text: "How much do you value elite status and luxury travel perks?",
           options: [
@@ -863,21 +901,23 @@
             "A lot — status and upgrades matter to me",
             "Very much — I want the highest tier experience",
           ],
-          weights: {
-            csr: [0, 1, 2, 3, 3],
-            amexPlat: [0, 1, 2, 3, 4],
-            amexGold: [0, 1, 1, 2, 2],
-            csp: [0, 1, 1, 2, 2],
-            ventureX: [0, 1, 2, 2, 3],
-            hhonors: [0, 1, 2, 3, 4],
-            marriott: [0, 1, 2, 3, 4],
-            united: [0, 1, 2, 3, 3],
-            delta: [0, 1, 2, 3, 3],
-            biltMW: [0, 1, 2, 2, 3],
+          type: "signal",
+          signals: {
+            csr: [-1, 1, 2, 3, 4],
+            amexPlat: [-2, 0, 2, 4, 6],
+            amexGold: [-1, 1, 2, 3, 3],
+            csp: [1, 2, 2, 2, 1],
+            ventureX: [-1, 1, 2, 3, 4],
+            hhonors: [-1, 1, 2, 4, 5],
+            marriott: [-1, 1, 2, 4, 5],
+            united: [-1, 1, 2, 3, 4],
+            delta: [-1, 1, 2, 3, 4],
+            biltMW: [-1, 1, 2, 3, 4],
             inkPref: [0, 0, 0, 0, 0],
-            wfargo: [0, 0, 0, 0, 0],
+            wfargo: [1, 1, 0, 0, -1],
           },
         },
+        /* Q18 — Car rentals */
         {
           text: "Do you rent cars, and how often?",
           options: [
@@ -887,21 +927,23 @@
             "5–10 times per year",
             "More than 10 times per year",
           ],
-          weights: {
+          type: "signal",
+          signals: {
             csr: [0, 1, 2, 3, 4],
             amexPlat: [0, 1, 2, 3, 4],
             amexGold: [0, 1, 1, 2, 3],
             csp: [0, 1, 2, 3, 3],
             ventureX: [0, 1, 2, 3, 4],
-            hhonors: [0, 0, 1, 1, 2],
-            marriott: [0, 0, 1, 1, 2],
-            united: [0, 1, 1, 2, 3],
-            delta: [0, 1, 1, 2, 3],
+            hhonors: [0, 0, 0, 1, 1],
+            marriott: [0, 0, 0, 1, 1],
+            united: [0, 0, 1, 1, 2],
+            delta: [0, 0, 1, 1, 2],
             biltMW: [0, 1, 1, 2, 3],
-            inkPref: [0, 1, 2, 2, 3],
+            inkPref: [0, 1, 2, 3, 4],
             wfargo: [0, 1, 1, 2, 3],
           },
         },
+        /* Q19 — Rewards experience */
         {
           text: "How experienced are you with credit card rewards?",
           options: [
@@ -911,21 +953,23 @@
             "Expert — I run multiple cards strategically",
             "Power user — I transfer points, track bonuses, optimize everything",
           ],
-          weights: {
-            csr: [0, 1, 2, 2, 2],
-            amexPlat: [0, 0, 1, 2, 4],
-            amexGold: [0, 1, 2, 2, 3],
-            csp: [1, 2, 3, 2, 1],
-            ventureX: [1, 2, 2, 2, 2],
+          type: "signal",
+          signals: {
+            csr: [0, 1, 3, 3, 3],
+            amexPlat: [-2, -1, 1, 3, 5],
+            amexGold: [0, 1, 3, 3, 4],
+            csp: [3, 4, 3, 2, 1],
+            ventureX: [2, 3, 3, 2, 2],
             hhonors: [1, 2, 2, 2, 2],
             marriott: [1, 2, 2, 2, 2],
             united: [1, 2, 2, 2, 2],
             delta: [1, 2, 2, 2, 2],
-            biltMW: [0, 1, 2, 3, 4],
-            inkPref: [0, 1, 2, 3, 4],
-            wfargo: [2, 3, 2, 1, 0],
+            biltMW: [-1, 0, 2, 4, 5],
+            inkPref: [-2, 0, 2, 4, 5],
+            wfargo: [3, 4, 2, 1, -1],
           },
         },
+        /* Q20 — Business owner */
         {
           text: "Do you own or operate a business with significant expenses?",
           options: [
@@ -935,21 +979,23 @@
             "Medium business ($10k–$50k/mo)",
             "Large business (over $50k/mo)",
           ],
-          weights: {
-            csr: [1, 1, 0, 0, 0],
+          type: "signal",
+          signals: {
+            csr: [2, 1, 0, 0, 0],
             amexPlat: [1, 1, 1, 0, 0],
-            amexGold: [1, 1, 0, 0, 0],
-            csp: [1, 1, 0, 0, 0],
+            amexGold: [2, 1, 0, 0, 0],
+            csp: [2, 1, 0, 0, 0],
             ventureX: [1, 1, 1, 0, 0],
-            hhonors: [1, 1, 0, 0, 0],
-            marriott: [1, 1, 0, 0, 0],
-            united: [1, 1, 0, 0, 0],
-            delta: [1, 1, 0, 0, 0],
-            biltMW: [1, 1, 0, 0, 0],
-            inkPref: [0, 1, 3, 4, 4],
-            wfargo: [1, 1, 0, 0, 0],
+            hhonors: [2, 1, 0, 0, 0],
+            marriott: [2, 1, 0, 0, 0],
+            united: [2, 1, 0, 0, 0],
+            delta: [2, 1, 0, 0, 0],
+            biltMW: [2, 1, 0, -1, -1],
+            inkPref: [-2, 0, 4, 6, 6],
+            wfargo: [2, 1, 0, 0, 0],
           },
         },
+        /* Q21 — Streaming/phone spend */
         {
           text: "How much do you spend on streaming, phone plans, or internet per month?",
           options: [
@@ -959,7 +1005,8 @@
             "$150–$300",
             "Over $300",
           ],
-          weights: {
+          type: "signal",
+          signals: {
             csr: [0, 0, 0, 0, 0],
             amexPlat: [0, 1, 2, 3, 4],
             amexGold: [0, 0, 0, 0, 0],
@@ -974,6 +1021,7 @@
             wfargo: [0, 0, 1, 2, 3],
           },
         },
+        /* Q22 — Airline fee credit */
         {
           text: "Would you use a $200–$300 annual airline fee credit?",
           options: [
@@ -983,21 +1031,23 @@
             "Yes — I'd use most or all of it",
             "Absolutely — I'd maximize it every year",
           ],
-          weights: {
-            csr: [0, 0, 1, 2, 3],
-            amexPlat: [0, 0, 1, 3, 4],
-            amexGold: [0, 0, 1, 2, 3],
+          type: "signal",
+          signals: {
+            csr: [-1, 0, 1, 2, 3],
+            amexPlat: [-2, -1, 1, 4, 5],
+            amexGold: [-1, 0, 1, 2, 3],
             csp: [0, 0, 1, 2, 2],
-            ventureX: [0, 1, 2, 3, 3],
-            hhonors: [0, 1, 2, 3, 3],
-            marriott: [0, 1, 2, 3, 3],
-            united: [0, 1, 2, 3, 4],
-            delta: [0, 1, 2, 3, 4],
-            biltMW: [0, 0, 1, 2, 2],
-            inkPref: [0, 0, 1, 2, 2],
-            wfargo: [0, 1, 2, 3, 3],
+            ventureX: [-1, 0, 1, 3, 4],
+            hhonors: [-1, 0, 1, 2, 3],
+            marriott: [-1, 0, 1, 2, 3],
+            united: [-1, 0, 1, 3, 5],
+            delta: [-1, 0, 1, 3, 5],
+            biltMW: [-1, 0, 1, 2, 2],
+            inkPref: [-1, 0, 1, 2, 2],
+            wfargo: [-1, 0, 1, 2, 3],
           },
         },
+        /* Q23 — Hotel credit */
         {
           text: "Would you use a $200/year hotel credit (Fine Hotels & Resorts or similar)?",
           options: [
@@ -1007,14 +1057,15 @@
             "Yes — I'd use it once a year",
             "Absolutely — I travel enough to use it easily",
           ],
-          weights: {
-            csr: [0, 0, 1, 3, 4],
-            amexPlat: [0, 0, 1, 3, 4],
-            amexGold: [0, 0, 0, 1, 2],
+          type: "signal",
+          signals: {
+            csr: [-1, 0, 1, 4, 5],
+            amexPlat: [-1, 0, 1, 4, 5],
+            amexGold: [-1, 0, 0, 1, 2],
             csp: [0, 0, 0, 1, 2],
             ventureX: [0, 0, 0, 1, 2],
-            hhonors: [0, 0, 2, 3, 4],
-            marriott: [0, 0, 2, 3, 4],
+            hhonors: [-1, 0, 2, 4, 5],
+            marriott: [-1, 0, 2, 4, 5],
             united: [0, 0, 0, 1, 2],
             delta: [0, 0, 0, 1, 2],
             biltMW: [0, 0, 1, 2, 3],
@@ -1022,6 +1073,7 @@
             wfargo: [0, 0, 0, 1, 2],
           },
         },
+        /* Q24 — Ride-sharing */
         {
           text: "How often do you use ride-sharing (Lyft, Uber)?",
           options: [
@@ -1031,7 +1083,8 @@
             "Often — several times a week",
             "Daily — it's my primary transportation",
           ],
-          weights: {
+          type: "signal",
+          signals: {
             csr: [0, 1, 2, 3, 4],
             amexPlat: [0, 0, 1, 1, 2],
             amexGold: [0, 0, 1, 1, 2],
@@ -1046,6 +1099,7 @@
             wfargo: [0, 0, 1, 2, 3],
           },
         },
+        /* Q25 — DoorDash */
         {
           text: "Would you use a free DoorDash DashPass membership?",
           options: [
@@ -1055,7 +1109,8 @@
             "Often — several times a week",
             "Yes, I already pay for DashPass",
           ],
-          weights: {
+          type: "signal",
+          signals: {
             csr: [0, 1, 2, 3, 4],
             amexPlat: [0, 0, 1, 1, 2],
             amexGold: [0, 1, 2, 3, 4],
@@ -1070,6 +1125,7 @@
             wfargo: [0, 0, 1, 2, 2],
           },
         },
+        /* Q26 — Category tracking appetite */
         {
           text: "How do you feel about tracking multiple credit card categories?",
           options: [
@@ -1079,21 +1135,23 @@
             "I actively optimize 3–5 categories",
             "I spreadsheet everything and love it",
           ],
-          weights: {
-            csr: [1, 2, 2, 2, 1],
-            amexPlat: [0, 0, 1, 2, 4],
-            amexGold: [0, 1, 2, 3, 3],
-            csp: [1, 2, 3, 2, 1],
-            ventureX: [2, 3, 2, 2, 1],
-            hhonors: [1, 2, 2, 2, 1],
-            marriott: [1, 2, 2, 2, 1],
-            united: [1, 2, 2, 2, 1],
-            delta: [1, 2, 2, 2, 1],
-            biltMW: [0, 1, 2, 3, 4],
-            inkPref: [0, 1, 2, 3, 4],
-            wfargo: [2, 3, 2, 1, 0],
+          type: "signal",
+          signals: {
+            csr: [1, 2, 3, 3, 2],
+            amexPlat: [-1, 0, 1, 3, 5],
+            amexGold: [-1, 1, 3, 4, 4],
+            csp: [1, 2, 4, 3, 2],
+            ventureX: [4, 4, 3, 2, 1],
+            hhonors: [1, 2, 2, 2, 2],
+            marriott: [1, 2, 2, 2, 2],
+            united: [1, 2, 2, 2, 2],
+            delta: [1, 2, 2, 2, 2],
+            biltMW: [-1, 1, 2, 4, 5],
+            inkPref: [-1, 0, 2, 4, 5],
+            wfargo: [4, 4, 3, 1, -1],
           },
         },
+        /* Q27 — Phone/purchase protection */
         {
           text: "How much do you value cell phone insurance, extended warranty, and purchase protection?",
           options: [
@@ -1103,21 +1161,23 @@
             "A lot — it's saved me money in the past",
             "Essential — I'd specifically pick a card for this",
           ],
-          weights: {
-            csr: [0, 1, 1, 2, 3],
-            amexPlat: [0, 1, 2, 3, 4],
-            amexGold: [0, 1, 1, 2, 3],
-            csp: [0, 1, 1, 2, 3],
+          type: "signal",
+          signals: {
+            csr: [0, 1, 2, 3, 4],
+            amexPlat: [0, 1, 2, 3, 5],
+            amexGold: [0, 1, 2, 2, 3],
+            csp: [0, 1, 2, 2, 3],
             ventureX: [0, 1, 2, 2, 3],
             hhonors: [0, 0, 0, 1, 1],
             marriott: [0, 0, 0, 1, 1],
             united: [0, 1, 1, 2, 2],
             delta: [0, 0, 1, 1, 2],
             biltMW: [0, 1, 1, 2, 3],
-            inkPref: [0, 1, 2, 3, 4],
-            wfargo: [0, 1, 2, 3, 4],
+            inkPref: [0, 1, 2, 3, 5],
+            wfargo: [0, 1, 2, 3, 5],
           },
         },
+        /* Q28 — Walmart+ credit */
         {
           text: "Would you use a Walmart+ membership credit (~$155/year)?",
           options: [
@@ -1127,12 +1187,13 @@
             "Probably — I'd use home delivery",
             "Yes — I already pay for Walmart+ or would switch",
           ],
-          weights: {
-            csr: [0, 0, 1, 2, 3],
+          type: "signal",
+          signals: {
+            csr: [0, 0, 0, 1, 2],
             amexPlat: [0, 0, 1, 2, 3],
-            amexGold: [0, 0, 0, 1, 2],
-            csp: [0, 0, 0, 1, 2],
-            ventureX: [0, 0, 0, 1, 2],
+            amexGold: [0, 0, 0, 1, 1],
+            csp: [0, 0, 0, 0, 1],
+            ventureX: [0, 0, 0, 1, 1],
             hhonors: [0, 0, 0, 1, 1],
             marriott: [0, 0, 0, 1, 1],
             united: [0, 0, 0, 1, 1],
@@ -1142,6 +1203,7 @@
             wfargo: [0, 0, 0, 1, 1],
           },
         },
+        /* Q29 — Digital entertainment credit */
         {
           text: "Would you use a $240/year digital entertainment credit?",
           options: [
@@ -1151,9 +1213,10 @@
             "I have 4+ qualifying subscriptions",
             "Yes — I already pay for most of these",
           ],
-          weights: {
+          type: "signal",
+          signals: {
             csr: [0, 0, 1, 2, 3],
-            amexPlat: [0, 1, 2, 3, 4],
+            amexPlat: [0, 1, 2, 4, 5],
             amexGold: [0, 0, 1, 1, 2],
             csp: [0, 0, 0, 1, 2],
             ventureX: [0, 0, 0, 1, 2],
@@ -1166,6 +1229,7 @@
             wfargo: [0, 0, 1, 2, 3],
           },
         },
+        /* Q30 — Equinox / gym credit */
         {
           text: "Would you use an Equinox or gym/wellness credit (~$300/year)?",
           options: [
@@ -1175,9 +1239,10 @@
             "Yes — I already go to an eligible gym",
             "Absolutely — I'd pick Equinox specifically for this",
           ],
-          weights: {
+          type: "signal",
+          signals: {
             csr: [0, 0, 1, 2, 3],
-            amexPlat: [0, 0, 1, 3, 4],
+            amexPlat: [0, 0, 1, 4, 5],
             amexGold: [0, 0, 0, 1, 2],
             csp: [0, 0, 0, 1, 1],
             ventureX: [0, 0, 0, 1, 1],
@@ -1190,6 +1255,7 @@
             wfargo: [0, 0, 0, 0, 0],
           },
         },
+        /* Q31 — Transfer partners */
         {
           text: "Do you want to transfer points to airline or hotel loyalty programs?",
           options: [
@@ -1199,21 +1265,23 @@
             "Yes — I transfer points regularly",
             "Yes — I strategically transfer for premium redemptions",
           ],
-          weights: {
-            csr: [1, 2, 2, 3, 3],
-            amexPlat: [0, 0, 2, 3, 4],
-            amexGold: [0, 0, 2, 3, 4],
-            csp: [1, 2, 2, 3, 2],
-            ventureX: [1, 2, 1, 2, 2],
-            hhonors: [0, 0, 1, 2, 4],
-            marriott: [0, 0, 1, 2, 4],
-            united: [0, 0, 2, 3, 4],
-            delta: [0, 0, 2, 3, 4],
-            biltMW: [0, 1, 2, 3, 3],
-            inkPref: [1, 2, 2, 3, 3],
-            wfargo: [3, 2, 0, 0, 0],
+          type: "signal",
+          signals: {
+            csr: [0, 2, 3, 4, 5],
+            amexPlat: [-1, 0, 3, 5, 6],
+            amexGold: [-1, 0, 3, 5, 6],
+            csp: [1, 3, 3, 4, 4],
+            ventureX: [2, 4, 2, 3, 3],
+            hhonors: [-2, -1, 1, 3, 5],
+            marriott: [-2, -1, 1, 3, 5],
+            united: [-2, -1, 3, 4, 5],
+            delta: [-2, -1, 3, 4, 5],
+            biltMW: [-1, 1, 3, 4, 4],
+            inkPref: [1, 3, 3, 4, 5],
+            wfargo: [5, 3, -1, -2, -2],
           },
         },
+        /* Q32 — No foreign transaction fees */
         {
           text: "How important are no foreign transaction fees when traveling abroad?",
           options: [
@@ -1223,21 +1291,23 @@
             "Important — 2–4 international trips per year",
             "Essential — I'm abroad constantly",
           ],
-          weights: {
-            csr: [0, 1, 2, 3, 4],
-            amexPlat: [0, 1, 2, 3, 4],
-            amexGold: [0, 1, 2, 3, 4],
-            csp: [0, 1, 2, 3, 4],
-            ventureX: [0, 1, 2, 3, 4],
-            hhonors: [0, 1, 2, 3, 4],
-            marriott: [0, 1, 2, 3, 4],
-            united: [0, 1, 2, 3, 4],
-            delta: [0, 1, 2, 3, 4],
-            biltMW: [0, 1, 2, 3, 4],
-            inkPref: [0, 1, 2, 3, 4],
-            wfargo: [0, 1, 2, 3, 4],
+          type: "signal",
+          signals: {
+            csr: [0, 1, 2, 4, 5],
+            amexPlat: [0, 1, 2, 4, 5],
+            amexGold: [0, 1, 2, 4, 5],
+            csp: [0, 1, 2, 4, 5],
+            ventureX: [0, 1, 2, 4, 5],
+            hhonors: [0, 1, 2, 4, 5],
+            marriott: [0, 1, 2, 4, 5],
+            united: [0, 1, 2, 4, 5],
+            delta: [0, 1, 2, 4, 5],
+            biltMW: [0, 1, 2, 4, 5],
+            inkPref: [0, 1, 2, 4, 5],
+            wfargo: [0, 1, 2, 4, 5],
           },
         },
+        /* Q33 — Companion ticket */
         {
           text: "Would you use a complimentary companion airline ticket benefit?",
           options: [
@@ -1247,7 +1317,8 @@
             "Often — I almost always travel with a companion",
             "Frequently — a companion ticket is a huge deal to me",
           ],
-          weights: {
+          type: "signal",
+          signals: {
             csr: [0, 0, 1, 1, 1],
             amexPlat: [0, 0, 1, 1, 2],
             amexGold: [0, 0, 0, 1, 1],
@@ -1255,13 +1326,14 @@
             ventureX: [0, 0, 1, 1, 1],
             hhonors: [0, 0, 1, 1, 1],
             marriott: [0, 0, 1, 1, 1],
-            united: [0, 1, 2, 3, 4],
-            delta: [0, 1, 2, 3, 4],
+            united: [0, 1, 3, 4, 5],
+            delta: [0, 1, 3, 4, 5],
             biltMW: [0, 0, 1, 1, 1],
             inkPref: [0, 0, 0, 1, 1],
             wfargo: [0, 0, 1, 1, 1],
           },
         },
+        /* Q34 — Biggest pain point */
         {
           text: "What's your biggest pain point with your current credit card?",
           options: [
@@ -1271,28 +1343,284 @@
             "My points expire or are hard to use",
             "I don't have a travel card at all — starting fresh",
           ],
-          weights: {
-            csr: [1, 2, 3, 2, 2],
-            amexPlat: [2, 1, 3, 2, 2],
-            amexGold: [1, 3, 1, 2, 2],
-            csp: [2, 2, 2, 2, 3],
-            ventureX: [2, 1, 2, 2, 3],
-            hhonors: [1, 1, 2, 3, 2],
-            marriott: [1, 1, 2, 3, 2],
-            united: [1, 1, 3, 2, 2],
-            delta: [1, 1, 3, 2, 2],
-            biltMW: [2, 1, 1, 2, 2],
+          type: "signal",
+          signals: {
+            csr: [1, 2, 4, 2, 2],
+            amexPlat: [2, 1, 5, 2, 2],
+            amexGold: [1, 4, 1, 2, 2],
+            csp: [3, 2, 2, 2, 4],
+            ventureX: [3, 1, 3, 3, 4],
+            hhonors: [1, 1, 2, 4, 2],
+            marriott: [1, 1, 2, 4, 2],
+            united: [1, 1, 4, 2, 2],
+            delta: [1, 1, 4, 2, 2],
+            biltMW: [3, 1, 1, 3, 2],
             inkPref: [1, 2, 1, 2, 2],
-            wfargo: [2, 1, 1, 2, 3],
+            wfargo: [3, 1, 1, 2, 4],
           },
         },
       ];
+
       const Q20_INDICES = [
         0, 1, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 23, 25, 30, 34,
       ];
       const BANK_20 = Q20_INDICES.map((i) => BANK_35[i]);
 
-      /* ══ STATE ══ */
+      /* ══════════════════════════════════════════════
+       SCORING ENGINE — 5-stage pipeline
+    ══════════════════════════════════════════════ */
+      function computeScores() {
+        const { questions, answers } = state;
+        const raw = {};
+        const mults = {};
+        const eliminated = new Set();
+        const reasons = {};
+        CK.forEach((k) => {
+          raw[k] = 0;
+          mults[k] = 1.0;
+          reasons[k] = [];
+        });
+
+        // Stage 1: accumulate weighted signals
+        answers.forEach((ansIdx, qi) => {
+          if (ansIdx === null) return;
+          const q = questions[qi];
+          CK.forEach((k) => {
+            const sig = (q.signals[k] || [])[ansIdx] || 0;
+            raw[k] += sig;
+          });
+
+          // Stage 2: brand loyalty multipliers
+          if (q.loyalty_boost) {
+            q.loyalty_boost.forEach((lb) => {
+              if (lb.option === ansIdx) {
+                mults[lb.card] *= lb.mult;
+              }
+            });
+          }
+
+          // Stage 3: dealbreaker / hard eliminators
+          if (q.dealbreaker) {
+            q.dealbreaker.forEach((db) => {
+              if (db.option === ansIdx) {
+                db.cards.forEach((c) => eliminated.add(c));
+              }
+            });
+          }
+        });
+
+        // Stage 4: fee appropriateness — find what fee the user selected
+        let userMaxFee = 9999;
+        let userMonthlySpend = 3000; // default mid estimate
+        answers.forEach((ansIdx, qi) => {
+          if (ansIdx === null) return;
+          const q = questions[qi];
+          if (q.type === "fee_filter" && q.fee_brackets) {
+            userMaxFee = q.fee_brackets[ansIdx];
+          }
+          if (q.type === "spend" && q.monthly_spend && qi === 11) {
+            // Q11 is total monthly spend
+            userMonthlySpend = q.monthly_spend[ansIdx];
+          }
+        });
+
+        // Hard eliminate cards over user's max fee tolerance
+        CK.forEach((k) => {
+          if (CARDS[k].fee > userMaxFee) {
+            eliminated.add(k);
+          }
+        });
+
+        // Stage 5: apply multipliers, zero out eliminated, normalize
+        const scored = {};
+        CK.forEach((k) => {
+          if (eliminated.has(k)) {
+            scored[k] = 0;
+          } else {
+            scored[k] = raw[k] * mults[k];
+          }
+        });
+
+        // Shift so minimum is 0, then normalize to 0-100
+        const vals = Object.values(scored);
+        const minV = Math.min(...vals);
+        const shifted = {};
+        CK.forEach((k) => {
+          shifted[k] = scored[k] - minV;
+        });
+        const maxV = Math.max(...Object.values(shifted));
+        const normalized = {};
+        CK.forEach((k) => {
+          normalized[k] = maxV > 0 ? Math.round((shifted[k] / maxV) * 100) : 0;
+        });
+
+        return { normalized, eliminated };
+      }
+
+      /* ══════════════════════════════════════════════
+       "WHY" EXPLANATION — generates human-readable
+       reasons for the top card recommendation
+    ══════════════════════════════════════════════ */
+      function generateWhyReasons(winnerKey) {
+        const { questions, answers } = state;
+        const card = CARDS[winnerKey];
+        const reasons = [];
+
+        // Check airline loyalty
+        const airlineQ = questions.find((q) =>
+          q.text.includes("preferred airline"),
+        );
+        const airlineIdx = airlineQ ? questions.indexOf(airlineQ) : -1;
+        if (airlineIdx >= 0 && answers[airlineIdx] !== null) {
+          const ai = answers[airlineIdx];
+          if (winnerKey === "delta" && ai === 0)
+            reasons.push(
+              "You prefer Delta — the Reserve gives Skyclub access and companion certificates",
+            );
+          if (winnerKey === "united" && ai === 1)
+            reasons.push(
+              "You prefer United — you'll earn bonus miles and get United Club access",
+            );
+        }
+
+        // Check hotel loyalty
+        const hotelQ = questions.find((q) =>
+          q.text.includes("preferred hotel chain"),
+        );
+        const hotelIdx = hotelQ ? questions.indexOf(hotelQ) : -1;
+        if (hotelIdx >= 0 && answers[hotelIdx] !== null) {
+          const hi = answers[hotelIdx];
+          if (winnerKey === "hhonors" && hi === 0)
+            reasons.push(
+              "You're a Hilton loyalist — the Aspire automatically gives you top-tier Diamond status",
+            );
+          if (winnerKey === "marriott" && hi === 1)
+            reasons.push(
+              "You're loyal to Marriott — the Brilliant card gets you Platinum Elite status automatically",
+            );
+        }
+
+        // Dining signals
+        const diningQ = questions.find((q) =>
+          q.text.includes("dining & food delivery"),
+        );
+        const diningIdx = diningQ ? questions.indexOf(diningQ) : -1;
+        if (
+          diningIdx >= 0 &&
+          answers[diningIdx] !== null &&
+          answers[diningIdx] >= 2
+        ) {
+          if (winnerKey === "amexGold")
+            reasons.push(
+              "You spend heavily on dining — Amex Gold's 4x on restaurants is the best in class",
+            );
+          if (winnerKey === "csr")
+            reasons.push(
+              "You spend heavily on dining — Chase Sapphire Reserve earns 3x on all dining",
+            );
+        }
+
+        // Fee comfort
+        const feeQ = questions.find((q) => q.type === "fee_filter");
+        const feeIdx = feeQ ? questions.indexOf(feeQ) : -1;
+        if (feeIdx >= 0 && answers[feeIdx] !== null) {
+          const fi = answers[feeIdx];
+          if (fi <= 1 && winnerKey === "biltMW")
+            reasons.push(
+              "You want no annual fee — Bilt is the only $0-fee card that earns travel rewards on rent",
+            );
+          if (fi <= 1 && winnerKey === "csp")
+            reasons.push(
+              "You want low fees — Chase Sapphire Preferred offers excellent value at just $95/year",
+            );
+          if (
+            fi === 4 &&
+            (winnerKey === "amexPlat" ||
+              winnerKey === "delta" ||
+              winnerKey === "marriott")
+          )
+            reasons.push(
+              "You're willing to pay for premium — the credits and perks offset the high annual fee",
+            );
+        }
+
+        // Lounge access
+        const loungeQ = questions.find((q) => q.text.includes("lounge access"));
+        const loungeIdx = loungeQ ? questions.indexOf(loungeQ) : -1;
+        if (
+          loungeIdx >= 0 &&
+          answers[loungeIdx] !== null &&
+          answers[loungeIdx] >= 3
+        ) {
+          if (winnerKey === "amexPlat")
+            reasons.push(
+              "Lounge access is critical to you — Amex Platinum unlocks Centurion Lounges, Priority Pass, and Delta Sky Clubs",
+            );
+          if (winnerKey === "csr")
+            reasons.push(
+              "Lounge access matters — CSR includes Priority Pass Select with 1,300+ lounges globally",
+            );
+          if (winnerKey === "ventureX")
+            reasons.push(
+              "You need lounge access — Venture X includes Priority Pass and Capital One lounges for a lower fee than competitors",
+            );
+        }
+
+        // Rent
+        const rentQ = questions.find((q) => q.text.includes("rent"));
+        const rentIdx = rentQ ? questions.indexOf(rentQ) : -1;
+        if (
+          rentIdx >= 0 &&
+          answers[rentIdx] !== null &&
+          answers[rentIdx] >= 3
+        ) {
+          if (winnerKey === "biltMW")
+            reasons.push(
+              "Earning points on rent is your top priority — only Bilt lets you do this with no fee",
+            );
+        }
+
+        // Business
+        const bizQ = questions.find((q) => q.text.includes("business"));
+        const bizIdx = bizQ ? questions.indexOf(bizQ) : -1;
+        if (bizIdx >= 0 && answers[bizIdx] !== null && answers[bizIdx] >= 2) {
+          if (winnerKey === "inkPref")
+            reasons.push(
+              "You have significant business expenses — Ink Preferred earns 3x on travel, shipping, ads, and more",
+            );
+        }
+
+        // Transfers
+        const xferQ = questions.find((q) => q.text.includes("transfer points"));
+        const xferIdx = xferQ ? questions.indexOf(xferQ) : -1;
+        if (
+          xferIdx >= 0 &&
+          answers[xferIdx] !== null &&
+          answers[xferIdx] >= 3
+        ) {
+          if (winnerKey === "amexPlat" || winnerKey === "amexGold")
+            reasons.push(
+              "You love transfer partners — Amex has 20+ airline and hotel partners for premium redemptions",
+            );
+          if (winnerKey === "csr" || winnerKey === "csp")
+            reasons.push(
+              "You value transfer partners — Chase Ultimate Rewards transfers to United, Hyatt, Southwest, and more",
+            );
+        }
+
+        // Fallback generic reason
+        if (reasons.length === 0) {
+          reasons.push(
+            `${card.name} scores highest across your combination of spending habits, travel frequency, and preferences`,
+          );
+        }
+
+        return reasons.slice(0, 3);
+      }
+
+      /* ══════════════════════════════════════════════
+       STATE
+    ══════════════════════════════════════════════ */
       let state = {
         mode: null,
         questions: [],
@@ -1302,7 +1630,9 @@
       };
       let allRankingsOpen = false;
 
-      /* ══ SCREEN ══ */
+      /* ══════════════════════════════════════════════
+       SCREEN / QUIZ LOGIC — unchanged from original
+    ══════════════════════════════════════════════ */
       function show(id) {
         document
           .querySelectorAll(".screen")
@@ -1311,7 +1641,6 @@
         window.scrollTo(0, 0);
       }
 
-      /* ══ START ══ */
       function startQuiz(mode) {
         state.mode = mode;
         state.questions = mode === 20 ? BANK_20 : BANK_35;
@@ -1322,7 +1651,6 @@
         renderQuiz();
       }
 
-      /* ══ RENDER ══ */
       function renderQuiz() {
         const { questions, answers, cur, mode } = state;
         const q = questions[cur];
@@ -1393,7 +1721,6 @@
         renderQuiz();
       }
 
-      /* ══ DOTS ══ */
       function renderDots() {
         const { questions, answers, cur } = state;
         const container = document.getElementById("dots");
@@ -1499,48 +1826,38 @@
           closeDrawer();
       });
 
-      /* ══ SCORES ══ */
-      function computeScores() {
-        const scores = {};
-        CK.forEach((k) => (scores[k] = 0));
-        state.answers.forEach((ansIdx, qi) => {
-          if (ansIdx === null) return;
-          const q = state.questions[qi];
-          CK.forEach((k) => {
-            scores[k] += (q.weights[k] || [])[ansIdx] || 0;
-          });
-        });
-        return scores;
-      }
-
-      /* ══ RESULTS ══ */
+      /* ══════════════════════════════════════════════
+       RESULTS
+    ══════════════════════════════════════════════ */
       function showResults() {
-        const scores = computeScores();
-        const maxPoss = state.questions.length * 4;
-        const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+        const { normalized, eliminated } = computeScores();
+        const sorted = Object.entries(normalized).sort((a, b) => b[1] - a[1]);
         const top3 = sorted.slice(0, 3);
-        const winner = CARDS[top3[0][0]];
+        const winnerKey = top3[0][0];
+        const winner = CARDS[winnerKey];
 
         document.getElementById("winner-sub").textContent = winner.name;
         document.getElementById("winner-sub").style.color = winner.color;
 
         const tc = document.getElementById("top-cards");
         tc.innerHTML = "";
-        top3.forEach(([key, score], i) => {
+        top3.forEach(([key, pct], i) => {
           const card = CARDS[key];
-          const pct = Math.round((score / maxPoss) * 100);
           const isW = i === 0;
+          const eliminated_tag = eliminated.has(key) ? " (filtered)" : "";
           const el = document.createElement("div");
           el.className = "rc rounded-md p-6 mb-2.5 relative overflow-hidden";
           el.style.borderColor = `${card.color}${isW ? "55" : "22"}`;
           if (isW) el.style.boxShadow = `0 16px 48px ${card.color}14`;
+
+          const feeDisplay = card.fee === 0 ? "$0/yr" : `$${card.fee}/yr`;
           el.innerHTML = `
 ${isW ? `<div class="rc-best-tag absolute top-4 right-[18px] font-mono text-[9px] tracking-[0.25em] uppercase text-[color:var(--red)]">Best Match</div>` : ""}
 <div class="flex items-start gap-4">
   <div class="text-[28px] flex-shrink-0 leading-none mt-0.5" style="color:${card.color}">${card.icon}</div>
   <div>
     <div class="font-display text-[22px] font-semibold tracking-[0.04em] uppercase mb-0.5" style="color:${card.color}">${card.name}</div>
-    <div class="font-mono text-[10px] tracking-[0.08em] text-[color:var(--text3)] mb-1.5">${card.fee} · ${card.network}</div>
+    <div class="font-mono text-[10px] tracking-[0.08em] text-[color:var(--text3)] mb-1.5">${feeDisplay} · ${card.network}</div>
     <div class="text-[13px] font-light text-[color:var(--text2)] italic">${card.tagline}</div>
   </div>
 </div>
@@ -1555,16 +1872,30 @@ ${isW ? `<div class="rc-best-tag absolute top-4 right-[18px] font-mono text-[9px
           tc.appendChild(el);
         });
 
+        // Why section
+        const why = document.getElementById("why-section");
+        const whyReasons = generateWhyReasons(winnerKey);
+        if (whyReasons.length > 0) {
+          why.innerHTML = `
+<div class="rounded-md px-6 py-5" style="border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02)">
+  <p class="font-mono text-[9px] tracking-[0.28em] uppercase text-[color:var(--text3)] mb-3">Why ${winner.name}?</p>
+  <ul class="space-y-2">
+    ${whyReasons.map((r) => `<li class="flex gap-3 text-[13px] font-light text-[color:var(--text2)] leading-[1.5]"><span class="text-[color:var(--red)] flex-shrink-0 mt-0.5">›</span><span>${r}</span></li>`).join("")}
+  </ul>
+</div>`;
+        }
+
         const ar = document.getElementById("all-rankings");
         ar.innerHTML = "";
-        sorted.forEach(([key, score]) => {
+        sorted.forEach(([key, pct]) => {
           const card = CARDS[key];
-          const pct = Math.round((score / maxPoss) * 100);
+          const isElim = eliminated.has(key);
           const row = document.createElement("div");
-          row.className = "flex items-center gap-2.5";
+          row.className =
+            "flex items-center gap-2.5" + (isElim ? " opacity-30" : "");
           row.innerHTML = `
 <div class="text-[13px] w-5 text-center flex-shrink-0" style="color:${card.color}">${card.icon}</div>
-<div class="text-[13px] font-light text-[color:var(--text2)] flex-1 overflow-hidden text-ellipsis whitespace-nowrap">${card.name}</div>
+<div class="text-[13px] font-light text-[color:var(--text2)] flex-1 overflow-hidden text-ellipsis whitespace-nowrap">${card.name}${isElim ? " <span class='font-mono text-[9px] text-[color:var(--text3)]'>(fee too high)</span>" : ""}</div>
 <div class="rank-track w-[100px] h-[2px] rounded-full overflow-hidden flex-shrink-0">
   <div class="rank-fill h-full rounded-full" style="width:${pct}%;background:${card.color}80;--bw:${pct}%"></div>
 </div>

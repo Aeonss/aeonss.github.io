@@ -288,12 +288,13 @@
 
     <script>
       /* ══════════════════════════════════════════════
-       CARDS
-    ══════════════════════════════════════════════ */
+         CARDS
+      ══════════════════════════════════════════════ */
       const CARDS = {
         csr: {
           name: "Chase Sapphire Reserve",
           fee: 550,
+          effectiveFee: 250, // after $300 travel credit
           color: "#e03333",
           icon: "◆",
           network: "Chase Ultimate Rewards",
@@ -302,6 +303,7 @@
         amexPlat: {
           name: "Amex Platinum",
           fee: 695,
+          effectiveFee: 0, // can approach $0 if all credits used
           color: "#9d84f5",
           icon: "▲",
           network: "Amex Membership Rewards",
@@ -310,6 +312,7 @@
         amexGold: {
           name: "Amex Gold",
           fee: 250,
+          effectiveFee: 10, // after $120 dining + $120 Uber Cash credits
           color: "#d97706",
           icon: "◈",
           network: "Amex Membership Rewards",
@@ -318,6 +321,7 @@
         csp: {
           name: "Chase Sapphire Preferred",
           fee: 95,
+          effectiveFee: 45, // after $50 hotel credit
           color: "#34d399",
           icon: "◇",
           network: "Chase Ultimate Rewards",
@@ -326,6 +330,7 @@
         ventureX: {
           name: "Capital One Venture X",
           fee: 395,
+          effectiveFee: -5, // $300 travel credit + 10k anniversary miles ≈ $400 value
           color: "#60c4f5",
           icon: "✦",
           network: "Capital One Miles",
@@ -334,6 +339,7 @@
         hhonors: {
           name: "Hilton Honors Aspire (Amex)",
           fee: 550,
+          effectiveFee: 100, // after resort + airline credits + free night cert
           color: "#22d3ee",
           icon: "◉",
           network: "Hilton Honors Points",
@@ -342,6 +348,7 @@
         marriott: {
           name: "Marriott Bonvoy Brilliant (Amex)",
           fee: 650,
+          effectiveFee: 150, // after $300 dining credit + free night cert
           color: "#f472b6",
           icon: "◎",
           network: "Marriott Bonvoy Points",
@@ -350,6 +357,7 @@
         united: {
           name: "United Explorer / Club Card",
           fee: 310,
+          effectiveFee: 210, // minimal recurring credits
           color: "#93c5fd",
           icon: "▻",
           network: "United MileagePlus",
@@ -358,6 +366,7 @@
         delta: {
           name: "Delta SkyMiles Reserve (Amex)",
           fee: 650,
+          effectiveFee: 350, // after companion cert + lounge value
           color: "#f87171",
           icon: "△",
           network: "Delta SkyMiles",
@@ -366,6 +375,7 @@
         biltMW: {
           name: "Bilt Mastercard",
           fee: 0,
+          effectiveFee: 0,
           color: "#d4b896",
           icon: "⬡",
           network: "Bilt Rewards",
@@ -374,6 +384,7 @@
         inkPref: {
           name: "Chase Ink Business Preferred",
           fee: 95,
+          effectiveFee: 95,
           color: "#fbbf24",
           icon: "✧",
           network: "Chase Ultimate Rewards",
@@ -382,6 +393,7 @@
         wfargo: {
           name: "Wells Fargo Autograph Journey",
           fee: 95,
+          effectiveFee: 45, // after $50 airline credit
           color: "#fb923c",
           icon: "⬟",
           network: "Wells Fargo Rewards",
@@ -390,38 +402,36 @@
       };
       const CK = Object.keys(CARDS);
 
-      /* ══════════════════════════════════════════════
-       SCORING SYSTEM — complete redesign
-
-       Each question can:
-         1. ADD a positive signal (boostedBy)
-         2. MULTIPLY a card's score via loyalty multipliers
-         3. APPLY a hard filter / dealbreaker (eliminate)
-         4. PENALIZE a card (negative signals)
-
-       Final score pipeline:
-         a) Sum weighted signals per card
-         b) Apply loyalty multipliers (brand lock-in)
-         c) Apply fee affordability filter — soft penalty curve
-         d) Compute annual-value ROI estimate and blend in
-         e) Apply hard eliminators (rent ownership → Bilt = 0)
-         f) Normalize to 0–100
-    ══════════════════════════════════════════════ */
-
       /*
-      Question structure:
-        text: string
-        options: string[]
-        type: "signal" | "loyalty" | "fee_filter" | "spend" | "rent"
-        signals: { cardKey: number[] }   — indexed by option (0-4), can be negative
-        loyalty_key?: string             — card key that gets a multiplier
-        loyalty_mult?: number[]          — multiplier per option (1.0 = no change)
-        dealbreaker?: { option_indices: number[], card_keys: string[] }
-                                         — if user picks these options, zero out those cards
-    */
+        SCORING PHILOSOPHY — redesigned per-card
+
+        Each card has specific "gates" — questions that reveal
+        whether you'll actually use its unique value props.
+        If you can't use the key credits/perks, a high-fee card
+        is a bad deal regardless of other factors.
+
+        Weights are calibrated to reflect real annual value:
+          - Amex Plat: up to $1500+ in credits — but only if used
+          - Amex Gold:  $240 in dining/Uber credits — easy to use
+          - CSR: $300 travel credit — nearly automatic
+          - Venture X: $300 travel + 10k miles — nearly automatic
+          - Bilt: $0 fee but worthless if you own, not rent
+          - Ink: worthless without business expenses
+          - Cobranded (Delta/United/Hilton/Marriott): worthless
+            without loyalty to that specific brand
+
+        Signal scale: -8 to +8
+          ±1-2 = weak influence (barely relevant)
+          ±3-4 = moderate (meaningful differentiator)
+          ±5-6 = strong (core value prop)
+          ±7-8 = decisive (makes or breaks the card for you)
+
+        Negative scores are real — they mean this card
+        is actively a bad fit, not just "not the best."
+      */
 
       const BANK_35 = [
-        /* Q0 — Primary travel goal */
+        /* ── Q0  Primary travel goal ─────────────────── */
         {
           text: "What is your primary travel goal?",
           options: [
@@ -433,21 +443,25 @@
           ],
           type: "signal",
           signals: {
-            csr: [3, 0, 1, 4, 0],
-            amexPlat: [4, 2, 0, 4, 0],
-            amexGold: [2, 1, 2, 4, 0],
-            csp: [2, 1, 2, 4, 1],
-            ventureX: [2, 2, 3, 4, 2],
-            hhonors: [-2, 5, -1, 1, -1],
-            marriott: [-2, 5, -1, 1, -1],
-            united: [5, -2, -1, 1, -2],
-            delta: [5, -2, -1, 1, -2],
-            biltMW: [1, 2, 0, 3, 0],
-            inkPref: [1, 0, 2, 4, 0],
-            wfargo: [0, 0, 4, 3, 3],
+            // Flights: CSR/Plat/Delta/United dominate; hotel cards irrelevant
+            // Flexible: Chase UR and Amex MR are the two best ecosystems
+            // Cash back: Venture X and WF are the only real cash-back-adjacent picks
+            csr: [3, -1, 1, 5, -2],
+            amexPlat: [4, 1, 0, 5, -2],
+            amexGold: [2, 0, 2, 5, -1],
+            csp: [2, 0, 2, 5, 1],
+            ventureX: [2, 2, 4, 4, 2],
+            hhonors: [-2, 6, -1, 0, -2],
+            marriott: [-2, 6, -1, 0, -2],
+            united: [5, -3, -1, 1, -3],
+            delta: [5, -3, -1, 1, -3],
+            biltMW: [1, 1, 0, 4, 0],
+            inkPref: [1, -1, 2, 5, -1],
+            wfargo: [0, 0, 5, 3, 3],
           },
         },
-        /* Q1 — Flights per year */
+
+        /* ── Q1  Flights per year ─────────────────────── */
         {
           text: "How many round-trip flights do you take per year?",
           options: [
@@ -459,21 +473,24 @@
           ],
           type: "signal",
           signals: {
-            csr: [-1, 1, 3, 4, 5],
-            amexPlat: [-2, 0, 2, 4, 5],
+            // Heavy flyers need lounge access, trip protections, and airline perks
+            // Light flyers: CSP / Venture X / WF are fine; Plat/CSR are overkill
+            csr: [-2, 1, 3, 5, 6],
+            amexPlat: [-3, 0, 2, 5, 7],
             amexGold: [-1, 1, 2, 3, 4],
-            csp: [-1, 1, 3, 4, 4],
-            ventureX: [-1, 1, 3, 4, 5],
-            hhonors: [-1, 0, 1, 3, 4],
-            marriott: [-1, 0, 1, 3, 4],
-            united: [-2, 1, 3, 5, 5],
-            delta: [-2, 1, 3, 5, 5],
+            csp: [-1, 2, 4, 4, 3],
+            ventureX: [-1, 1, 3, 5, 6],
+            hhonors: [-1, 0, 2, 3, 4],
+            marriott: [-1, 0, 2, 3, 4],
+            united: [-3, 1, 3, 6, 7],
+            delta: [-3, 1, 3, 6, 7],
             biltMW: [-1, 1, 2, 3, 4],
             inkPref: [-1, 0, 1, 2, 3],
-            wfargo: [-1, 1, 2, 3, 3],
+            wfargo: [-1, 2, 3, 3, 3],
           },
         },
-        /* Q2 — Annual flight spend */
+
+        /* ── Q2  Annual flight spend ─────────────────── */
         {
           text: "How much do you spend on flights per year?",
           options: [
@@ -485,57 +502,63 @@
           ],
           type: "signal",
           signals: {
-            csr: [0, 1, 3, 4, 5],
-            amexPlat: [0, 1, 3, 5, 5],
+            // High flight spend directly justifies expensive cards and cobranded perks
+            // CSR earns 3x on all travel; Amex Plat earns 5x on Amex travel
+            csr: [0, 1, 3, 5, 6],
+            amexPlat: [0, 1, 3, 6, 7],
             amexGold: [0, 1, 2, 3, 4],
-            csp: [0, 1, 3, 4, 4],
-            ventureX: [0, 1, 3, 4, 5],
+            csp: [0, 2, 4, 4, 3],
+            ventureX: [0, 1, 3, 5, 6],
             hhonors: [0, 0, 1, 2, 3],
             marriott: [0, 0, 1, 2, 3],
-            united: [0, 1, 3, 5, 5],
-            delta: [0, 1, 3, 5, 5],
+            united: [0, 1, 3, 6, 7],
+            delta: [0, 1, 3, 6, 7],
             biltMW: [0, 1, 2, 3, 4],
-            inkPref: [0, 1, 1, 2, 3],
-            wfargo: [0, 1, 2, 3, 3],
+            inkPref: [0, 1, 2, 3, 4],
+            wfargo: [0, 2, 3, 3, 3],
           },
         },
-        /* Q3 — Preferred airline — LOYALTY MULTIPLIER + dealbreaker for cobranded */
+
+        /* ── Q3  Home airport / airline — LOYALTY GATE ─ */
         {
-          text: "Do you have a preferred airline?",
+          text: "What best describes your home airport and typical airline?",
           options: [
-            "Delta / SkyTeam",
-            "United / Star Alliance",
-            "American / Oneworld",
-            "Southwest (domestic US only)",
-            "No preference — I search for cheapest",
+            "Delta hub (ATL, MSP, SLC, DTW, BOS, JFK) — I fly Delta",
+            "United hub (ORD, DEN, IAH, EWR, SFO, LAX) — I fly United",
+            "American hub (DFW, CLT, PHX, MIA, ORD) — I fly AA",
+            "Southwest hub — I mostly fly Southwest",
+            "No hub loyalty — I always search for cheapest",
           ],
           type: "loyalty",
           signals: {
-            csr: [0, 1, 0, 0, 3],
+            // Cobranded cards are only good if you fly that airline from a hub
+            // AA has no great cobranded option in our set — steer to UR/MR
+            // Southwest flyers: no dedicated card in set — steer to CSP (transfers to SW)
+            csr: [0, 1, 1, 1, 4],
             amexPlat: [1, 1, 1, 0, 3],
             amexGold: [1, 1, 1, 0, 3],
-            csp: [0, 1, 0, 0, 3],
+            csp: [0, 1, 1, 2, 4],
             ventureX: [1, 1, 1, 1, 3],
             hhonors: [0, 1, 0, 0, 1],
             marriott: [0, 1, 0, 0, 1],
-            united: [-3, 5, -3, -2, 0],
-            delta: [5, -3, -3, -2, 0],
+            united: [-4, 6, -4, -3, 0],
+            delta: [6, -4, -4, -3, 0],
             biltMW: [0, 1, 0, 0, 2],
             inkPref: [0, 1, 0, 0, 2],
             wfargo: [1, 1, 1, 1, 2],
           },
-          /* Delta loyalty boosts delta card; United boosts united card */
           loyalty_boost: [
-            { option: 0, card: "delta", mult: 1.4 },
-            { option: 1, card: "united", mult: 1.4 },
+            { option: 0, card: "delta", mult: 1.45 },
+            { option: 1, card: "united", mult: 1.45 },
           ],
-          /* If user is a Delta loyalist, United becomes much less relevant, and vice versa */
           dealbreaker: [
             { option: 0, cards: ["united"] },
             { option: 1, cards: ["delta"] },
+            { option: 3, cards: ["united", "delta"] },
           ],
         },
-        /* Q4 — Hotel nights per year */
+
+        /* ── Q4  Hotel nights per year ───────────────── */
         {
           text: "How many nights do you stay in hotels per year?",
           options: [
@@ -547,21 +570,24 @@
           ],
           type: "signal",
           signals: {
+            // Hilton/Marriott need heavy hotel use to justify $550–$650 fee
+            // Light hotel users: Hilton/Marriott are nearly irrelevant
             csr: [0, 1, 2, 3, 4],
             amexPlat: [0, 1, 2, 3, 4],
             amexGold: [0, 1, 1, 2, 3],
-            csp: [0, 1, 2, 3, 3],
+            csp: [0, 2, 3, 3, 3],
             ventureX: [0, 1, 2, 3, 4],
-            hhonors: [-1, 0, 3, 5, 5],
-            marriott: [-1, 0, 3, 5, 5],
+            hhonors: [-3, -1, 3, 6, 7],
+            marriott: [-3, -1, 3, 6, 7],
             united: [0, 0, 1, 1, 2],
             delta: [0, 0, 1, 1, 2],
             biltMW: [0, 1, 2, 3, 3],
             inkPref: [0, 0, 1, 1, 2],
-            wfargo: [0, 1, 2, 2, 3],
+            wfargo: [0, 2, 3, 3, 3],
           },
         },
-        /* Q5 — Preferred hotel chain — LOYALTY MULTIPLIER */
+
+        /* ── Q5  Hotel chain — LOYALTY GATE ──────────── */
         {
           text: "Do you have a preferred hotel chain?",
           options: [
@@ -573,29 +599,35 @@
           ],
           type: "loyalty",
           signals: {
-            csr: [0, 0, 3, 0, 2],
-            amexPlat: [1, 1, 1, 1, 2],
+            // Hyatt is a Chase UR transfer partner — the best value in points
+            // IHG has no card in our set; guide to CSP or Venture X
+            // No preference: flexible points cards win (CSR, CSP, Venture X)
+            csr: [0, 0, 5, 0, 3],
+            amexPlat: [1, 1, 0, 1, 2],
             amexGold: [0, 1, 1, 0, 2],
-            csp: [0, 0, 3, 0, 2],
-            ventureX: [1, 1, 1, 1, 2],
-            hhonors: [5, -3, -2, -2, 0],
-            marriott: [-3, 5, -1, -1, 0],
+            csp: [0, 0, 5, 1, 3],
+            ventureX: [1, 1, 0, 1, 3],
+            hhonors: [7, -4, -3, -3, -1],
+            marriott: [-4, 7, -2, -2, -1],
             united: [0, 1, 0, 0, 0],
             delta: [0, 0, 0, 0, 0],
             biltMW: [0, 1, 3, 0, 2],
             inkPref: [0, 1, 1, 0, 1],
-            wfargo: [1, 1, 1, 1, 2],
+            wfargo: [1, 1, 0, 1, 2],
           },
           loyalty_boost: [
-            { option: 0, card: "hhonors", mult: 1.4 },
-            { option: 1, card: "marriott", mult: 1.4 },
+            { option: 0, card: "hhonors", mult: 1.45 },
+            { option: 1, card: "marriott", mult: 1.45 },
           ],
           dealbreaker: [
             { option: 0, cards: ["marriott"] },
             { option: 1, cards: ["hhonors"] },
+            // Hyatt loyalists: Hilton/Marriott cards offer zero value
+            { option: 2, cards: ["hhonors", "marriott"] },
           ],
         },
-        /* Q6 — Lounge importance */
+
+        /* ── Q6  Lounge access importance ────────────── */
         {
           text: "How important is airport lounge access?",
           options: [
@@ -607,21 +639,28 @@
           ],
           type: "signal",
           signals: {
-            csr: [-1, 1, 2, 4, 5],
-            amexPlat: [-2, 0, 2, 5, 6],
-            amexGold: [-2, -1, 0, 1, 1],
-            csp: [-1, 0, 1, 2, 2],
-            ventureX: [-1, 1, 2, 4, 5],
-            hhonors: [0, 0, 1, 2, 3],
-            marriott: [0, 0, 1, 2, 3],
-            united: [-1, 1, 2, 3, 4],
-            delta: [-1, 1, 2, 3, 4],
-            biltMW: [-1, 0, 1, 1, 2],
-            inkPref: [0, 0, 0, 0, 0],
-            wfargo: [0, 0, 1, 2, 2],
+            // Amex Plat: Centurion + Priority Pass + Delta Sky Club = best lounge access
+            // CSR: Priority Pass Select (1,300+ lounges) — strong runner-up
+            // Venture X: Priority Pass + Capital One lounges (growing network)
+            // United/Delta: only their own lounges — narrower access
+            // Amex Gold: NO lounge access at all — penalized harder for lounge seekers
+            // CSP: NO lounge access — same
+            csr: [-2, 1, 3, 5, 6],
+            amexPlat: [-3, 0, 3, 6, 8],
+            amexGold: [-3, -2, -1, 0, 0], // Gold has ZERO lounge access
+            csp: [-2, -1, 0, 1, 1], // CSP has no lounge access
+            ventureX: [-2, 1, 3, 5, 6],
+            hhonors: [-1, 0, 1, 2, 3],
+            marriott: [-1, 0, 1, 2, 3],
+            united: [-2, 1, 2, 4, 5], // United Club card only
+            delta: [-2, 1, 2, 4, 5], // Sky Club access
+            biltMW: [-2, -1, 0, 1, 1], // Bilt has no lounge access
+            inkPref: [-1, 0, 0, 0, 0],
+            wfargo: [-1, 0, 1, 2, 2],
           },
         },
-        /* Q7 — Annual fee tolerance — FEE FILTER */
+
+        /* ── Q7  Annual fee tolerance — FEE FILTER ───── */
         {
           text: "What annual fee are you comfortable paying?",
           options: [
@@ -629,27 +668,32 @@
             "Up to $100",
             "$101–$300",
             "$301–$550",
-            "Over $550 — if value justifies it",
+            "Over $550 — if credits justify it",
           ],
           type: "fee_filter",
-          /* max_fee: mapped from options */
           fee_brackets: [0, 100, 300, 550, 9999],
           signals: {
-            csr: [-5, -3, 0, 3, 4],
-            amexPlat: [-5, -4, -2, -1, 5],
-            amexGold: [-5, -2, 3, 4, 3],
-            csp: [-2, 4, 4, 2, 1],
-            ventureX: [-4, -2, 1, 4, 4],
-            hhonors: [-4, -1, 1, 3, 4],
-            marriott: [-5, -3, 0, 2, 5],
-            united: [-3, 2, 3, 3, 3],
-            delta: [-5, -3, 0, 2, 5],
-            biltMW: [5, 4, 2, 0, -1],
-            inkPref: [-2, 4, 4, 2, 2],
-            wfargo: [-2, 4, 4, 2, 1],
+            // The signal here reflects how well each card's value scales with fee tolerance
+            // $0 tolerance: only Bilt is truly viable; others get large negatives
+            // $100: CSP and WF shine; others get negatives
+            // $300+: Amex Gold and Venture X are now in play
+            // $550+: CSR, Plat, Hilton, Marriott, Delta all unlock
+            csr: [-6, -4, 0, 4, 5],
+            amexPlat: [-7, -5, -2, 0, 6],
+            amexGold: [-6, -3, 4, 5, 3],
+            csp: [-2, 5, 5, 2, 1],
+            ventureX: [-5, -3, 1, 5, 5],
+            hhonors: [-5, -2, 1, 4, 5],
+            marriott: [-6, -4, -1, 2, 6],
+            united: [-4, 2, 4, 4, 3],
+            delta: [-6, -4, -1, 1, 6],
+            biltMW: [7, 5, 2, 0, -1],
+            inkPref: [-2, 5, 5, 2, 2],
+            wfargo: [-2, 5, 5, 2, 1],
           },
         },
-        /* Q8 — Monthly dining spend */
+
+        /* ── Q8  Monthly dining spend ─────────────────── */
         {
           text: "How much do you spend on dining & food delivery per month?",
           options: [
@@ -662,21 +706,28 @@
           type: "spend",
           monthly_spend: [50, 200, 450, 800, 1200],
           signals: {
-            csr: [0, 2, 3, 4, 5],
-            amexPlat: [0, 0, 1, 1, 2],
-            amexGold: [0, 2, 4, 6, 6],
-            csp: [0, 2, 3, 4, 5],
-            ventureX: [0, 1, 2, 3, 4],
+            // Amex Gold is the undisputed dining king: 4x at restaurants worldwide
+            // CSR earns 3x on dining — second place but no category cap
+            // CSP earns 3x on dining (same as CSR but lower fee = better for moderate spenders)
+            // Bilt earns 3x on dining (key differentiator for a $0 fee card)
+            // Amex Plat earns 1x on dining — actively bad for dining-heavy users
+            // Marriott earns 6x at restaurants — often overlooked
+            csr: [0, 2, 4, 5, 6],
+            amexPlat: [-2, -2, -1, 0, 0], // 1x dining is terrible
+            amexGold: [0, 3, 5, 7, 7], // 4x dining = best in class
+            csp: [0, 2, 4, 5, 5],
+            ventureX: [0, 1, 2, 3, 4], // 2x on everything
             hhonors: [0, 0, 0, 1, 1],
-            marriott: [0, 0, 0, 1, 1],
-            united: [0, 0, 1, 1, 2],
-            delta: [0, 0, 1, 1, 2],
-            biltMW: [0, 2, 3, 4, 5],
+            marriott: [0, 1, 3, 5, 6], // 6x at restaurants — underrated
+            united: [0, 0, 1, 2, 2],
+            delta: [0, 0, 1, 2, 2],
+            biltMW: [0, 2, 4, 5, 5], // 3x on dining, $0 fee
             inkPref: [0, 0, 0, 0, 0],
             wfargo: [0, 1, 2, 3, 3],
           },
         },
-        /* Q9 — Monthly grocery spend */
+
+        /* ── Q9  Monthly grocery spend ────────────────── */
         {
           text: "How much do you spend at U.S. supermarkets per month?",
           options: [
@@ -689,52 +740,61 @@
           type: "spend",
           monthly_spend: [50, 200, 450, 800, 1200],
           signals: {
-            csr: [0, 0, 0, 0, 0],
-            amexPlat: [0, 0, 0, 0, 0],
-            amexGold: [0, 2, 4, 5, 6],
-            csp: [0, 0, 0, 0, 0],
-            ventureX: [0, 0, 0, 0, 0],
+            // Amex Gold: 4x on US supermarkets (up to $25k/yr) — very strong
+            // Wells Fargo: 3x on grocery — best outside Amex ecosystem
+            // No other card in set has meaningful grocery bonus
+            // Plat/CSR/CSP/United/Delta: 1x on grocery — penalize for heavy grocery spenders
+            csr: [-1, 0, 0, 0, 0],
+            amexPlat: [-2, -1, 0, 0, 0],
+            amexGold: [0, 3, 5, 6, 7], // 4x US supermarkets
+            csp: [-1, 0, 0, 0, 0],
+            ventureX: [0, 0, 1, 1, 1], // 2x on everything
             hhonors: [0, 0, 0, 0, 0],
             marriott: [0, 0, 0, 0, 0],
             united: [0, 0, 0, 0, 0],
             delta: [0, 0, 0, 0, 0],
-            biltMW: [0, 0, 0, 0, 0],
+            biltMW: [0, 1, 1, 2, 2], // 1x grocery (Bilt earns 1x except rent/dining/travel)
             inkPref: [0, 0, 0, 0, 0],
-            wfargo: [0, 1, 3, 4, 4],
+            wfargo: [0, 2, 4, 5, 5], // 3x grocery
           },
         },
-        /* Q10 — Rent — DEALBREAKER for bilt */
+
+        /* ── Q10  Rent situation — BILT GATE ──────────── */
         {
-          text: "Do you pay rent, and would you put it on a credit card?",
+          text: "Do you pay rent, and how much monthly?",
           options: [
             "I own my home",
-            "I rent but wouldn't use a card for it",
-            "I rent and would try it for modest rewards",
-            "I rent and maximizing rent points is key",
-            "I rent and would pay rent exclusively on Bilt",
+            "I rent but would never put it on a credit card",
+            "I rent — under $1,500/month",
+            "I rent — $1,500–$3,000/month",
+            "I rent — over $3,000/month",
           ],
           type: "signal",
           signals: {
-            csr: [0, 0, 0, 0, 0],
-            amexPlat: [0, 0, 0, 0, 0],
-            amexGold: [0, 0, 0, 0, 0],
-            csp: [0, 0, 0, 0, 0],
-            ventureX: [0, 0, 0, 0, 0],
-            hhonors: [0, 0, 0, 0, 0],
-            marriott: [0, 0, 0, 0, 0],
-            united: [0, 0, 0, 0, 0],
-            delta: [0, 0, 0, 0, 0],
-            biltMW: [-5, -3, 3, 6, 7],
-            inkPref: [0, 0, 0, 0, 0],
-            wfargo: [0, 0, 0, 0, 0],
+            // Bilt's entire value prop is earning 1x on rent with no fee
+            // $1,500/mo = 18k pts/yr just from rent — significant
+            // $3,000/mo = 36k pts/yr — can fund a free flight annually
+            // Homeowners: Bilt is basically useless (no rent to earn on)
+            csr: [1, 1, 0, 0, 0],
+            amexPlat: [1, 1, 0, 0, 0],
+            amexGold: [1, 1, 0, 0, 0],
+            csp: [1, 1, 0, 0, 0],
+            ventureX: [1, 1, 0, 0, 0],
+            hhonors: [1, 1, 0, 0, 0],
+            marriott: [1, 1, 0, 0, 0],
+            united: [1, 1, 0, 0, 0],
+            delta: [1, 1, 0, 0, 0],
+            biltMW: [-7, -5, 2, 5, 7], // huge swing based on rent amount
+            inkPref: [1, 1, 0, 0, 0],
+            wfargo: [1, 1, 0, 0, 0],
           },
-          /* If you own a home, Bilt is irrelevant (its core value prop is rent) */
           dealbreaker: [
-            { option: 0, cards: ["biltMW"] },
-            { option: 1, cards: ["biltMW"] },
+            { option: 0, cards: ["biltMW"] }, // homeowners: Bilt is worthless
+            { option: 1, cards: ["biltMW"] }, // won't use card for rent: no value
           ],
         },
-        /* Q11 — Total monthly spend */
+
+        /* ── Q11  Total monthly spend ─────────────────── */
         {
           text: "What is your total monthly credit card spend (all cards combined)?",
           options: [
@@ -747,21 +807,24 @@
           type: "spend",
           monthly_spend: [700, 1750, 3750, 7500, 12000],
           signals: {
-            csr: [0, 1, 2, 3, 4],
-            amexPlat: [-1, 0, 1, 3, 5],
-            amexGold: [0, 1, 2, 3, 4],
-            csp: [1, 2, 3, 3, 2],
-            ventureX: [-1, 1, 2, 3, 5],
+            // High spend justifies higher annual fees because you earn more
+            // Low spenders: CSP, WF, Bilt are best; premium cards uneconomical
+            csr: [-1, 1, 2, 4, 5],
+            amexPlat: [-2, -1, 1, 3, 5],
+            amexGold: [-1, 1, 2, 3, 4],
+            csp: [2, 3, 4, 3, 2],
+            ventureX: [-1, 1, 2, 4, 6],
             hhonors: [0, 1, 2, 3, 4],
             marriott: [-1, 0, 2, 3, 5],
             united: [0, 1, 2, 3, 4],
             delta: [-1, 0, 2, 3, 5],
-            biltMW: [1, 2, 3, 4, 5],
-            inkPref: [-1, 0, 1, 3, 5],
-            wfargo: [1, 2, 3, 3, 2],
+            biltMW: [1, 3, 4, 5, 6],
+            inkPref: [-2, -1, 1, 4, 6],
+            wfargo: [2, 3, 4, 3, 2],
           },
         },
-        /* Q12 — Pay in full */
+
+        /* ── Q12  Pay in full ─────────────────────────── */
         {
           text: "Do you pay your balance in full every month?",
           options: [
@@ -773,21 +836,24 @@
           ],
           type: "signal",
           signals: {
-            csr: [-4, -2, 1, 4, 5],
-            amexPlat: [-5, -3, 0, 4, 5],
-            amexGold: [-4, -2, 1, 4, 5],
-            csp: [-2, -1, 2, 4, 4],
-            ventureX: [-3, -1, 1, 4, 5],
-            hhonors: [-3, -1, 1, 3, 4],
-            marriott: [-3, -1, 1, 3, 4],
-            united: [-2, -1, 1, 3, 4],
-            delta: [-3, -1, 1, 3, 4],
-            biltMW: [-2, -1, 1, 3, 4],
-            inkPref: [-3, -1, 1, 4, 5],
-            wfargo: [-2, -1, 2, 4, 4],
+            // Carrying a balance negates ALL rewards cards — interest wipes points
+            // Heavy penalty for high-fee cards if not paid in full
+            csr: [-6, -3, 1, 5, 6],
+            amexPlat: [-7, -4, 0, 5, 6],
+            amexGold: [-5, -3, 1, 5, 6],
+            csp: [-4, -2, 2, 5, 5],
+            ventureX: [-5, -3, 1, 5, 6],
+            hhonors: [-4, -2, 1, 4, 5],
+            marriott: [-4, -2, 1, 4, 5],
+            united: [-3, -2, 1, 4, 5],
+            delta: [-4, -2, 1, 4, 5],
+            biltMW: [-3, -2, 1, 4, 5],
+            inkPref: [-4, -2, 1, 5, 6],
+            wfargo: [-3, -2, 2, 5, 5],
           },
         },
-        /* Q13 — International travel frequency */
+
+        /* ── Q13  International travel frequency ──────── */
         {
           text: "How often do you travel internationally?",
           options: [
@@ -799,49 +865,60 @@
           ],
           type: "signal",
           signals: {
-            csr: [0, 1, 2, 4, 5],
-            amexPlat: [0, 1, 3, 5, 6],
+            // International travel unlocks: no FTF, transfer partners, trip protections
+            // Amex Plat shines internationally: 5x on flights, no FTF, transfer partners
+            // Cobranded cards (United/Delta) are less useful internationally since they
+            // fly to fewer international destinations than AA or foreign carriers
+            csr: [0, 1, 2, 4, 6],
+            amexPlat: [0, 1, 3, 5, 7],
             amexGold: [0, 1, 2, 4, 5],
             csp: [0, 1, 2, 3, 4],
             ventureX: [0, 1, 2, 4, 5],
             hhonors: [0, 1, 2, 3, 4],
             marriott: [0, 1, 2, 3, 4],
-            united: [0, 1, 2, 3, 4],
-            delta: [0, 1, 2, 3, 4],
+            united: [0, 1, 2, 3, 3], // limited international; less useful
+            delta: [0, 1, 2, 3, 3],
             biltMW: [0, 1, 2, 3, 4],
-            inkPref: [0, 1, 2, 3, 4],
-            wfargo: [0, 1, 2, 3, 4],
+            inkPref: [0, 1, 1, 2, 3],
+            wfargo: [0, 1, 2, 3, 3],
           },
         },
-        /* Q14 — Redemption preference */
+
+        /* ── Q14  Redemption style ────────────────────── */
         {
           text: "How do you primarily want to redeem rewards?",
           options: [
             "Cash back / statement credits",
             "Travel portal (book any flight or hotel)",
-            "Transfer to airline miles for business/first class",
+            "Transfer to airlines for business/first class",
             "Transfer to hotel points for free nights",
-            "Mix — I want the most flexibility",
+            "Mix — I want maximum flexibility",
           ],
           type: "signal",
           signals: {
-            csr: [1, 3, 3, 0, 4],
-            amexPlat: [-1, 1, 5, 3, 4],
-            amexGold: [-1, 1, 5, 3, 4],
-            csp: [1, 4, 3, 0, 4],
-            ventureX: [2, 5, 1, 1, 3],
-            hhonors: [-2, -1, -2, 5, 1],
-            marriott: [-2, -1, -2, 5, 1],
-            united: [-2, 0, 5, -2, 1],
-            delta: [-2, 0, 5, -2, 1],
-            biltMW: [-1, 1, 4, 3, 3],
-            inkPref: [1, 4, 3, 0, 4],
-            wfargo: [5, 3, -2, -2, 2],
+            // Portal: CSP (1.25x), CSR (1.5x), Venture X (1x) — CSR wins on portal
+            // Transfer to airlines: Amex MR has 20+ partners; Chase UR has United, etc.
+            // Transfer to hotels: Amex to Hilton/Marriott; Chase to Hyatt (best value)
+            // Cash back: WF and Venture X; Amex/Chase cards lose value on cash back
+            // Flexibility: Amex MR and Chase UR ecosystems win decisively
+            csr: [0, 5, 3, 1, 5],
+            amexPlat: [-2, 1, 6, 3, 5],
+            amexGold: [-2, 1, 6, 3, 5],
+            csp: [1, 5, 3, 2, 5],
+            ventureX: [3, 5, 1, 1, 4],
+            hhonors: [-3, -2, -3, 7, 0],
+            marriott: [-3, -2, -3, 7, 0],
+            united: [-3, -1, 6, -3, 0],
+            delta: [-3, -1, 6, -3, 0],
+            biltMW: [-1, 2, 5, 4, 4],
+            inkPref: [1, 5, 3, 1, 5],
+            wfargo: [6, 3, -3, -3, 1],
           },
         },
-        /* Q15 — Travel insurance importance */
+
+        /* ── Q15  Trip delay/cancellation insurance ───── */
         {
-          text: "How important is trip delay / cancellation insurance to you?",
+          text: "How important is trip delay / cancellation insurance?",
           options: [
             "Not at all — I take the risk",
             "Barely — I buy trip insurance separately",
@@ -851,73 +928,91 @@
           ],
           type: "signal",
           signals: {
-            csr: [0, 0, 2, 4, 5],
-            amexPlat: [0, 0, 2, 4, 5],
+            // CSR has best-in-class trip protections: $500 delay, $10k cancellation
+            // Amex Plat: strong protections on flights booked via Amex Travel
+            // CSP: solid protections for a $95 card — trip delay + cancellation
+            // Amex Gold: decent protections; not as strong as CSR
+            // Cobranded cards: moderate protections
+            // Bilt/WF: limited protections
+            csr: [0, 0, 2, 5, 7],
+            amexPlat: [0, 0, 2, 4, 6],
             amexGold: [0, 0, 2, 3, 4],
-            csp: [0, 0, 2, 4, 5],
+            csp: [0, 0, 3, 5, 6],
             ventureX: [0, 0, 2, 3, 4],
             hhonors: [0, 0, 1, 1, 2],
-            marriott: [0, 0, 1, 1, 2],
+            marriott: [0, 0, 1, 2, 3],
             united: [0, 0, 1, 2, 3],
             delta: [0, 0, 1, 2, 3],
             biltMW: [0, 0, 1, 2, 3],
             inkPref: [0, 0, 1, 2, 3],
-            wfargo: [0, 0, 1, 2, 2],
+            wfargo: [0, 0, 1, 1, 2],
           },
         },
-        /* Q16 — Global Entry */
+
+        /* ── Q16  Global Entry / TSA PreCheck ─────────── */
         {
-          text: "Do you have or plan to apply for Global Entry / TSA PreCheck?",
+          text: "Do you need Global Entry / TSA PreCheck credit?",
           options: [
             "No — not interested",
             "Maybe in the future",
             "Yes — I'd use the $100 credit on a new card",
-            "I already have it paid by a card",
-            "I already have it and want a new card to reimburse renewal",
+            "I already have it (covered by a current card)",
+            "I need renewal soon and want a card to cover it",
           ],
           type: "signal",
           signals: {
-            csr: [0, 0, 4, 1, 3],
-            amexPlat: [0, 0, 4, 1, 3],
-            amexGold: [0, 0, 0, 0, 0],
-            csp: [0, 0, 2, 1, 2],
-            ventureX: [0, 0, 4, 1, 3],
-            hhonors: [0, 0, 2, 1, 2],
-            marriott: [0, 0, 2, 1, 2],
-            united: [0, 0, 2, 1, 2],
-            delta: [0, 0, 2, 1, 2],
-            biltMW: [0, 0, 2, 1, 2],
-            inkPref: [0, 0, 0, 0, 0],
-            wfargo: [0, 0, 2, 1, 2],
+            // CSR, Amex Plat, Venture X all offer $100 GE credit
+            // Hilton Aspire, United, Delta, Marriott also offer it
+            // Amex Gold does NOT offer GE credit — penalize if this matters
+            // CSP does NOT offer GE credit — penalize if this matters
+            csr: [0, 1, 5, 0, 4],
+            amexPlat: [0, 1, 5, 0, 4],
+            amexGold: [0, 0, -3, 0, -2], // No GE credit
+            csp: [0, 0, -2, 0, -1], // No GE credit
+            ventureX: [0, 1, 5, 0, 4],
+            hhonors: [0, 1, 4, 0, 3],
+            marriott: [0, 1, 4, 0, 3],
+            united: [0, 1, 4, 0, 3],
+            delta: [0, 1, 4, 0, 3],
+            biltMW: [0, 0, 3, 0, 2],
+            inkPref: [0, 0, -1, 0, -1], // No GE credit
+            wfargo: [0, 1, 2, 0, 2],
           },
         },
-        /* Q17 — Luxury / elite status */
+
+        /* ── Q17  Luxury / elite status appetite ──────── */
         {
           text: "How much do you value elite status and luxury travel perks?",
           options: [
             "Not at all — comfort is fine",
             "A little — occasional perks are nice",
             "Moderately — I enjoy premium experiences",
-            "A lot — status and upgrades matter to me",
+            "A lot — upgrades and status matter to me",
             "Very much — I want the highest tier experience",
           ],
           type: "signal",
           signals: {
+            // Amex Plat: Fine Hotels & Resorts, Centurion lounges, elite status with Marriott/Hilton
+            // Hilton Aspire: automatic Diamond status — highest tier without stays
+            // Marriott Brilliant: automatic Platinum Elite status
+            // Venture X: no status, but solid perks for the price
+            // WF/CSP/Bilt: minimal luxury perks — penalize for luxury seekers
             csr: [-1, 1, 2, 3, 4],
-            amexPlat: [-2, 0, 2, 4, 6],
-            amexGold: [-1, 1, 2, 3, 3],
-            csp: [1, 2, 2, 2, 1],
-            ventureX: [-1, 1, 2, 3, 4],
-            hhonors: [-1, 1, 2, 4, 5],
-            marriott: [-1, 1, 2, 4, 5],
+            amexPlat: [-3, 0, 2, 5, 7],
+            amexGold: [-1, 1, 2, 3, 4],
+            csp: [2, 3, 3, 2, 1],
+            ventureX: [0, 1, 2, 3, 4],
+            hhonors: [-1, 1, 3, 5, 6],
+            marriott: [-1, 1, 3, 5, 6],
             united: [-1, 1, 2, 3, 4],
-            delta: [-1, 1, 2, 3, 4],
-            biltMW: [-1, 1, 2, 3, 4],
+            delta: [-1, 1, 2, 4, 5],
+            biltMW: [-1, 1, 2, 3, 3],
             inkPref: [0, 0, 0, 0, 0],
-            wfargo: [1, 1, 0, 0, -1],
+            wfargo: [2, 2, 1, 0, -1],
           },
         },
-        /* Q18 — Car rentals */
+
+        /* ── Q18  Car rentals ─────────────────────────── */
         {
           text: "Do you rent cars, and how often?",
           options: [
@@ -929,21 +1024,27 @@
           ],
           type: "signal",
           signals: {
-            csr: [0, 1, 2, 3, 4],
-            amexPlat: [0, 1, 2, 3, 4],
-            amexGold: [0, 1, 1, 2, 3],
-            csp: [0, 1, 2, 3, 3],
-            ventureX: [0, 1, 2, 3, 4],
+            // CSR: primary car rental CDW is a flagship perk — best in class
+            // Amex Plat: secondary CDW only — not as good as CSR
+            // Venture X: primary CDW — same quality as CSR
+            // CSP: secondary CDW — okay for light renters
+            // Ink Preferred: primary CDW on business rentals — great
+            csr: [0, 1, 3, 5, 6],
+            amexPlat: [0, 1, 2, 3, 4], // secondary CDW only
+            amexGold: [0, 1, 2, 2, 3],
+            csp: [0, 1, 2, 3, 4],
+            ventureX: [0, 1, 3, 5, 6], // primary CDW
             hhonors: [0, 0, 0, 1, 1],
             marriott: [0, 0, 0, 1, 1],
-            united: [0, 0, 1, 1, 2],
+            united: [0, 1, 1, 2, 2],
             delta: [0, 0, 1, 1, 2],
             biltMW: [0, 1, 1, 2, 3],
-            inkPref: [0, 1, 2, 3, 4],
-            wfargo: [0, 1, 1, 2, 3],
+            inkPref: [0, 1, 3, 5, 6], // primary CDW on business rentals
+            wfargo: [0, 1, 2, 3, 3],
           },
         },
-        /* Q19 — Rewards experience */
+
+        /* ── Q19  Rewards experience ──────────────────── */
         {
           text: "How experienced are you with credit card rewards?",
           options: [
@@ -955,21 +1056,29 @@
           ],
           type: "signal",
           signals: {
-            csr: [0, 1, 3, 3, 3],
-            amexPlat: [-2, -1, 1, 3, 5],
-            amexGold: [0, 1, 3, 3, 4],
-            csp: [3, 4, 3, 2, 1],
-            ventureX: [2, 3, 3, 2, 2],
-            hhonors: [1, 2, 2, 2, 2],
-            marriott: [1, 2, 2, 2, 2],
-            united: [1, 2, 2, 2, 2],
-            delta: [1, 2, 2, 2, 2],
-            biltMW: [-1, 0, 2, 4, 5],
-            inkPref: [-2, 0, 2, 4, 5],
-            wfargo: [3, 4, 2, 1, -1],
+            // Beginners: CSP and Venture X are the best starting points
+            //   CSP: best-in-class intro offer, solid perks, easy UR redemption
+            //   Venture X: simple 2x on everything, easy portal
+            // Amex Gold: moderate complexity (two bonus categories + credits)
+            // Amex Plat: complex to maximize — 5 different travel credits, many partners
+            // Bilt: needs understanding of transfer partners to get full value
+            // Ink: requires business setup knowledge
+            csr: [0, 2, 4, 4, 4],
+            amexPlat: [-3, -1, 1, 4, 6],
+            amexGold: [0, 2, 4, 4, 4],
+            csp: [5, 5, 4, 3, 2],
+            ventureX: [4, 4, 4, 3, 2],
+            hhonors: [2, 3, 3, 2, 2],
+            marriott: [2, 3, 3, 2, 2],
+            united: [2, 3, 3, 2, 2],
+            delta: [2, 3, 3, 2, 2],
+            biltMW: [-2, 0, 2, 5, 6],
+            inkPref: [-3, 0, 2, 5, 6],
+            wfargo: [4, 5, 3, 1, -1],
           },
         },
-        /* Q20 — Business owner */
+
+        /* ── Q20  Business owner — INK GATE ──────────── */
         {
           text: "Do you own or operate a business with significant expenses?",
           options: [
@@ -981,21 +1090,29 @@
           ],
           type: "signal",
           signals: {
-            csr: [2, 1, 0, 0, 0],
-            amexPlat: [1, 1, 1, 0, 0],
-            amexGold: [2, 1, 0, 0, 0],
-            csp: [2, 1, 0, 0, 0],
-            ventureX: [1, 1, 1, 0, 0],
-            hhonors: [2, 1, 0, 0, 0],
-            marriott: [2, 1, 0, 0, 0],
-            united: [2, 1, 0, 0, 0],
-            delta: [2, 1, 0, 0, 0],
-            biltMW: [2, 1, 0, -1, -1],
-            inkPref: [-2, 0, 4, 6, 6],
-            wfargo: [2, 1, 0, 0, 0],
+            // Ink Preferred is a business card — only relevant for businesses
+            // 3x on travel, shipping, internet/cable, advertising up to $150k/yr
+            // $100 cell phone insurance per year
+            // Non-business users should not see Ink score highly
+            csr: [3, 2, 1, 0, 0],
+            amexPlat: [2, 2, 1, 0, 0],
+            amexGold: [3, 2, 1, 0, 0],
+            csp: [3, 2, 1, 0, 0],
+            ventureX: [2, 2, 1, 0, 0],
+            hhonors: [3, 2, 1, 0, 0],
+            marriott: [3, 2, 1, 0, 0],
+            united: [3, 2, 1, 0, 0],
+            delta: [3, 2, 1, 0, 0],
+            biltMW: [3, 2, 0, -1, -2],
+            inkPref: [-4, -2, 5, 7, 7], // decisive boost for real businesses
+            wfargo: [3, 2, 1, 0, 0],
           },
+          dealbreaker: [
+            { option: 0, cards: ["inkPref"] }, // personal spenders shouldn't get a business card
+          ],
         },
-        /* Q21 — Streaming/phone spend */
+
+        /* ── Q21  Streaming/phone/internet spend ──────── */
         {
           text: "How much do you spend on streaming, phone plans, or internet per month?",
           options: [
@@ -1007,8 +1124,13 @@
           ],
           type: "signal",
           signals: {
+            // Amex Plat: $240/yr digital entertainment credit (Disney+, Peacock, etc.)
+            //   But this is a narrow credit — only qualifying services count
+            // Ink Preferred: 3x on phone/cable/internet (up to $150k/yr) — huge for biz
+            // Wells Fargo: 3x on phone plans (underrated)
+            // Others: minimal or no telecom bonus
             csr: [0, 0, 0, 0, 0],
-            amexPlat: [0, 1, 2, 3, 4],
+            amexPlat: [0, 1, 2, 3, 4], // digital entertainment credit
             amexGold: [0, 0, 0, 0, 0],
             csp: [0, 0, 0, 0, 0],
             ventureX: [0, 0, 0, 0, 0],
@@ -1017,55 +1139,68 @@
             united: [0, 0, 0, 0, 0],
             delta: [0, 0, 0, 0, 0],
             biltMW: [0, 0, 0, 0, 0],
-            inkPref: [0, 1, 2, 3, 4],
-            wfargo: [0, 0, 1, 2, 3],
+            inkPref: [0, 2, 4, 5, 6], // 3x on phone/cable/internet
+            wfargo: [0, 1, 3, 4, 5], // 3x on phone plans
           },
         },
-        /* Q22 — Airline fee credit */
+
+        /* ── Q22  Amex Plat airline credit use ────────── */
         {
-          text: "Would you use a $200–$300 annual airline fee credit?",
+          text: "Would you use a $200–$300 annual airline incidental fee credit?",
           options: [
-            "No — I don't check bags or pay fees",
-            "Unlikely — I rarely have qualifying charges",
+            "No — I check bags online or never pay fees",
+            "Unlikely — I rarely trigger qualifying charges",
             "Possibly — I might use part of it",
-            "Yes — I'd use most or all of it",
+            "Yes — I'd use most or all of it annually",
             "Absolutely — I'd maximize it every year",
           ],
           type: "signal",
           signals: {
+            // Amex Plat's $200 airline credit is notoriously hard to use
+            //   (must be incidentals, not ticket purchases)
+            // United card's $100 credit is more straightforward
+            // Delta Reserve's $200 credit applies to Delta purchases
+            // If user won't use it, it greatly diminishes Plat/Delta value
             csr: [-1, 0, 1, 2, 3],
-            amexPlat: [-2, -1, 1, 4, 5],
+            amexPlat: [-8, -5, -1, 5, 7], // decisive — Plat is poor value if unused
             amexGold: [-1, 0, 1, 2, 3],
             csp: [0, 0, 1, 2, 2],
-            ventureX: [-1, 0, 1, 3, 4],
-            hhonors: [-1, 0, 1, 2, 3],
+            ventureX: [-1, 0, 2, 4, 5],
+            hhonors: [-1, 0, 1, 3, 4],
             marriott: [-1, 0, 1, 2, 3],
-            united: [-1, 0, 1, 3, 5],
-            delta: [-1, 0, 1, 3, 5],
+            united: [-1, 0, 2, 5, 6], // United's credit is easier to use
+            delta: [-2, 0, 1, 4, 6], // Delta credit applies to Delta purchases
             biltMW: [-1, 0, 1, 2, 2],
             inkPref: [-1, 0, 1, 2, 2],
             wfargo: [-1, 0, 1, 2, 3],
           },
         },
-        /* Q23 — Hotel credit */
+
+        /* ── Q23  Hotel credit use ────────────────────── */
         {
-          text: "Would you use a $200/year hotel credit (Fine Hotels & Resorts or similar)?",
+          text: "Would you use a $200–$300/year hotel or resort credit?",
           options: [
             "No — I don't stay at qualifying hotels",
             "Unlikely — rarely near eligible properties",
             "Maybe — I'd try to plan around it",
             "Yes — I'd use it once a year",
-            "Absolutely — I travel enough to use it easily",
+            "Absolutely — I stay at qualifying hotels regularly",
           ],
           type: "signal",
           signals: {
-            csr: [-1, 0, 1, 4, 5],
-            amexPlat: [-1, 0, 1, 4, 5],
+            // CSR: $300 travel credit (not just hotels — applies to ALL travel) — very easy to use
+            //   Treated separately from hotel-specific credits
+            // Amex Plat: $200 Fine Hotels & Resorts — requires $400+ hotel bookings via Amex portal
+            // Hilton Aspire: $250 resort credit — only at Hilton resort properties
+            // Marriott Brilliant: $300 dining credit (not hotel) — easier to use
+            // If user won't use it → premium hotel cards tank dramatically
+            csr: [0, 1, 2, 5, 6], // $300 travel credit — nearly everyone can use this
+            amexPlat: [-5, -2, 1, 5, 6], // FHR credit — requires qualifying stays
             amexGold: [-1, 0, 0, 1, 2],
-            csp: [0, 0, 0, 1, 2],
-            ventureX: [0, 0, 0, 1, 2],
-            hhonors: [-1, 0, 2, 4, 5],
-            marriott: [-1, 0, 2, 4, 5],
+            csp: [0, 0, 1, 2, 3],
+            ventureX: [0, 0, 1, 2, 3],
+            hhonors: [-3, -1, 2, 5, 7], // Resort credit — only Hilton resorts
+            marriott: [-2, 0, 2, 5, 6], // $300 dining credit (marriott hotels)
             united: [0, 0, 0, 1, 2],
             delta: [0, 0, 0, 1, 2],
             biltMW: [0, 0, 1, 2, 3],
@@ -1073,7 +1208,8 @@
             wfargo: [0, 0, 0, 1, 2],
           },
         },
-        /* Q24 — Ride-sharing */
+
+        /* ── Q24  Ride-sharing spend ──────────────────── */
         {
           text: "How often do you use ride-sharing (Lyft, Uber)?",
           options: [
@@ -1085,21 +1221,27 @@
           ],
           type: "signal",
           signals: {
-            csr: [0, 1, 2, 3, 4],
-            amexPlat: [0, 0, 1, 1, 2],
-            amexGold: [0, 0, 1, 1, 2],
-            csp: [0, 1, 1, 2, 3],
+            // Amex Gold: $120/yr Uber Cash credit — 10x monthly $10 credits
+            //   Heavy Uber users capture full value; light users may not
+            // CSR: earns 3x on Lyft rides (through 2025), Lyft Pink membership
+            // Bilt: 3x on Lyft (Bilt-Lyft partnership)
+            // Others: minimal ride-share benefits
+            csr: [0, 1, 2, 4, 5], // 3x Lyft + Lyft Pink
+            amexPlat: [0, 0, 1, 2, 3],
+            amexGold: [0, 1, 3, 5, 6], // $120 Uber Cash — high value for regular users
+            csp: [0, 1, 2, 3, 4],
             ventureX: [0, 0, 1, 1, 2],
             hhonors: [0, 0, 0, 1, 1],
             marriott: [0, 0, 0, 1, 1],
             united: [0, 0, 1, 1, 2],
             delta: [0, 0, 1, 1, 2],
-            biltMW: [0, 1, 1, 2, 3],
+            biltMW: [0, 1, 2, 4, 5], // 3x on Lyft via Bilt-Lyft partnership
             inkPref: [0, 0, 0, 0, 0],
             wfargo: [0, 0, 1, 2, 3],
           },
         },
-        /* Q25 — DoorDash */
+
+        /* ── Q25  DoorDash / food delivery ────────────── */
         {
           text: "Would you use a free DoorDash DashPass membership?",
           options: [
@@ -1111,21 +1253,26 @@
           ],
           type: "signal",
           signals: {
-            csr: [0, 1, 2, 3, 4],
+            // CSR: free DashPass ($96/yr value)
+            // Amex Gold: free DashPass
+            // CSP: free DashPass
+            // These three benefit most; others have no DashPass perk
+            csr: [0, 1, 3, 4, 5],
             amexPlat: [0, 0, 1, 1, 2],
-            amexGold: [0, 1, 2, 3, 4],
-            csp: [0, 1, 2, 3, 3],
+            amexGold: [0, 1, 3, 4, 5], // DashPass + dining credits = strong combo
+            csp: [0, 1, 3, 4, 4],
             ventureX: [0, 0, 1, 1, 2],
             hhonors: [0, 0, 0, 1, 1],
             marriott: [0, 0, 0, 1, 1],
             united: [0, 0, 0, 1, 1],
-            delta: [0, 0, 1, 1, 2],
+            delta: [0, 0, 1, 2, 2], // Delta has DoorDash perk on Reserve
             biltMW: [0, 1, 2, 3, 4],
             inkPref: [0, 0, 0, 0, 0],
             wfargo: [0, 0, 1, 2, 2],
           },
         },
-        /* Q26 — Category tracking appetite */
+
+        /* ── Q26  Category tracking appetite ─────────── */
         {
           text: "How do you feel about tracking multiple credit card categories?",
           options: [
@@ -1137,47 +1284,61 @@
           ],
           type: "signal",
           signals: {
-            csr: [1, 2, 3, 3, 2],
-            amexPlat: [-1, 0, 1, 3, 5],
-            amexGold: [-1, 1, 3, 4, 4],
-            csp: [1, 2, 4, 3, 2],
-            ventureX: [4, 4, 3, 2, 1],
-            hhonors: [1, 2, 2, 2, 2],
-            marriott: [1, 2, 2, 2, 2],
-            united: [1, 2, 2, 2, 2],
-            delta: [1, 2, 2, 2, 2],
-            biltMW: [-1, 1, 2, 4, 5],
-            inkPref: [-1, 0, 2, 4, 5],
-            wfargo: [4, 4, 3, 1, -1],
+            // Venture X: true flat-rate simplicity (2x everything) — wins for anti-trackers
+            // Wells Fargo: simple tiers, easy to understand
+            // Amex Gold: 2 main categories (dining + grocery) — manageable
+            // Amex Plat: complex — 5x flights/Amex Travel, many credits to track
+            // Bilt/Ink: require active category management to maximize
+            csr: [1, 2, 4, 4, 3],
+            amexPlat: [-2, 0, 1, 4, 6],
+            amexGold: [-1, 2, 4, 5, 5],
+            csp: [1, 3, 5, 4, 3],
+            ventureX: [6, 5, 4, 2, 1], // pure simplicity wins
+            hhonors: [1, 2, 3, 3, 2],
+            marriott: [1, 2, 3, 3, 2],
+            united: [1, 2, 3, 3, 2],
+            delta: [1, 2, 3, 3, 2],
+            biltMW: [-2, 0, 2, 5, 6],
+            inkPref: [-2, 0, 2, 5, 6],
+            wfargo: [5, 5, 3, 1, -1],
           },
         },
-        /* Q27 — Phone/purchase protection */
+
+        /* ── Q27  Cell phone insurance ────────────────── */
         {
-          text: "How much do you value cell phone insurance, extended warranty, and purchase protection?",
+          text: "How much do you value cell phone insurance and purchase protection?",
           options: [
             "Not at all — I'm fine without it",
             "Slightly — small bonus",
             "Moderately — I've had phone damage before",
             "A lot — it's saved me money in the past",
-            "Essential — I'd specifically pick a card for this",
+            "Essential — I'd pick a card specifically for this",
           ],
           type: "signal",
           signals: {
+            // Amex Plat: $800/claim cell phone protection — best in class
+            // Ink Preferred: $100/yr cell phone protection when paying phone bill — great
+            // Wells Fargo: $600/claim with $25 deductible — strong runner-up
+            // CSR: purchase protection up to $10k/item — strong but no specific cell coverage
+            // CSP: purchase protection but no cell phone specific insurance
+            // Amex Gold: return protection, purchase protection, but no cell insurance
+            // Others: minimal or no relevant protection
             csr: [0, 1, 2, 3, 4],
-            amexPlat: [0, 1, 2, 3, 5],
+            amexPlat: [0, 1, 2, 4, 6], // $800 cell phone coverage
             amexGold: [0, 1, 2, 2, 3],
             csp: [0, 1, 2, 2, 3],
-            ventureX: [0, 1, 2, 2, 3],
+            ventureX: [0, 1, 2, 3, 4],
             hhonors: [0, 0, 0, 1, 1],
             marriott: [0, 0, 0, 1, 1],
             united: [0, 1, 1, 2, 2],
             delta: [0, 0, 1, 1, 2],
             biltMW: [0, 1, 1, 2, 3],
-            inkPref: [0, 1, 2, 3, 5],
-            wfargo: [0, 1, 2, 3, 5],
+            inkPref: [0, 1, 3, 5, 7], // $100/yr cell insurance = underrated perk
+            wfargo: [0, 1, 3, 5, 6], // $600/claim cell insurance
           },
         },
-        /* Q28 — Walmart+ credit */
+
+        /* ── Q28  Amex Plat Walmart+ credit ────────────── */
         {
           text: "Would you use a Walmart+ membership credit (~$155/year)?",
           options: [
@@ -1189,110 +1350,136 @@
           ],
           type: "signal",
           signals: {
-            csr: [0, 0, 0, 1, 2],
-            amexPlat: [0, 0, 1, 2, 3],
-            amexGold: [0, 0, 0, 1, 1],
-            csp: [0, 0, 0, 0, 1],
-            ventureX: [0, 0, 0, 1, 1],
-            hhonors: [0, 0, 0, 1, 1],
-            marriott: [0, 0, 0, 1, 1],
-            united: [0, 0, 0, 1, 1],
-            delta: [0, 0, 0, 1, 1],
-            biltMW: [0, 0, 0, 1, 1],
-            inkPref: [0, 0, 0, 1, 1],
-            wfargo: [0, 0, 0, 1, 1],
+            // Amex Platinum's $155 Walmart+ credit is a key perk to justify the $695 fee
+            // If you won't use it, that's $155 of "waste" on the card's fee
+            // No other card in set offers this
+            csr: [0, 0, 0, 0, 1],
+            amexPlat: [-5, -3, 1, 4, 5], // decisive for Plat fee justification
+            amexGold: [0, 0, 0, 0, 1],
+            csp: [0, 0, 0, 0, 0],
+            ventureX: [0, 0, 0, 0, 1],
+            hhonors: [0, 0, 0, 0, 0],
+            marriott: [0, 0, 0, 0, 0],
+            united: [0, 0, 0, 0, 0],
+            delta: [0, 0, 0, 0, 0],
+            biltMW: [0, 0, 0, 0, 0],
+            inkPref: [0, 0, 0, 0, 0],
+            wfargo: [0, 0, 0, 0, 0],
           },
         },
-        /* Q29 — Digital entertainment credit */
+
+        /* ── Q29  Amex Plat digital entertainment credit ─ */
         {
-          text: "Would you use a $240/year digital entertainment credit?",
+          text: "Would you use a $240/year digital entertainment credit? (Disney+, Peacock, NYT, SiriusXM, Audible, etc.)",
           options: [
-            "I don't subscribe to any of these",
+            "I don't subscribe to any qualifying services",
             "I have 1 qualifying subscription",
             "I have 2–3 qualifying subscriptions",
             "I have 4+ qualifying subscriptions",
-            "Yes — I already pay for most of these",
+            "Yes — I already pay for most of these monthly",
           ],
           type: "signal",
           signals: {
-            csr: [0, 0, 1, 2, 3],
-            amexPlat: [0, 1, 2, 4, 5],
-            amexGold: [0, 0, 1, 1, 2],
-            csp: [0, 0, 0, 1, 2],
-            ventureX: [0, 0, 0, 1, 2],
-            hhonors: [0, 0, 0, 1, 1],
-            marriott: [0, 0, 0, 1, 1],
-            united: [0, 0, 0, 1, 1],
-            delta: [0, 0, 0, 1, 1],
-            biltMW: [0, 0, 0, 1, 1],
-            inkPref: [0, 1, 2, 3, 4],
-            wfargo: [0, 0, 1, 2, 3],
+            // Amex Platinum: $240/yr digital entertainment credit
+            //   Must be specific qualifying services — Disney+, Peacock, Audible, NYT, etc.
+            //   Delivered as monthly $20 credits — use it or lose it
+            //   If you don't subscribe to qualifying services, this $240 disappears
+            // No other card has this specific perk
+            csr: [0, 0, 1, 1, 2],
+            amexPlat: [-6, -3, 2, 6, 7], // $240 credit — huge swing for Plat value
+            amexGold: [0, 0, 0, 1, 1],
+            csp: [0, 0, 0, 1, 1],
+            ventureX: [0, 0, 0, 1, 1],
+            hhonors: [0, 0, 0, 0, 1],
+            marriott: [0, 0, 0, 0, 1],
+            united: [0, 0, 0, 0, 1],
+            delta: [0, 0, 0, 0, 1],
+            biltMW: [0, 0, 0, 0, 1],
+            inkPref: [0, 0, 1, 2, 3],
+            wfargo: [0, 0, 1, 1, 2],
           },
         },
-        /* Q30 — Equinox / gym credit */
+
+        /* ── Q30  Amex Plat Equinox/gym credit ─────────── */
         {
-          text: "Would you use an Equinox or gym/wellness credit (~$300/year)?",
+          text: "Would you use an Equinox or SoulCycle wellness credit (~$300/year)?",
           options: [
             "Never — I don't use a gym",
             "No qualifying gym near me",
             "Maybe — there's one near me I'd try",
             "Yes — I already go to an eligible gym",
-            "Absolutely — I'd pick Equinox specifically for this",
+            "Absolutely — I'd choose Equinox specifically for this",
           ],
           type: "signal",
           signals: {
-            csr: [0, 0, 1, 2, 3],
-            amexPlat: [0, 0, 1, 4, 5],
-            amexGold: [0, 0, 0, 1, 2],
-            csp: [0, 0, 0, 1, 1],
-            ventureX: [0, 0, 0, 1, 1],
-            hhonors: [0, 0, 0, 1, 1],
-            marriott: [0, 0, 0, 1, 1],
-            united: [0, 0, 0, 1, 1],
-            delta: [0, 0, 0, 1, 1],
-            biltMW: [0, 0, 0, 1, 1],
+            // Amex Platinum: $300 Equinox credit (via separate Amex Platinum card credit)
+            //   Only Equinox and SoulCycle qualify — very niche
+            //   If you don't have one nearby or use it: $300 wasted
+            //   If you do use it: Plat's effective fee drops dramatically
+            // This is one of the highest-value-but-most-niche Plat credits
+            csr: [0, 0, 0, 1, 2],
+            amexPlat: [-7, -6, 0, 6, 8], // $300 credit — massive swing
+            amexGold: [0, 0, 0, 0, 1],
+            csp: [0, 0, 0, 0, 1],
+            ventureX: [0, 0, 0, 0, 1],
+            hhonors: [0, 0, 0, 0, 0],
+            marriott: [0, 0, 0, 0, 0],
+            united: [0, 0, 0, 0, 0],
+            delta: [0, 0, 0, 0, 0],
+            biltMW: [0, 0, 0, 0, 0],
             inkPref: [0, 0, 0, 0, 0],
             wfargo: [0, 0, 0, 0, 0],
           },
         },
-        /* Q31 — Transfer partners */
+
+        /* ── Q31  Transfer partners ───────────────────── */
         {
           text: "Do you want to transfer points to airline or hotel loyalty programs?",
           options: [
             "No — I prefer simple cash back",
             "Maybe — I'd book through a portal instead",
             "Yes — I'd occasionally transfer for better value",
-            "Yes — I transfer points regularly",
+            "Yes — I transfer regularly and know my programs",
             "Yes — I strategically transfer for premium redemptions",
           ],
           type: "signal",
           signals: {
-            csr: [0, 2, 3, 4, 5],
-            amexPlat: [-1, 0, 3, 5, 6],
-            amexGold: [-1, 0, 3, 5, 6],
-            csp: [1, 3, 3, 4, 4],
-            ventureX: [2, 4, 2, 3, 3],
-            hhonors: [-2, -1, 1, 3, 5],
-            marriott: [-2, -1, 1, 3, 5],
-            united: [-2, -1, 3, 4, 5],
-            delta: [-2, -1, 3, 4, 5],
-            biltMW: [-1, 1, 3, 4, 4],
-            inkPref: [1, 3, 3, 4, 5],
-            wfargo: [5, 3, -1, -2, -2],
+            // Transfer enthusiasts: Amex MR and Chase UR are the best ecosystems
+            // Amex MR has 20+ partners; Chase UR has 13+ with best-in-class Hyatt
+            // Bilt is increasingly strong — transfers to Hyatt, AA, United, Alaska, etc.
+            // Capital One: 15+ transfer partners — growing but fewer premium options
+            // Cash-back preference: WF wins, Amex/Chase cards offer poor cash-back rates
+            csr: [-1, 2, 4, 5, 6],
+            amexPlat: [-2, 0, 3, 6, 7],
+            amexGold: [-2, 0, 3, 6, 7],
+            csp: [0, 3, 4, 5, 5],
+            ventureX: [2, 4, 3, 3, 3],
+            hhonors: [-3, -2, 1, 3, 5],
+            marriott: [-3, -2, 1, 3, 5],
+            united: [-3, -2, 4, 5, 5],
+            delta: [-3, -2, 4, 5, 5],
+            biltMW: [-2, 0, 3, 5, 6],
+            inkPref: [0, 3, 4, 5, 6],
+            wfargo: [6, 3, -2, -3, -4], // strong cash-back signal; penalized for transfers
           },
         },
-        /* Q32 — No foreign transaction fees */
+
+        /* ── Q32  Foreign transaction fees ───────────── */
         {
-          text: "How important are no foreign transaction fees when traveling abroad?",
+          text: "How important are no foreign transaction fees?",
           options: [
             "Not important — I rarely go abroad",
             "Slightly — every few years I travel abroad",
-            "Moderately — I go international once a year",
+            "Moderately — international once a year",
             "Important — 2–4 international trips per year",
             "Essential — I'm abroad constantly",
           ],
           type: "signal",
           signals: {
+            // All premium cards in set have no FTF — this question differentiates
+            // at the low-fee end (CSP, WF, Bilt — all have no FTF, so they get equal credit)
+            // Wells Fargo has no FTF, which is notable for a $95 card
+            // This is mostly a tiebreaker for heavy international travelers
             csr: [0, 1, 2, 4, 5],
             amexPlat: [0, 1, 2, 4, 5],
             amexGold: [0, 1, 2, 4, 5],
@@ -1307,81 +1494,142 @@
             wfargo: [0, 1, 2, 4, 5],
           },
         },
-        /* Q33 — Companion ticket */
+
+        /* ── Q33  Companion ticket value ─────────────── */
         {
-          text: "Would you use a complimentary companion airline ticket benefit?",
+          text: "Would you value a complimentary companion airline ticket?",
           options: [
             "No — I always travel solo",
-            "Rarely — I sometimes travel with someone",
-            "Sometimes — I travel with a partner or family 1–2x/year",
+            "Rarely — occasionally travel with someone",
+            "Yes — I travel with a partner 1–2x/year",
             "Often — I almost always travel with a companion",
-            "Frequently — a companion ticket is a huge deal to me",
+            "Huge deal — this is worth hundreds of dollars to me",
           ],
           type: "signal",
           signals: {
-            csr: [0, 0, 1, 1, 1],
-            amexPlat: [0, 0, 1, 1, 2],
-            amexGold: [0, 0, 0, 1, 1],
-            csp: [0, 0, 1, 1, 1],
-            ventureX: [0, 0, 1, 1, 1],
-            hhonors: [0, 0, 1, 1, 1],
-            marriott: [0, 0, 1, 1, 1],
-            united: [0, 1, 3, 4, 5],
-            delta: [0, 1, 3, 4, 5],
-            biltMW: [0, 0, 1, 1, 1],
-            inkPref: [0, 0, 0, 1, 1],
-            wfargo: [0, 0, 1, 1, 1],
+            // Delta Reserve: annual companion certificate (domestic first class) — ~$400-800 value
+            // United Explorer/Club: similar certificate, more restrictive
+            // These companion certs can FULLY justify the annual fee for couples
+            // Other cards: no companion certificate benefit
+            csr: [0, 0, 0, 0, 0],
+            amexPlat: [0, 0, 0, 1, 1],
+            amexGold: [0, 0, 0, 0, 0],
+            csp: [0, 0, 0, 0, 0],
+            ventureX: [0, 0, 0, 0, 0],
+            hhonors: [0, 0, 1, 1, 2],
+            marriott: [0, 0, 1, 1, 2],
+            united: [0, 1, 4, 6, 7], // companion cert for United flyers
+            delta: [0, 1, 4, 6, 7], // companion cert for Delta flyers — huge value
+            biltMW: [0, 0, 0, 0, 0],
+            inkPref: [0, 0, 0, 0, 0],
+            wfargo: [0, 0, 0, 0, 0],
           },
         },
-        /* Q34 — Biggest pain point */
+
+        /* ── Q34  Biggest pain point ──────────────────── */
         {
-          text: "What's your biggest pain point with your current credit card?",
+          text: "What's your biggest pain point with your current card setup?",
           options: [
-            "I'm paying an annual fee but not getting enough value",
-            "I'm not earning enough on dining and travel",
-            "I don't have lounge access or travel protections",
-            "My points expire or are hard to use",
-            "I don't have a travel card at all — starting fresh",
+            "Paying an annual fee but not getting enough value",
+            "Earning too little on dining and everyday spending",
+            "No lounge access or travel protections",
+            "Points that expire, devalue, or are hard to use",
+            "I don't have a travel card at all — starting from scratch",
           ],
           type: "signal",
           signals: {
-            csr: [1, 2, 4, 2, 2],
-            amexPlat: [2, 1, 5, 2, 2],
-            amexGold: [1, 4, 1, 2, 2],
-            csp: [3, 2, 2, 2, 4],
-            ventureX: [3, 1, 3, 3, 4],
+            // Pain #1 (wasting fee): CSP, WF, Venture X — great value per dollar
+            // Pain #2 (weak dining): Amex Gold is the obvious upgrade
+            // Pain #3 (no lounge): Amex Plat or CSR or Venture X — lounge-first cards
+            // Pain #4 (bad redemption): Chase UR and Amex MR — best flexibility
+            // Pain #5 (starting fresh): CSP and WF — best beginner cards
+            csr: [1, 2, 5, 3, 3],
+            amexPlat: [2, 0, 7, 2, 2],
+            amexGold: [1, 6, 0, 2, 2],
+            csp: [4, 2, 1, 3, 5],
+            ventureX: [4, 1, 4, 4, 4],
             hhonors: [1, 1, 2, 4, 2],
             marriott: [1, 1, 2, 4, 2],
-            united: [1, 1, 4, 2, 2],
-            delta: [1, 1, 4, 2, 2],
-            biltMW: [3, 1, 1, 3, 2],
-            inkPref: [1, 2, 1, 2, 2],
-            wfargo: [3, 1, 1, 2, 4],
+            united: [1, 1, 5, 2, 2],
+            delta: [1, 1, 5, 2, 2],
+            biltMW: [4, 2, 0, 4, 2],
+            inkPref: [1, 2, 0, 3, 2],
+            wfargo: [5, 2, 1, 3, 5],
           },
         },
       ];
 
+      /*
+        20-question mode: pick the 20 most differentiating questions
+        — covers all major dimensions without niche credits
+      */
       const Q20_INDICES = [
-        0, 1, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 23, 25, 30, 34,
+        0, // primary travel goal
+        1, // flights per year
+        3, // home airport / airline loyalty
+        4, // hotel nights
+        5, // hotel chain loyalty
+        6, // lounge importance
+        7, // fee tolerance
+        8, // dining spend
+        9, // grocery spend
+        10, // rent situation
+        11, // total monthly spend
+        12, // pay in full
+        13, // international travel
+        14, // redemption style
+        17, // luxury/elite appetite
+        19, // rewards experience
+        23, // hotel credit use
+        25, // DoorDash/DashPass
+        31, // transfer partners
+        34, // biggest pain point
       ];
       const BANK_20 = Q20_INDICES.map((i) => BANK_35[i]);
 
       /* ══════════════════════════════════════════════
-       SCORING ENGINE — 5-stage pipeline
-    ══════════════════════════════════════════════ */
+         SCORING ENGINE
+         
+         Redesigned for absolute fit scoring:
+         Each card is measured against its own theoretical
+         ceiling, producing a genuine % match rather than
+         just "best of this set."
+         
+         Key improvements:
+         1. Cards with hard prerequisites (Bilt=rent,
+            Ink=business, Delta=Delta hub) tank appropriately
+            when prerequisites aren't met
+         2. Amex Plat's credits create meaningful gates —
+            not using the Equinox/Walmart/Digital/Airline
+            credits each subtract meaningfully from its score
+         3. Amex Gold correctly wins on dining/grocery
+            combinations even against higher-fee cards
+         4. Venture X correctly wins for simplicity-seekers
+            with moderate travel — it's often the right answer
+         5. CSP correctly wins for beginners with low-moderate
+            travel who want genuine value, not complexity
+      ══════════════════════════════════════════════ */
+
+      function getTheoreticalMax(cardKey, questions) {
+        let total = 0;
+        questions.forEach((q) => {
+          const sigs = q.signals[cardKey] || [];
+          const best = Math.max(...sigs, 0);
+          total += best;
+        });
+        return total || 1;
+      }
+
       function computeScores() {
         const { questions, answers } = state;
         const raw = {};
         const mults = {};
         const eliminated = new Set();
-        const reasons = {};
         CK.forEach((k) => {
           raw[k] = 0;
           mults[k] = 1.0;
-          reasons[k] = [];
         });
 
-        // Stage 1: accumulate weighted signals
         answers.forEach((ansIdx, qi) => {
           if (ansIdx === null) return;
           const q = questions[qi];
@@ -1390,228 +1638,242 @@
             raw[k] += sig;
           });
 
-          // Stage 2: brand loyalty multipliers
           if (q.loyalty_boost) {
             q.loyalty_boost.forEach((lb) => {
-              if (lb.option === ansIdx) {
-                mults[lb.card] *= lb.mult;
-              }
+              if (lb.option === ansIdx) mults[lb.card] *= lb.mult;
             });
           }
 
-          // Stage 3: dealbreaker / hard eliminators
           if (q.dealbreaker) {
             q.dealbreaker.forEach((db) => {
-              if (db.option === ansIdx) {
+              if (db.option === ansIdx)
                 db.cards.forEach((c) => eliminated.add(c));
-              }
             });
           }
         });
 
-        // Stage 4: fee appropriateness — find what fee the user selected
+        // Hard fee elimination
         let userMaxFee = 9999;
-        let userMonthlySpend = 3000; // default mid estimate
         answers.forEach((ansIdx, qi) => {
           if (ansIdx === null) return;
           const q = questions[qi];
           if (q.type === "fee_filter" && q.fee_brackets) {
             userMaxFee = q.fee_brackets[ansIdx];
           }
-          if (q.type === "spend" && q.monthly_spend && qi === 11) {
-            // Q11 is total monthly spend
-            userMonthlySpend = q.monthly_spend[ansIdx];
-          }
         });
-
-        // Hard eliminate cards over user's max fee tolerance
         CK.forEach((k) => {
-          if (CARDS[k].fee > userMaxFee) {
-            eliminated.add(k);
-          }
+          if (CARDS[k].fee > userMaxFee) eliminated.add(k);
         });
 
-        // Stage 5: apply multipliers, zero out eliminated, normalize
+        // Apply multipliers, zero out eliminated
         const scored = {};
         CK.forEach((k) => {
-          if (eliminated.has(k)) {
-            scored[k] = 0;
-          } else {
-            scored[k] = raw[k] * mults[k];
-          }
+          scored[k] = eliminated.has(k) ? -9999 : raw[k] * mults[k];
         });
 
-        // Shift so minimum is 0, then normalize to 0-100
-        const vals = Object.values(scored);
-        const minV = Math.min(...vals);
-        const shifted = {};
-        CK.forEach((k) => {
-          shifted[k] = scored[k] - minV;
-        });
-        const maxV = Math.max(...Object.values(shifted));
+        /*
+          Absolute fit percentage:
+          - ratio of 1.0 → 93% (no card is a perfect match)
+          - ratio of 0.5 → 69% (decent match)
+          - ratio of 0.0 → 45% (neutral / unclear)
+          - negative ratio → 20–44% (poor fit)
+          - hard eliminated → 0%
+
+          We use a wider spread (20–93) than before to make
+          differences more meaningful and visible.
+        */
         const normalized = {};
         CK.forEach((k) => {
-          normalized[k] = maxV > 0 ? Math.round((shifted[k] / maxV) * 100) : 0;
+          if (eliminated.has(k)) {
+            normalized[k] = 0;
+            return;
+          }
+          const ceiling = getTheoreticalMax(k, questions);
+          const rawRatio = scored[k] / ceiling;
+          // Wider spread: more separation between good and bad fits
+          const display = Math.round(
+            Math.min(93, Math.max(18, 45 + rawRatio * 52)),
+          );
+          normalized[k] = display;
         });
 
         return { normalized, eliminated };
       }
 
       /* ══════════════════════════════════════════════
-       "WHY" EXPLANATION — generates human-readable
-       reasons for the top card recommendation
-    ══════════════════════════════════════════════ */
+         "WHY" EXPLANATION
+         Generates human-readable reasons for top pick,
+         tied to actual question answers
+      ══════════════════════════════════════════════ */
       function generateWhyReasons(winnerKey) {
         const { questions, answers } = state;
         const card = CARDS[winnerKey];
         const reasons = [];
 
-        // Check airline loyalty
-        const airlineQ = questions.find((q) =>
-          q.text.includes("preferred airline"),
-        );
-        const airlineIdx = airlineQ ? questions.indexOf(airlineQ) : -1;
-        if (airlineIdx >= 0 && answers[airlineIdx] !== null) {
-          const ai = answers[airlineIdx];
-          if (winnerKey === "delta" && ai === 0)
+        const qIdx = (substr) => {
+          const q = questions.find((q) => q.text.includes(substr));
+          return q ? questions.indexOf(q) : -1;
+        };
+        const ans = (substr) => {
+          const i = qIdx(substr);
+          return i >= 0 ? answers[i] : null;
+        };
+
+        // Airline loyalty
+        const airlineAns = ans("home airport");
+        if (airlineAns !== null) {
+          if (winnerKey === "delta" && airlineAns === 0)
             reasons.push(
-              "You prefer Delta — the Reserve gives Skyclub access and companion certificates",
+              "You fly Delta from a Delta hub — the Reserve earns SkyMiles faster and gives Skyclub lounge access plus an annual companion certificate",
             );
-          if (winnerKey === "united" && ai === 1)
+          if (winnerKey === "united" && airlineAns === 1)
             reasons.push(
-              "You prefer United — you'll earn bonus miles and get United Club access",
+              "You fly United from a United hub — you'll earn bonus miles, get free checked bags, and have access to United Club lounges",
             );
         }
 
-        // Check hotel loyalty
-        const hotelQ = questions.find((q) =>
-          q.text.includes("preferred hotel chain"),
-        );
-        const hotelIdx = hotelQ ? questions.indexOf(hotelQ) : -1;
-        if (hotelIdx >= 0 && answers[hotelIdx] !== null) {
-          const hi = answers[hotelIdx];
-          if (winnerKey === "hhonors" && hi === 0)
+        // Hotel loyalty
+        const hotelAns = ans("preferred hotel chain");
+        if (hotelAns !== null) {
+          if (winnerKey === "hhonors" && hotelAns === 0)
             reasons.push(
-              "You're a Hilton loyalist — the Aspire automatically gives you top-tier Diamond status",
+              "You're a Hilton loyalist — the Aspire card automatically grants Diamond status (top tier) without requiring any stays",
             );
-          if (winnerKey === "marriott" && hi === 1)
+          if (winnerKey === "marriott" && hotelAns === 1)
             reasons.push(
-              "You're loyal to Marriott — the Brilliant card gets you Platinum Elite status automatically",
+              "You're loyal to Marriott — the Brilliant card automatically gives you Platinum Elite status and an annual free night worth up to 85,000 points",
+            );
+          if ((winnerKey === "csr" || winnerKey === "csp") && hotelAns === 2)
+            reasons.push(
+              "You prefer Hyatt — Chase Ultimate Rewards is the only major points currency that transfers 1:1 to Hyatt, often yielding 2–4 cents per point at Park Hyatt properties",
             );
         }
 
-        // Dining signals
-        const diningQ = questions.find((q) =>
-          q.text.includes("dining & food delivery"),
-        );
-        const diningIdx = diningQ ? questions.indexOf(diningQ) : -1;
-        if (
-          diningIdx >= 0 &&
-          answers[diningIdx] !== null &&
-          answers[diningIdx] >= 2
-        ) {
+        // Dining
+        const diningAns = ans("dining & food delivery");
+        if (diningAns !== null && diningAns >= 2) {
           if (winnerKey === "amexGold")
             reasons.push(
-              "You spend heavily on dining — Amex Gold's 4x on restaurants is the best in class",
+              "Your dining spend is substantial — Amex Gold's 4x at restaurants worldwide is the highest dining multiplier of any card in this comparison",
             );
           if (winnerKey === "csr")
             reasons.push(
-              "You spend heavily on dining — Chase Sapphire Reserve earns 3x on all dining",
+              "You spend heavily on dining — CSR earns an uncapped 3x at all restaurants, combining well with its 1.5x portal redemption for ~4.5% effective return",
             );
         }
 
-        // Fee comfort
-        const feeQ = questions.find((q) => q.type === "fee_filter");
-        const feeIdx = feeQ ? questions.indexOf(feeQ) : -1;
-        if (feeIdx >= 0 && answers[feeIdx] !== null) {
-          const fi = answers[feeIdx];
-          if (fi <= 1 && winnerKey === "biltMW")
+        // Grocery
+        const groceryAns = ans("U.S. supermarkets");
+        if (groceryAns !== null && groceryAns >= 2) {
+          if (winnerKey === "amexGold")
             reasons.push(
-              "You want no annual fee — Bilt is the only $0-fee card that earns travel rewards on rent",
+              "You buy groceries frequently — Amex Gold's 4x at U.S. supermarkets (on up to $25,000/yr) stacks with the dining bonus to make this card extremely efficient for your everyday spending",
             );
-          if (fi <= 1 && winnerKey === "csp")
+          if (winnerKey === "wfargo")
             reasons.push(
-              "You want low fees — Chase Sapphire Preferred offers excellent value at just $95/year",
+              "Your grocery spend is significant — Wells Fargo Autograph Journey earns 3x at U.S. supermarkets, more than most premium cards",
             );
-          if (
-            fi === 4 &&
-            (winnerKey === "amexPlat" ||
-              winnerKey === "delta" ||
-              winnerKey === "marriott")
-          )
+        }
+
+        // Fee
+        const feeAns = ans("annual fee");
+        if (feeAns !== null) {
+          if (feeAns <= 1 && winnerKey === "biltMW")
             reasons.push(
-              "You're willing to pay for premium — the credits and perks offset the high annual fee",
+              "You want no annual fee — Bilt is the only $0-fee card that earns transferable travel points on rent, dining, and travel",
+            );
+          if (feeAns <= 1 && winnerKey === "csp")
+            reasons.push(
+              "You want low fees — Chase Sapphire Preferred delivers best-in-class value at $95/yr: 3x dining, 2x travel, trip protections, and access to Chase's transfer partner network",
+            );
+          if (feeAns <= 1 && winnerKey === "wfargo")
+            reasons.push(
+              "You want low fees — Wells Fargo Autograph Journey is a straightforward $95/yr card with 3x on travel, restaurants, and groceries",
+            );
+          if (feeAns === 4 && winnerKey === "amexPlat")
+            reasons.push(
+              "You're open to a premium fee when credits justify it — the Platinum's $695 fee is offset by up to $1,500+ in annual credits across travel, wellness, entertainment, and dining",
             );
         }
 
         // Lounge access
-        const loungeQ = questions.find((q) => q.text.includes("lounge access"));
-        const loungeIdx = loungeQ ? questions.indexOf(loungeQ) : -1;
-        if (
-          loungeIdx >= 0 &&
-          answers[loungeIdx] !== null &&
-          answers[loungeIdx] >= 3
-        ) {
+        const loungeAns = ans("lounge access");
+        if (loungeAns !== null && loungeAns >= 3) {
           if (winnerKey === "amexPlat")
             reasons.push(
-              "Lounge access is critical to you — Amex Platinum unlocks Centurion Lounges, Priority Pass, and Delta Sky Clubs",
+              "Lounge access is essential to you — Amex Platinum gives the broadest access: 40+ Centurion Lounges, Delta Sky Clubs when flying Delta, Priority Pass Select, and Escape lounges",
             );
           if (winnerKey === "csr")
             reasons.push(
-              "Lounge access matters — CSR includes Priority Pass Select with 1,300+ lounges globally",
+              "Lounge access matters — CSR's Priority Pass Select covers 1,300+ lounges worldwide at a fraction of Platinum's fee",
             );
           if (winnerKey === "ventureX")
             reasons.push(
-              "You need lounge access — Venture X includes Priority Pass and Capital One lounges for a lower fee than competitors",
+              "You need lounge access — Venture X includes Priority Pass and Capital One's own lounges, effectively making the $395 fee nearly free via the $300 travel credit + anniversary miles",
             );
         }
 
         // Rent
-        const rentQ = questions.find((q) => q.text.includes("rent"));
-        const rentIdx = rentQ ? questions.indexOf(rentQ) : -1;
-        if (
-          rentIdx >= 0 &&
-          answers[rentIdx] !== null &&
-          answers[rentIdx] >= 3
-        ) {
+        const rentAns = ans("Do you pay rent");
+        if (rentAns !== null && rentAns >= 3) {
           if (winnerKey === "biltMW")
             reasons.push(
-              "Earning points on rent is your top priority — only Bilt lets you do this with no fee",
+              "Earning on rent is your unique opportunity — at your rent level you'd accumulate tens of thousands of Bilt points annually just from housing payments, which no other card allows",
             );
         }
 
         // Business
-        const bizQ = questions.find((q) => q.text.includes("business"));
-        const bizIdx = bizQ ? questions.indexOf(bizQ) : -1;
-        if (bizIdx >= 0 && answers[bizIdx] !== null && answers[bizIdx] >= 2) {
+        const bizAns = ans("own or operate a business");
+        if (bizAns !== null && bizAns >= 2) {
           if (winnerKey === "inkPref")
             reasons.push(
-              "You have significant business expenses — Ink Preferred earns 3x on travel, shipping, ads, and more",
+              "Your business expenses are substantial — Ink Preferred earns 3x on travel, shipping, internet, cable, phone, and advertising (up to $150k/yr), all pooled into Chase Ultimate Rewards",
+            );
+        }
+
+        // Simplicity
+        const categoryAns = ans("tracking multiple credit card");
+        if (categoryAns !== null && categoryAns <= 1) {
+          if (winnerKey === "ventureX")
+            reasons.push(
+              "You want simplicity — Venture X's flat 2x on everything eliminates category tracking while still earning meaningful rewards for active travelers",
+            );
+          if (winnerKey === "wfargo")
+            reasons.push(
+              "You want simplicity — Wells Fargo Autograph Journey has just three clear categories (travel, restaurants, groceries) with everything else earning 1x",
+            );
+        }
+
+        // Experience level
+        const expAns = ans("experienced are you");
+        if (expAns !== null && expAns <= 1) {
+          if (winnerKey === "csp")
+            reasons.push(
+              "You're earlier in the rewards journey — Chase Sapphire Preferred is widely considered the best first travel card: large welcome bonus, clear category bonuses, and a straightforward path to free travel",
             );
         }
 
         // Transfers
-        const xferQ = questions.find((q) => q.text.includes("transfer points"));
-        const xferIdx = xferQ ? questions.indexOf(xferQ) : -1;
-        if (
-          xferIdx >= 0 &&
-          answers[xferIdx] !== null &&
-          answers[xferIdx] >= 3
-        ) {
+        const xferAns = ans("transfer points");
+        if (xferAns !== null && xferAns >= 3) {
           if (winnerKey === "amexPlat" || winnerKey === "amexGold")
             reasons.push(
-              "You love transfer partners — Amex has 20+ airline and hotel partners for premium redemptions",
+              "You're a transfer-points optimizer — Amex Membership Rewards is the most versatile points currency, with 20+ airline and hotel partners and outsized value for business and first class awards",
             );
           if (winnerKey === "csr" || winnerKey === "csp")
             reasons.push(
-              "You value transfer partners — Chase Ultimate Rewards transfers to United, Hyatt, Southwest, and more",
+              "You value transfer partners — Chase Ultimate Rewards transfers to Hyatt (the best hotel points value in the industry), plus United, Southwest, British Airways, and more",
+            );
+          if (winnerKey === "biltMW")
+            reasons.push(
+              "You value transfer partners — Bilt's network (Hyatt, AA, United, Alaska, Air France) is surprisingly strong for a $0-fee card, and you're earning on rent to fuel those transfers",
             );
         }
 
-        // Fallback generic reason
+        // Fallback
         if (reasons.length === 0) {
           reasons.push(
-            `${card.name} scores highest across your combination of spending habits, travel frequency, and preferences`,
+            `${card.name} scores highest across your combination of spending habits, travel patterns, and preferences`,
           );
         }
 
@@ -1619,8 +1881,8 @@
       }
 
       /* ══════════════════════════════════════════════
-       STATE
-    ══════════════════════════════════════════════ */
+         STATE
+      ══════════════════════════════════════════════ */
       let state = {
         mode: null,
         questions: [],
@@ -1631,8 +1893,8 @@
       let allRankingsOpen = false;
 
       /* ══════════════════════════════════════════════
-       SCREEN / QUIZ LOGIC — unchanged from original
-    ══════════════════════════════════════════════ */
+         SCREEN / QUIZ LOGIC
+      ══════════════════════════════════════════════ */
       function show(id) {
         document
           .querySelectorAll(".screen")
@@ -1827,32 +2089,42 @@
       });
 
       /* ══════════════════════════════════════════════
-       RESULTS
-    ══════════════════════════════════════════════ */
+         RESULTS
+      ══════════════════════════════════════════════ */
       function showResults() {
         const { normalized, eliminated } = computeScores();
         const sorted = Object.entries(normalized).sort((a, b) => b[1] - a[1]);
-        const top3 = sorted.slice(0, 3);
-        const winnerKey = top3[0][0];
+        const nonZero = sorted.filter(([, s]) => s > 0);
+        const display3 =
+          nonZero.length >= 3 ? nonZero.slice(0, 3) : sorted.slice(0, 3);
+        const winnerKey = display3[0][0];
         const winner = CARDS[winnerKey];
+        const winnerPct = display3[0][1];
+
+        const matchLabel =
+          winnerPct >= 82
+            ? "Excellent match"
+            : winnerPct >= 68
+              ? "Strong match"
+              : winnerPct >= 54
+                ? "Good match"
+                : "Closest match";
 
         document.getElementById("winner-sub").textContent = winner.name;
         document.getElementById("winner-sub").style.color = winner.color;
 
         const tc = document.getElementById("top-cards");
         tc.innerHTML = "";
-        top3.forEach(([key, pct], i) => {
+        display3.forEach(([key, pct], i) => {
           const card = CARDS[key];
           const isW = i === 0;
-          const eliminated_tag = eliminated.has(key) ? " (filtered)" : "";
+          const feeDisplay = card.fee === 0 ? "$0/yr" : `$${card.fee}/yr`;
           const el = document.createElement("div");
           el.className = "rc rounded-md p-6 mb-2.5 relative overflow-hidden";
           el.style.borderColor = `${card.color}${isW ? "55" : "22"}`;
           if (isW) el.style.boxShadow = `0 16px 48px ${card.color}14`;
-
-          const feeDisplay = card.fee === 0 ? "$0/yr" : `$${card.fee}/yr`;
           el.innerHTML = `
-${isW ? `<div class="rc-best-tag absolute top-4 right-[18px] font-mono text-[9px] tracking-[0.25em] uppercase text-[color:var(--red)]">Best Match</div>` : ""}
+${isW ? `<div class="rc-best-tag absolute top-4 right-[18px] font-mono text-[9px] tracking-[0.25em] uppercase text-[color:var(--red)]">${matchLabel}</div>` : ""}
 <div class="flex items-start gap-4">
   <div class="text-[28px] flex-shrink-0 leading-none mt-0.5" style="color:${card.color}">${card.icon}</div>
   <div>
@@ -1863,7 +2135,7 @@ ${isW ? `<div class="rc-best-tag absolute top-4 right-[18px] font-mono text-[9px
 </div>
 <div class="mt-4">
   <div class="flex justify-between mb-1 font-mono text-[9.5px] text-[color:var(--text3)] tracking-[0.1em] uppercase">
-    <span>Match Score</span><span style="color:${card.color}">${pct}%</span>
+    <span>Fit Score</span><span style="color:${card.color}">${pct}%</span>
   </div>
   <div class="rc-track h-[3px] rounded-full overflow-hidden">
     <div class="rc-fill h-full rounded-full" style="width:${pct}%;background:${card.color};--bw:${pct}%"></div>
@@ -1877,7 +2149,7 @@ ${isW ? `<div class="rc-best-tag absolute top-4 right-[18px] font-mono text-[9px
         const whyReasons = generateWhyReasons(winnerKey);
         if (whyReasons.length > 0) {
           why.innerHTML = `
-<div class="rounded-md px-6 py-5" style="border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02)">
+<div class="rounded-md px-6 py-5 mb-2.5" style="border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02)">
   <p class="font-mono text-[9px] tracking-[0.28em] uppercase text-[color:var(--text3)] mb-3">Why ${winner.name}?</p>
   <ul class="space-y-2">
     ${whyReasons.map((r) => `<li class="flex gap-3 text-[13px] font-light text-[color:var(--text2)] leading-[1.5]"><span class="text-[color:var(--red)] flex-shrink-0 mt-0.5">›</span><span>${r}</span></li>`).join("")}
@@ -1889,13 +2161,13 @@ ${isW ? `<div class="rc-best-tag absolute top-4 right-[18px] font-mono text-[9px
         ar.innerHTML = "";
         sorted.forEach(([key, pct]) => {
           const card = CARDS[key];
-          const isElim = eliminated.has(key);
+          const isElim = eliminated.has(key) || pct === 0;
           const row = document.createElement("div");
           row.className =
-            "flex items-center gap-2.5" + (isElim ? " opacity-30" : "");
+            "flex items-center gap-2.5" + (isElim ? " opacity-25" : "");
           row.innerHTML = `
 <div class="text-[13px] w-5 text-center flex-shrink-0" style="color:${card.color}">${card.icon}</div>
-<div class="text-[13px] font-light text-[color:var(--text2)] flex-1 overflow-hidden text-ellipsis whitespace-nowrap">${card.name}${isElim ? " <span class='font-mono text-[9px] text-[color:var(--text3)]'>(fee too high)</span>" : ""}</div>
+<div class="text-[13px] font-light text-[color:var(--text2)] flex-1 overflow-hidden text-ellipsis whitespace-nowrap">${card.name}${isElim ? `<span class='font-mono text-[9px] text-[color:var(--text3)]'> · filtered</span>` : ""}</div>
 <div class="rank-track w-[100px] h-[2px] rounded-full overflow-hidden flex-shrink-0">
   <div class="rank-fill h-full rounded-full" style="width:${pct}%;background:${card.color}80;--bw:${pct}%"></div>
 </div>

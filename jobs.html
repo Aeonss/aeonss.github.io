@@ -8,8 +8,9 @@
       href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;900&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
-
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="jobs.css" />
     <script>
       tailwind.config = {
         theme: {
@@ -21,10 +22,40 @@
             },
           },
         },
+        safelist: [
+          "font-mono",
+          "tracking-[0.1em]",
+          "uppercase",
+          "no-underline",
+          "px-3.5",
+          "py-1.5",
+          "rounded-[3px]",
+          "duration-[180ms]",
+          "text-[color:var(--text3)]",
+          "text-[color:var(--text2)]",
+          "text-[color:var(--red)]",
+          "hover:text-[color:var(--text2)]",
+          "hover:bg-[var(--bg2)]",
+          "bg-[var(--red-g)]",
+          "fixed",
+          "top-0",
+          "left-0",
+          "right-0",
+          "z-[100]",
+          "h-14",
+          "mt-6",
+          "mr-9",
+          "flex-shrink-0",
+          "gap-0.5",
+          "ml-auto",
+          "font-display",
+          "text-xl",
+          "font-bold",
+          "tracking-[0.08em]",
+          "h-[70px]",
+        ],
       };
     </script>
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="jobs.css" />
     <script src="navbar.js"></script>
   </head>
 
@@ -32,15 +63,12 @@
     <site-navbar></site-navbar>
 
     <!-- SEARCH -->
-    <!-- search-wrap: pt-[60px] px-8 max-w-[860px] mx-auto -->
-    <div class="pt-[60px] px-8 max-w-[860px] mx-auto mt-8">
-      <!-- search-row: flex gap-2.5 -->
+    <div class="pt-[60px] px-8 max-w-[1400px] mx-auto mt-8">
       <div class="flex gap-2.5">
         <input
           id="searchInput"
           class="search-input flex-1 text-[15px] px-[18px] py-3 rounded"
           type="text"
-          value=""
           placeholder="e.g. Project Accountant, Software Engineer…"
         />
         <button
@@ -51,29 +79,154 @@
           Search
         </button>
       </div>
+
+      <!-- FILTER TOGGLE ROW -->
+      <div class="flex items-center gap-3 mt-3 flex-wrap">
+        <button
+          id="filtersToggle"
+          class="filters-toggle-btn text-[10px] tracking-[0.1em] uppercase px-3 py-[6px]"
+          onclick="toggleFilters()"
+        >
+          <span>⚙ Filters</span>
+          <span class="chev">▾</span>
+        </button>
+        <div id="activeFiltersRow" class="active-filters-row"></div>
+      </div>
+
+      <!-- FILTERS PANEL -->
+      <div id="filtersPanel" class="filters-panel mt-2">
+        <!-- ROW 1: Title Contains / Title NOT Contains -->
+        <div class="filter-group grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <div class="filter-label">
+              <span class="dot green"></span>Job title must include
+            </div>
+            <div class="tag-input-wrap" onclick="focusTagInput('titleInc')">
+              <div id="pills-titleInc" class="contents"></div>
+              <input
+                id="titleInc"
+                class="tag-ghost-input"
+                placeholder="e.g. analyst, engineer…"
+                onkeydown="tagKeydown(event, 'titleInc', 'include')"
+              />
+            </div>
+            <div class="filter-hint">
+              Press Enter or comma to add • matches job_title_or
+            </div>
+          </div>
+          <div>
+            <div class="filter-label">
+              <span class="dot red"></span>Job title must NOT include
+            </div>
+            <div class="tag-input-wrap" onclick="focusTagInput('titleExc')">
+              <div id="pills-titleExc" class="contents"></div>
+              <input
+                id="titleExc"
+                class="tag-ghost-input"
+                placeholder="e.g. cyber, senior…"
+                onkeydown="tagKeydown(event, 'titleExc', 'exclude')"
+              />
+            </div>
+            <div class="filter-hint">
+              Press Enter or comma to add • matches job_title_not
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 2: Description Contains / Description NOT Contains -->
+        <div class="filter-group grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <div class="filter-label">
+              <span class="dot green"></span>Description must contain
+            </div>
+            <div class="tag-input-wrap" onclick="focusTagInput('descInc')">
+              <div id="pills-descInc" class="contents"></div>
+              <input
+                id="descInc"
+                class="tag-ghost-input"
+                placeholder="e.g. ts/sci, clearance…"
+                onkeydown="tagKeydown(event, 'descInc', 'include')"
+              />
+            </div>
+            <div class="filter-hint">
+              Press Enter or comma to add • matches job_description_contains_or
+            </div>
+          </div>
+          <div>
+            <div class="filter-label">
+              <span class="dot red"></span>Description must NOT contain
+            </div>
+            <div class="tag-input-wrap" onclick="focusTagInput('descExc')">
+              <div id="pills-descExc" class="contents"></div>
+              <input
+                id="descExc"
+                class="tag-ghost-input"
+                placeholder="e.g. polygraph, poly…"
+                onkeydown="tagKeydown(event, 'descExc', 'exclude')"
+              />
+            </div>
+            <div class="filter-hint">
+              Press Enter or comma to add • matches job_description_contains_not
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 3: Posted within + Salary range -->
+        <div class="filter-group grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <div class="filter-label">
+              <span class="dot"></span>Posted within
+            </div>
+            <select id="maxAgeDays" class="filter-select w-full">
+              <option value="7">7 days</option>
+              <option value="14">14 days</option>
+              <option value="30" selected>30 days</option>
+              <option value="60">60 days</option>
+              <option value="90">90 days</option>
+            </select>
+          </div>
+          <div>
+            <div class="filter-label">
+              <span class="dot"></span>Salary range (annual USD)
+            </div>
+            <div class="range-input-pair">
+              <input
+                id="salaryMin"
+                class="range-input"
+                type="number"
+                placeholder="Min e.g. 80000"
+              />
+              <span class="range-sep">—</span>
+              <input
+                id="salaryMax"
+                class="range-input"
+                type="number"
+                placeholder="Max e.g. 150000"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /filters-panel -->
     </div>
 
     <!-- CACHE TOOLBAR -->
-    <!-- cache-toolbar: max-w-[860px] mx-auto mt-2.5 px-8 flex items-center gap-2 flex-wrap -->
     <div
-      class="max-w-[860px] mx-auto mt-2.5 px-8 flex items-center gap-2 flex-wrap"
+      class="max-w-[1400px] mx-auto mt-3 px-8 flex items-center gap-2 flex-wrap"
     >
-      <span
-        id="cacheStat"
-        class="cache-stat font-mono text-[10px] text-[color:var(--text3)] flex-1"
+      <span id="cacheStat" class="cache-stat font-mono text-[10px] flex-1"
+        >Cache: loading…</span
       >
-        Cache: loading…
-      </span>
       <button
         class="cache-btn font-mono text-[10px] tracking-[0.08em] uppercase px-3 py-[5px] rounded-[3px] cursor-pointer"
         onclick="exportCache()"
       >
-        ⬆️ Export Cache
+        ⬆️ Export
       </button>
       <label
         class="cache-btn font-mono text-[10px] tracking-[0.08em] uppercase px-3 py-[5px] rounded-[3px] cursor-pointer"
       >
-        ⬇️ Import Cache
+        ⬇️ Import
         <input
           type="file"
           accept=".json"
@@ -82,7 +235,7 @@
         />
       </label>
       <button
-        class="cache-btn danger font-mono text-[10px] tracking-[0.08em] uppercase px-3 py-[5px] rounded-[3px] cursor-pointer"
+        class="cache-btn font-mono text-[10px] tracking-[0.08em] uppercase px-3 py-[5px] rounded-[3px] cursor-pointer"
         onclick="loadCurrentCache()"
       >
         ⚡ Load Cache
@@ -91,39 +244,37 @@
         class="cache-btn danger font-mono text-[10px] tracking-[0.08em] uppercase px-3 py-[5px] rounded-[3px] cursor-pointer"
         onclick="clearCache()"
       >
-        ❌ Clear Cache
+        ❌ Clear
       </button>
     </div>
 
     <!-- ERROR BOX -->
     <div
       id="errorBox"
-      class="error-box font-mono text-[11.5px] px-4 py-2.5 rounded mx-8 mt-3"
+      class="error-box font-mono text-[11.5px] px-4 py-2.5 rounded mx-8 mt-3 max-w-[1400px]"
     ></div>
 
     <!-- META BAR -->
-    <!-- meta-bar: flex items-center gap-2 px-8 pt-4 pb-2 font-mono text-[11px] text-[color:var(--text3)] min-h-[46px] -->
     <div
-      class="flex items-center gap-2 px-8 pt-4 pb-2 font-mono text-[11px] text-[color:var(--text3)] min-h-[46px]"
+      class="flex items-center gap-2 px-8 pt-4 pb-2 font-mono text-[11px] min-h-[46px] max-w-[1400px] mx-auto"
     >
-      <div id="loader" class="meta-dots-loader" style="display: none">
+      <div
+        id="loader"
+        class="meta-dots-loader"
+        style="display: none; align-items: center; gap: 4px"
+      >
         <span></span><span></span><span></span>
-        <span class="ml-1 font-mono text-[11px] text-[color:var(--text3)]"
-          >Fetching jobs…</span
-        >
+        <span class="ml-1 font-mono text-[11px]">Fetching jobs…</span>
       </div>
       <span id="metaText" style="display: none"></span>
     </div>
 
     <!-- JOBS GRID -->
     <main>
-      <!-- jobs-grid: px-8 pb-20 grid gap-3 auto-fill minmax(320px,1fr) -->
       <div
         id="jobsGrid"
-        class="px-8 pb-20 grid gap-3"
-        style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr))"
+        class="px-8 pb-20 grid grid-cols-3 gap-3 max-w-[1400px] mx-auto"
       >
-        <!-- empty state -->
         <div class="col-span-full text-center py-20 text-[color:var(--text3)]">
           <div class="text-[44px] mb-4 inline-block animate-bounce">🔍</div>
           <div
@@ -146,9 +297,138 @@
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXIiOjEsImp0aSI6IjAzM2Y0ZGEwLWU4ZTYtNDU3MC05ZGE1LTQ2Y2JiNDgxMWY2MiIsImNyZWF0ZWRfYnkiOjE2NzMwMywicGVybWlzc2lvbnMiOltdLCJhdWQiOiJhcGkiLCJpYXQiOjE3Nzg1MDg5MjEsInN1YiI6IjE2NjU5OSIsIm5hbWUiOiJzZGRzc2QiLCJlbWFpbCI6Im9yNHMwb2JyQHQub21teC5uZXQifQ.DNhbpQcQp0njIMtRiKO64mN9vRpXRXf5H8tRmxatd0w",
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXIiOjEsImp0aSI6ImU5OTBkYzA2LTYxMzUtNGZlYS04YzFiLTgyZDZmNjI4ZDVmNiIsImNyZWF0ZWRfYnkiOjE2NzQ0MywicGVybWlzc2lvbnMiOltdLCJhdWQiOiJhcGkiLCJpYXQiOjE3Nzg1Mjk0MzEsInN1YiI6IjE2NjczMyIsIm5hbWUiOiJhc2Rhc2QiLCJlbWFpbCI6IjNuZjg3enpmQHNwYW1tYWlsLm9yZyJ9.zrKgrGGpphTEV6HSARkx8I4juPDynW6wEjzrjgWeqFs",
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXIiOjEsImp0aSI6IjA5NDRhMGU4LTE4ZjItNDQ1NC04NmYxLWZmNTA2ZWQ3MDU2OCIsImNyZWF0ZWRfYnkiOjE2NzQ4OSwicGVybWlzc2lvbnMiOltdLCJhdWQiOiJhcGkiLCJpYXQiOjE3Nzg1NTAwNTAsInN1YiI6IjE2Njc3OCIsIm5hbWUiOiJhc2Rhc2QiLCJlbWFpbCI6ImF3ZTlwbXQ4QHNwYW1tYWlsLm9yZyJ9.A1SmIw1eST1OWimEDa3JHJUj4Bmgb2Sc_A65cvBzxYY",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXIiOjEsImp0aSI6IjFkNjcwMzE1LTE1YjgtNDJlZS04OWJhLWJlNWMzMmRiMGJhNyIsImNyZWF0ZWRfYnkiOjE3MDMwMCwicGVybWlzc2lvbnMiOltdLCJhdWQiOiJhcGkiLCJpYXQiOjE3Nzg4NzM0MDUsInN1YiI6IjE2OTU4NiIsIm5hbWUiOiJhc2FzZGRzYSIsImVtYWlsIjoiOTJreThlOWxAbWljcm9zbG9wLmFzaWEifQ.3xXAvTIZPyUb4f7SdPrAVgdMh3lt5Q5FnbG7pW5ehQM",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXIiOjEsImp0aSI6IjFkNjcwMzE1LTE1YjgtNDJlZS04OWJhLWJlNWMzMmRiMGJhNyIsImNyZWF0ZWRfYnkiOjE3MDMwMCwicGVybWlzc2lvbnMiOltdLCJhdWQiOiJhcGkiLCJpYXQiOjE3Nzg4NzM0MDUsInN1YiI6IjE2OTU4NiIsIm5hbWUiOiJhc2Fzc2RzYSIsImVtYWlsIjoiOTJreThlOWxAbWljcm9zbG9wLmFzaWEifQ.3xXAvTIZPyUb4f7SdPrAVgdMh3lt5Q5FnbG7pW5ehQM",
       ];
       const API_KEY = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
+
+      // ─── TAG-PILL STATE ──────────────────────────────────────────────────────
+      // { fieldId: [{ value, type }] }
+      const tagState = {
+        titleInc: [],
+        titleExc: [],
+        descInc: [],
+        descExc: [],
+      };
+
+      function focusTagInput(id) {
+        document.getElementById(id).focus();
+      }
+
+      function tagKeydown(e, fieldId, type) {
+        if (e.key === "Enter" || e.key === ",") {
+          e.preventDefault();
+          const val = e.target.value.trim().replace(/,$/, "");
+          if (val) addTag(fieldId, val, type);
+          e.target.value = "";
+        } else if (
+          e.key === "Backspace" &&
+          !e.target.value &&
+          tagState[fieldId].length
+        ) {
+          removeTag(fieldId, tagState[fieldId].length - 1);
+        }
+      }
+
+      function addTag(fieldId, value, type) {
+        // dedup
+        if (
+          tagState[fieldId].some(
+            (t) => t.value.toLowerCase() === value.toLowerCase(),
+          )
+        )
+          return;
+        tagState[fieldId].push({ value, type });
+        renderPills(fieldId);
+        updateActiveFiltersSummary();
+      }
+
+      function removeTag(fieldId, idx) {
+        tagState[fieldId].splice(idx, 1);
+        renderPills(fieldId);
+        updateActiveFiltersSummary();
+      }
+
+      function renderPills(fieldId) {
+        const container = document.getElementById(`pills-${fieldId}`);
+        container.innerHTML = "";
+        tagState[fieldId].forEach((tag, i) => {
+          const pill = document.createElement("span");
+          pill.className = `tag-pill ${tag.type}`;
+          pill.innerHTML = `${escHtml(tag.value)}<button onclick="removeTag('${fieldId}',${i})" title="Remove">×</button>`;
+          container.appendChild(pill);
+        });
+      }
+
+      function escHtml(s) {
+        return s
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      // ─── ACTIVE FILTER SUMMARY ───────────────────────────────────────────────
+      function updateActiveFiltersSummary() {
+        const row = document.getElementById("activeFiltersRow");
+        const pills = [];
+
+        const add = (items, cls, prefix) =>
+          items.forEach((t) =>
+            pills.push(
+              `<span class="af-pill ${cls}">${prefix}${escHtml(t.value)}</span>`,
+            ),
+          );
+
+        add(tagState.titleInc, "inc", "title: ");
+        add(tagState.titleExc, "exc", "−title: ");
+        add(tagState.descInc, "inc", "desc: ");
+        add(tagState.descExc, "exc", "−desc: ");
+        const maxAge = document.getElementById("maxAgeDays").value;
+        if (maxAge !== "30")
+          pills.push(`<span class="af-pill neu">≤${maxAge}d</span>`);
+
+        const sMin = document.getElementById("salaryMin").value;
+        const sMax = document.getElementById("salaryMax").value;
+        if (sMin || sMax)
+          pills.push(
+            `<span class="af-pill neu">$${sMin || "?"}–$${sMax || "?"}</span>`,
+          );
+
+        row.innerHTML = pills.join("");
+        // update toggle button active state
+        const btn = document.getElementById("filtersToggle");
+        const hasFilters = pills.length > 0;
+        btn.classList.toggle(
+          "active",
+          hasFilters || btn.classList.contains("open"),
+        );
+      }
+
+      // ─── FILTER PANEL TOGGLE ─────────────────────────────────────────────────
+      function toggleFilters() {
+        const panel = document.getElementById("filtersPanel");
+        const btn = document.getElementById("filtersToggle");
+        const open = panel.classList.toggle("open");
+        btn.classList.toggle("active", open);
+        if (open) btn.querySelector(".chev").style.transform = "rotate(180deg)";
+        else btn.querySelector(".chev").style.transform = "";
+      }
+
+      // wire change events to update summary
+      document
+        .querySelectorAll("[name=seniority],[name=work]")
+        .forEach((el) =>
+          el.addEventListener("change", updateActiveFiltersSummary),
+        );
+      document
+        .getElementById("maxAgeDays")
+        .addEventListener("change", updateActiveFiltersSummary);
+      document
+        .getElementById("salaryMin")
+        .addEventListener("input", updateActiveFiltersSummary);
+      document
+        .getElementById("salaryMax")
+        .addEventListener("input", updateActiveFiltersSummary);
 
       // ─── CACHE ───────────────────────────────────────────────────────────────
       const CACHE_KEY = "jobsCache_v1";
@@ -164,34 +444,30 @@
         try {
           localStorage.setItem(CACHE_KEY, JSON.stringify(data));
         } catch (e) {
-          console.warn("localStorage quota hit, trimming cache…", e);
-          for (const k of Object.keys(data)) {
+          for (const k of Object.keys(data))
             if (data[k].length > 50) data[k] = data[k].slice(-50);
-          }
           try {
             localStorage.setItem(CACHE_KEY, JSON.stringify(data));
           } catch {}
         }
       }
-      function getCacheForSearch(searchName) {
+      function getCacheForSearch(key) {
         const raw = loadCache();
-        const key = searchName.toLowerCase().trim();
-        const cachedJobs = raw[key] || [];
+        const k = key.toLowerCase().trim();
+        const cachedJobs = raw[k] || [];
         return { cachedJobs, cachedIds: cachedJobs.map((j) => String(j.id)) };
       }
-      function addToCache(searchName, jobs) {
+      function addToCache(key, jobs) {
         const raw = loadCache();
-        const key = searchName.toLowerCase().trim();
-        const existing = new Set((raw[key] || []).map((j) => String(j.id)));
-        const merged = [...(raw[key] || [])];
-        for (const job of jobs) {
-          const id = String(job.id);
-          if (!existing.has(id)) {
+        const k = key.toLowerCase().trim();
+        const existing = new Set((raw[k] || []).map((j) => String(j.id)));
+        const merged = [...(raw[k] || [])];
+        for (const job of jobs)
+          if (!existing.has(String(job.id))) {
             merged.push(job);
-            existing.add(id);
+            existing.add(String(job.id));
           }
-        }
-        raw[key] = merged;
+        raw[k] = merged;
         saveCache(raw);
       }
       function updateCacheStat() {
@@ -201,16 +477,15 @@
         const stat = document.getElementById("cacheStat");
         if (!keys.length) {
           stat.innerHTML = "Cache: <strong>empty</strong>";
-        } else {
-          const searches = keys
-            .map((k) => `<em>${k}</em> (${raw[k].length})`)
-            .join(", ");
-          stat.innerHTML = `Cache: <strong>${total}</strong> jobs — ${searches}`;
+          return;
         }
+        const searches = keys
+          .map((k) => `<em>${k}</em> (${raw[k].length})`)
+          .join(", ");
+        stat.innerHTML = `Cache: <strong>${total}</strong> jobs — ${searches}`;
       }
       function exportCache() {
-        const data = loadCache();
-        const blob = new Blob([JSON.stringify(data, null, 2)], {
+        const blob = new Blob([JSON.stringify(loadCache(), null, 2)], {
           type: "application/json",
         });
         const a = document.createElement("a");
@@ -230,10 +505,9 @@
               throw new Error("Bad format");
             saveCache(parsed);
             updateCacheStat();
-            // Auto-render all cached jobs grouped by search term
             renderAllCached(parsed);
           } catch (err) {
-            alert("Failed to import cache: " + err.message);
+            alert("Failed to import: " + err.message);
           }
         };
         reader.readAsText(file);
@@ -241,28 +515,22 @@
       }
       function loadCurrentCache() {
         try {
-          const cache = JSON.parse(localStorage.getItem(CACHE_KEY) || "{}");
-          renderAllCached(cache);
+          renderAllCached(JSON.parse(localStorage.getItem(CACHE_KEY) || "{}"));
         } catch (err) {
           alert("Failed to load cache: " + err.message);
         }
       }
-
       function renderAllCached(cacheData) {
         const grid = document.getElementById("jobsGrid");
         const metaText = document.getElementById("metaText");
-        const errorBox = document.getElementById("errorBox");
-
-        errorBox.style.display = "none";
+        document.getElementById("errorBox").style.display = "none";
         const keys = Object.keys(cacheData);
         if (!keys.length) return;
-
         const total = keys.reduce((s, k) => s + cacheData[k].length, 0);
-        metaText.innerHTML = `Showing <strong style="color:var(--text)">${total}</strong> cached jobs across <strong style="color:var(--text)">${keys.length}</strong> search${keys.length !== 1 ? "es" : ""}`;
+        metaText.innerHTML = `Showing <strong style="color:var(--text)">${total}</strong> cached jobs`;
         metaText.style.display = "inline";
-
-        let html = "";
-        let idx = 0;
+        let html = "",
+          idx = 0;
         for (const key of keys) {
           const jobs = cacheData[key];
           if (!jobs.length) continue;
@@ -276,12 +544,10 @@
         grid.innerHTML = html;
       }
       function clearCache() {
-        if (!confirm("Clear all cached jobs? This cannot be undone.")) return;
+        if (!confirm("Clear all cached jobs?")) return;
         localStorage.removeItem(CACHE_KEY);
         updateCacheStat();
-        // Reset grid to empty state
         document.getElementById("metaText").style.display = "none";
-        document.getElementById("metaText").innerHTML = "";
         document.getElementById("jobsGrid").innerHTML = `
           <div class="col-span-full text-center py-20 text-[color:var(--text3)]">
             <div class="text-[44px] mb-4 inline-block">🔍</div>
@@ -290,11 +556,16 @@
       }
 
       // ─── HELPERS ─────────────────────────────────────────────────────────────
-      document
-        .getElementById("searchInput")
-        .addEventListener("keydown", (e) => {
-          if (e.key === "Enter") doSearch();
-        });
+      const searchInput = document.getElementById("searchInput");
+      const searchBtn = document.getElementById("searchBtn");
+      const syncBtn = () => {
+        searchBtn.disabled = !searchInput.value.trim();
+      };
+      searchInput.addEventListener("input", syncBtn);
+      searchInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") doSearch();
+      });
+      syncBtn();
 
       const daysAgo = (d) => {
         if (!d) return null;
@@ -342,8 +613,7 @@
         const label =
           SENIORITY_MAP[raw] || (raw ? raw.replace(/_/g, " ") : null);
         if (!label) return "";
-        const cls = SENIORITY_CLS[label] || "badge-generic";
-        return badge(label, cls);
+        return badge(label, SENIORITY_CLS[label] || "badge-generic");
       };
       const descToHtml = (t) => {
         if (!t) return "";
@@ -371,8 +641,6 @@
         const delay = Math.min(i * 40, 400);
         const logo = job.company_object?.logo;
         const init = (job.company || "?")[0].toUpperCase();
-        // card-logo: w-10 h-10 rounded-md flex-shrink-0 object-contain p-1
-        // card-logo-fallback: w-10 h-10 rounded-md flex-shrink-0 flex items-center justify-center font-display text-lg font-semibold
         const logoHtml = logo
           ? `<img src="${logo}" alt="" class="card-logo w-10 h-10 rounded-md flex-shrink-0 object-contain p-1" onerror="this.outerHTML='<div class=\\'card-logo-fallback w-10 h-10 rounded-md flex-shrink-0 flex items-center justify-center font-display text-lg font-semibold\\'>${init}</div>'">`
           : `<div class="card-logo-fallback w-10 h-10 rounded-md flex-shrink-0 flex items-center justify-center font-display text-lg font-semibold">${init}</div>`;
@@ -390,33 +658,20 @@
 <div class="job-card${cachedClass} rounded-md flex flex-col overflow-hidden" style="animation-delay:${delay}ms">
   <div class="card-topbar"></div>
   <div class="p-5 flex flex-col gap-3.5 flex-1">
-
-    <!-- logo row -->
     <div class="flex items-start justify-between gap-2.5">
       ${logoHtml}
-      <div class="flex flex-wrap gap-[5px] justify-end">
-        ${newnessBadge}
-        ${workBadge(job)}
-      </div>
+      <div class="flex flex-wrap gap-[5px] justify-end">${newnessBadge}${workBadge(job)}</div>
     </div>
-
-    <!-- title + company -->
     <div>
-      <div class="text-[14.5px] font-semibold leading-[1.35] text-[color:var(--text)]">${job.job_title || "Untitled Role"}</div>
+      <div class="text-[14.5px] font-semibold leading-[1.35]">${job.job_title || "Untitled Role"}</div>
       <div class="card-company text-[13px] font-medium mt-0.5">${job.company || "Unknown"}</div>
     </div>
-
-    <!-- seniority + employment badges -->
     <div class="flex flex-wrap gap-[5px]">${senBadge(job.seniority)}${eBadges}</div>
-
-    <!-- meta -->
-    <div class="flex flex-col gap-[5px] text-[12.5px] text-[color:var(--text2)]">
+    <div class="flex flex-col gap-[5px] text-[12.5px]">
       ${job.long_location || job.location ? `<div class="flex items-center gap-[7px]"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-45 flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${job.long_location || job.location}</div>` : ""}
       ${job.company_object?.industry ? `<div class="flex items-center gap-[7px]"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-45 flex-shrink-0"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>${job.company_object.industry}</div>` : ""}
       ${salary ? `<div class="card-salary flex items-center gap-[7px]"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-45 flex-shrink-0"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>${salary}</div>` : ""}
     </div>
-
-    <!-- description toggle -->
     ${
       descHtml
         ? `
@@ -426,17 +681,12 @@
         <span id="lbl-${id}">Show Description</span>
       </button>
       <div id="wrap-${id}" class="desc-wrap">
-        <div>
-          <div class="desc-body text-[12px] leading-[1.7] text-[color:var(--text2)] pt-3">${descHtml}</div>
-        </div>
+        <div><div class="desc-body text-[12px] leading-[1.7] pt-3">${descHtml}</div></div>
       </div>
     </div>`
         : ""
     }
-
   </div>
-
-  <!-- footer -->
   <div class="card-footer px-5 py-3 flex items-center justify-between">
     <span class="card-date font-mono text-[10.5px]">${posted || job.date_posted || "—"}</span>
     <a href="${url}" target="_blank" rel="noopener" class="card-link font-mono text-[10.5px] tracking-[0.08em] uppercase">View Posting →</a>
@@ -461,6 +711,43 @@
         lbl.textContent = open ? "Show Description" : "Hide Description";
       }
 
+      // ─── BUILD API BODY FROM FILTERS ─────────────────────────────────────────
+      function buildSearchBody(query, cachedIds) {
+        const body = {
+          page: 0,
+          limit: 25,
+          job_title_or: [query],
+          job_location_or: [{ id: 6254928 }],
+          posted_at_max_age_days:
+            parseInt(document.getElementById("maxAgeDays").value) || 30,
+          job_seniority_or: ["c_level", "junior", "mid_level"],
+          company_country_code_or: ["US"],
+        };
+
+        // Title filters
+        const titleInc = tagState.titleInc.map((t) => t.value);
+        const titleExc = tagState.titleExc.map((t) => t.value);
+        if (titleInc.length) body.job_title_or = [query, ...titleInc];
+        if (titleExc.length) body.job_title_not = titleExc;
+
+        // Description filters
+        const descInc = tagState.descInc.map((t) => t.value);
+        const descExc = tagState.descExc.map((t) => t.value);
+        if (descInc.length) body.job_description_contains_or = descInc;
+        if (descExc.length) body.job_description_contains_not = descExc;
+
+        // Salary
+        const sMin = parseInt(document.getElementById("salaryMin").value);
+        const sMax = parseInt(document.getElementById("salaryMax").value);
+        if (sMin) body.min_annual_salary = sMin;
+        if (sMax) body.max_annual_salary = sMax;
+
+        // Exclude cached IDs
+        if (cachedIds.length) body.job_id_not = cachedIds;
+
+        return body;
+      }
+
       // ─── SEARCH ──────────────────────────────────────────────────────────────
       async function doSearch() {
         const query = document.getElementById("searchInput").value.trim();
@@ -481,17 +768,7 @@
         const { cachedJobs, cachedIds } = getCacheForSearch(query);
 
         try {
-          const body = {
-            page: 0,
-            limit: 25,
-            job_title_or: [query],
-            job_location_or: [{ id: 6254928 }],
-            job_seniority_or: ["junior", "mid_level"],
-            posted_at_max_age_days: 30,
-            company_country_code_or: ["US"],
-          };
-          if (cachedIds.length > 0) body.job_id_not = cachedIds;
-
+          const body = buildSearchBody(query, cachedIds);
           const res = await fetch("https://api.theirstack.com/v1/jobs/search", {
             method: "POST",
             headers: {
@@ -537,9 +814,9 @@
             <span style="margin:0 6px;color:var(--border)">·</span>
             <span style="font-family:'JetBrains Mono',monospace;font-size:11px">for <strong style="color:var(--text)">"${query}"</strong></span>`;
 
-          let html = "";
-          let idx = 0;
-          if (newJobs.length > 0) {
+          let html = "",
+            idx = 0;
+          if (newJobs.length) {
             html += renderSectionDivider(
               "New Listings",
               newJobs.length,
@@ -547,7 +824,7 @@
             );
             for (const job of newJobs) html += renderCard(job, idx++, true);
           }
-          if (cachedJobs.length > 0) {
+          if (cachedJobs.length) {
             html += renderSectionDivider(
               "Previously Seen",
               cachedJobs.length,

@@ -1,4 +1,4 @@
-/* ── SEARCH INPUT (::placeholder pseudo + focus box-shadow with CSS-var colors) ── */
+/* ── SEARCH INPUT ─────────────────────────────────────────────────────────── */
 .search-input {
   background: var(--bg2);
   border: 1px solid var(--border);
@@ -17,7 +17,7 @@
   box-shadow: 0 0 0 3px rgba(224, 51, 51, 0.1);
 }
 
-/* ── SEARCH BUTTON (CSS-var red + hover box-shadow + :disabled state) ── */
+/* ── SEARCH BUTTON ────────────────────────────────────────────────────────── */
 .search-btn {
   background: var(--red);
   transition:
@@ -40,7 +40,7 @@
   box-shadow: none;
 }
 
-/* ── CACHE BUTTONS (CSS-var colors + .danger hover variant) ── */
+/* ── CACHE BUTTONS ────────────────────────────────────────────────────────── */
 .cache-btn {
   border: 1px solid var(--border);
   background: transparent;
@@ -56,7 +56,12 @@
   color: var(--red);
 }
 
-/* ── ERROR BOX (display:none sentinel + CSS-var RGBA colors) ── */
+/* ── CACHE STAT ───────────────────────────────────────────────────────────── */
+.cache-stat {
+  color: var(--text3);
+}
+
+/* ── ERROR BOX ────────────────────────────────────────────────────────────── */
 .error-box {
   display: none;
   background: rgba(224, 51, 51, 0.08);
@@ -64,28 +69,54 @@
   color: var(--red);
 }
 
-/* ── META LOADER (jobs-specific display:none sentinel + dotPulse reuse) ── */
+/* ── META LOADER ──────────────────────────────────────────────────────────── */
 .meta-dots-loader {
   display: none;
+  flex-direction: row;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
-.meta-dots-loader span {
+@keyframes dotBounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-5px);
+  }
+}
+/* dots: children 1-3 */
+.meta-dots-loader span:nth-child(1),
+.meta-dots-loader span:nth-child(2),
+.meta-dots-loader span:nth-child(3) {
   display: inline-block;
   width: 5px;
   height: 5px;
   border-radius: 50%;
   background: var(--red);
-  animation: dotPulse 1.2s ease-in-out infinite;
+  animation: dotBounce 0.9s ease-in-out infinite;
+  flex-shrink: 0;
 }
 .meta-dots-loader span:nth-child(2) {
-  animation-delay: 0.2s;
+  animation-delay: 0.15s;
 }
 .meta-dots-loader span:nth-child(3) {
-  animation-delay: 0.4s;
+  animation-delay: 0.3s;
+}
+/* text label: 4th span — no dot styles, no animation */
+.meta-dots-loader span:nth-child(4) {
+  color: var(--text3);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  animation: none;
+  background: none;
+  width: auto;
+  height: auto;
+  border-radius: 0;
 }
 
-/* ── JOB CARD (keyframe + CSS-var colors + hover shadow + opacity states) ── */
+/* ── JOB CARD ─────────────────────────────────────────────────────────────── */
 @keyframes cardIn {
   from {
     opacity: 0;
@@ -120,7 +151,7 @@
   opacity: 1;
 }
 
-/* ── CARD TOP ACCENT BAR (gradient + opacity 0 → 1 on parent hover) ── */
+/* ── CARD TOP ACCENT BAR ──────────────────────────────────────────────────── */
 .card-topbar {
   height: 2px;
   background: linear-gradient(90deg, var(--red) 0%, #ff7070 100%);
@@ -128,7 +159,7 @@
   transition: opacity 0.2s;
 }
 
-/* ── CARD LOGO / FALLBACK (CSS-var bg/border/color) ── */
+/* ── CARD LOGO / FALLBACK ─────────────────────────────────────────────────── */
 .card-logo {
   background: var(--bg3);
   border: 1px solid var(--border);
@@ -139,7 +170,7 @@
   color: var(--text3);
 }
 
-/* ── ALL BADGE VARIANTS (raw RGBA + CSS-var combos — not expressible in Tailwind CDN) ── */
+/* ── BADGES ───────────────────────────────────────────────────────────────── */
 .badge {
   font-family: "JetBrains Mono", monospace;
   border: 1px solid;
@@ -196,7 +227,7 @@
   background: transparent;
 }
 
-/* ── DESC ACCORDION (grid-template-rows 0fr→1fr — no Tailwind equivalent) ── */
+/* ── DESC ACCORDION ───────────────────────────────────────────────────────── */
 .desc-wrap {
   display: grid;
   grid-template-rows: 0fr;
@@ -207,6 +238,8 @@
 }
 .desc-wrap > div {
   overflow: hidden;
+  max-height: 320px;
+  overflow-y: auto;
 }
 
 .desc-toggle-btn {
@@ -224,7 +257,7 @@
   transition: transform 0.3s;
 }
 
-/* ── CARD COLORS / BORDERS needing CSS vars ── */
+/* ── CARD MISC ────────────────────────────────────────────────────────────── */
 .card-company {
   color: var(--red);
 }
@@ -251,9 +284,274 @@
   border-top: 1px solid var(--border);
 }
 
-/* ── SECTION DIVIDER LINE (CSS-var bg) ── */
+/* ── SECTION DIVIDER ──────────────────────────────────────────────────────── */
 .section-divider-line {
   flex: 1;
   height: 1px;
   background: var(--border);
+}
+
+/* ── FILTERS PANEL ────────────────────────────────────────────────────────── */
+.filters-panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  max-height: 0;
+}
+.filters-panel.open {
+  max-height: 1400px;
+}
+
+/* ── FILTERS TOGGLE BUTTON ────────────────────────────────────────────────── */
+.filters-toggle-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text3);
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "JetBrains Mono", monospace;
+  transition:
+    border-color 0.2s,
+    color 0.2s;
+}
+.filters-toggle-btn:hover {
+  border-color: var(--bord2);
+  color: var(--text2);
+}
+.filters-toggle-btn.active {
+  border-color: var(--red);
+  color: var(--red);
+}
+.filters-toggle-btn .chev {
+  transition: transform 0.25s;
+}
+.filters-toggle-btn.active .chev {
+  transform: rotate(180deg);
+}
+
+/* ── FILTER GROUP ─────────────────────────────────────────────────────────── */
+.filter-group {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.filter-group:last-child {
+  border-bottom: none;
+}
+
+/* ── FILTER LABEL ─────────────────────────────────────────────────────────── */
+.filter-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.filter-label .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text3);
+  flex-shrink: 0;
+}
+.filter-label .dot.green {
+  background: #5fe8a0;
+}
+.filter-label .dot.red {
+  background: var(--red);
+}
+
+/* ── TAG INPUT ────────────────────────────────────────────────────────────── */
+.tag-input-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 6px 8px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  min-height: 38px;
+  cursor: text;
+  transition: border-color 0.2s;
+}
+.tag-input-wrap:focus-within {
+  border-color: var(--bord2);
+}
+
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px;
+  flex-shrink: 0;
+}
+.tag-pill.include {
+  background: rgba(95, 232, 160, 0.1);
+  color: #5fe8a0;
+  border: 1px solid rgba(95, 232, 160, 0.25);
+}
+.tag-pill.exclude {
+  background: rgba(224, 51, 51, 0.08);
+  color: var(--red);
+  border: 1px solid rgba(224, 51, 51, 0.25);
+}
+.tag-pill button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+  padding: 0;
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+.tag-pill button:hover {
+  opacity: 1;
+}
+
+.tag-ghost-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  flex: 1;
+  min-width: 140px;
+}
+.tag-ghost-input::placeholder {
+  color: var(--text3);
+}
+
+/* ── FILTER HINT ──────────────────────────────────────────────────────────── */
+.filter-hint {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  color: var(--text3);
+  margin-top: 5px;
+}
+
+/* ── FILTER SELECT ────────────────────────────────────────────────────────── */
+.filter-select {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  border-radius: 4px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  padding: 6px 10px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.filter-select:focus {
+  border-color: var(--bord2);
+}
+.filter-select option {
+  background: var(--bg2);
+}
+
+/* ── RANGE INPUTS ─────────────────────────────────────────────────────────── */
+.range-input-pair {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.range-sep {
+  color: var(--text3);
+  font-family: monospace;
+  font-size: 12px;
+}
+.range-input {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 4px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  padding: 6px 10px;
+  outline: none;
+  width: 120px;
+  transition: border-color 0.2s;
+}
+.range-input:focus {
+  border-color: var(--bord2);
+}
+.range-input::placeholder {
+  color: var(--text3);
+}
+
+/* ── CHECKBOX TOGGLE LABELS ───────────────────────────────────────────────── */
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.check-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px;
+  color: var(--text2);
+  cursor: pointer;
+  padding: 4px 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+.check-label:has(input:checked) {
+  border-color: var(--red);
+  color: var(--red);
+}
+.check-label input {
+  display: none;
+}
+
+/* ── ACTIVE FILTER SUMMARY PILLS ─────────────────────────────────────────── */
+.active-filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+}
+.af-pill {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.af-pill.inc {
+  background: rgba(95, 232, 160, 0.1);
+  color: #5fe8a0;
+  border: 1px solid rgba(95, 232, 160, 0.25);
+}
+.af-pill.exc {
+  background: rgba(224, 51, 51, 0.08);
+  color: var(--red);
+  border: 1px solid rgba(224, 51, 51, 0.25);
+}
+.af-pill.neu {
+  background: var(--bg3);
+  color: var(--text3);
+  border: 1px solid var(--border);
 }

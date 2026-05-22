@@ -22,41 +22,129 @@
             },
           },
         },
-        safelist: [
-          "font-mono",
-          "tracking-[0.1em]",
-          "uppercase",
-          "no-underline",
-          "px-3.5",
-          "py-1.5",
-          "rounded-[3px]",
-          "duration-[180ms]",
-          "text-[color:var(--text3)]",
-          "text-[color:var(--text2)]",
-          "text-[color:var(--red)]",
-          "hover:text-[color:var(--text2)]",
-          "hover:bg-[var(--bg2)]",
-          "bg-[var(--red-g)]",
-          "fixed",
-          "top-0",
-          "left-0",
-          "right-0",
-          "z-[100]",
-          "h-14",
-          "mt-6",
-          "mr-9",
-          "flex-shrink-0",
-          "gap-0.5",
-          "ml-auto",
-          "font-display",
-          "text-xl",
-          "font-bold",
-          "tracking-[0.08em]",
-          "h-[70px]",
-        ],
       };
     </script>
     <script src="navbar.js"></script>
+    <style>
+      /* ── Location autocomplete ── */
+      .loc-wrap {
+        position: relative;
+      }
+      .loc-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        z-index: 200;
+        background: var(--bg2, #1a1a1f);
+        border: 1px solid var(--border, #2e2e38);
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      }
+      .loc-dropdown.open {
+        display: block;
+      }
+      .loc-option {
+        padding: 8px 14px;
+        font-size: 12.5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text2, #c0c0cc);
+        transition: background 120ms;
+      }
+      .loc-option:hover,
+      .loc-option.active {
+        background: var(--bg3, #25252e);
+        color: var(--text, #f0f0f6);
+      }
+      .loc-option .loc-type {
+        font-size: 9.5px;
+        font-family: "JetBrains Mono", monospace;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0.45;
+        margin-left: auto;
+      }
+      .loc-selected-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: var(--bg3, #25252e);
+        border: 1px solid var(--border, #2e2e38);
+        border-radius: 4px;
+        padding: 3px 8px 3px 10px;
+        font-size: 12px;
+        color: var(--text2, #c0c0cc);
+        margin-top: 5px;
+      }
+      .loc-selected-pill button {
+        background: none;
+        border: none;
+        color: var(--text3, #606070);
+        cursor: pointer;
+        padding: 0;
+        font-size: 14px;
+        line-height: 1;
+        margin-left: 2px;
+      }
+      .loc-selected-pill button:hover {
+        color: var(--red, #e05c5c);
+      }
+      .loc-loading {
+        padding: 10px 14px;
+        font-size: 11.5px;
+        font-family: "JetBrains Mono", monospace;
+        color: var(--text3, #606070);
+        letter-spacing: 0.06em;
+      }
+
+      /* ── Remote toggle ── */
+      .remote-toggle-group {
+        display: flex;
+        gap: 0;
+        border: 1px solid var(--border, #2e2e38);
+        border-radius: 5px;
+        overflow: hidden;
+        width: fit-content;
+      }
+      .remote-toggle-group button {
+        padding: 6px 14px;
+        font-size: 10.5px;
+        font-family: "JetBrains Mono", monospace;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        background: transparent;
+        border: none;
+        color: var(--text3, #606070);
+        cursor: pointer;
+        transition:
+          background 120ms,
+          color 120ms;
+        border-right: 1px solid var(--border, #2e2e38);
+      }
+      .remote-toggle-group button:last-child {
+        border-right: none;
+      }
+      .remote-toggle-group button:hover {
+        background: var(--bg3, #25252e);
+        color: var(--text2, #c0c0cc);
+      }
+      .remote-toggle-group button.active {
+        background: var(--bg3, #25252e);
+        color: var(--text, #f0f0f6);
+        box-shadow: inset 0 0 0 1px var(--border, #2e2e38);
+      }
+      .remote-toggle-group button.active.remote-yes {
+        color: #5fe8a0;
+      }
+      .remote-toggle-group button.active.remote-no {
+        color: #e89a5f;
+      }
+    </style>
   </head>
 
   <body>
@@ -95,7 +183,59 @@
 
       <!-- FILTERS PANEL -->
       <div id="filtersPanel" class="filters-panel mt-2">
-        <!-- ROW 1: Title Contains / Title NOT Contains -->
+        <!-- ROW 0: Location + Remote -->
+        <div class="filter-group grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Location search -->
+          <div>
+            <div class="filter-label">
+              <span class="dot"></span>Job location
+            </div>
+            <div class="loc-wrap">
+              <input
+                id="locSearch"
+                class="filter-select w-full"
+                type="text"
+                placeholder="Type to search"
+                autocomplete="off"
+                oninput="onLocInput()"
+                onkeydown="onLocKeydown(event)"
+                onfocus="if (locDropdownItems.length) openLocDropdown();"
+              />
+              <div id="locDropdown" class="loc-dropdown"></div>
+            </div>
+            <!-- Selected locations as pills -->
+            <div id="locPills" class="flex flex-wrap gap-1.5 mt-1"></div>
+            <div class="filter-hint">Searches location catalog</div>
+          </div>
+
+          <!-- Remote toggle -->
+          <div>
+            <div class="filter-label">
+              <span class="dot"></span>Work arrangement
+            </div>
+            <div class="remote-toggle-group mt-1" id="remoteToggle">
+              <button class="active" data-val="" onclick="setRemote('')">
+                Any
+              </button>
+              <button
+                class="remote-yes"
+                data-val="true"
+                onclick="setRemote('true')"
+              >
+                Remote
+              </button>
+              <button
+                class="remote-no"
+                data-val="false"
+                onclick="setRemote('false')"
+              >
+                On-site
+              </button>
+            </div>
+            <div class="filter-hint">Filters by remote field in the API</div>
+          </div>
+        </div>
+
         <div class="filter-group grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <div class="filter-label">
@@ -302,13 +442,7 @@
       const API_KEY = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
 
       // ─── TAG-PILL STATE ──────────────────────────────────────────────────────
-      // { fieldId: [{ value, type }] }
-      const tagState = {
-        titleInc: [],
-        titleExc: [],
-        descInc: [],
-        descExc: [],
-      };
+      const tagState = { titleInc: [], titleExc: [], descInc: [], descExc: [] };
 
       function focusTagInput(id) {
         document.getElementById(id).focus();
@@ -330,7 +464,6 @@
       }
 
       function addTag(fieldId, value, type) {
-        // dedup
         if (
           tagState[fieldId].some(
             (t) => t.value.toLowerCase() === value.toLowerCase(),
@@ -367,6 +500,149 @@
           .replace(/"/g, "&quot;");
       }
 
+      // ─── LOCATION STATE ──────────────────────────────────────────────────────
+      let selectedLocations = [
+        { id: 6254928, name: "Virginia", type: "country" },
+      ];
+      let locDropdownItems = [];
+      let locDebounceTimer = null;
+      let locActiveIdx = -1;
+
+      function renderLocPills() {
+        const container = document.getElementById("locPills");
+        container.innerHTML = selectedLocations
+          .map(
+            (loc, i) =>
+              `<span class="loc-selected-pill">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="opacity:.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            ${escHtml(loc.name)}
+            <button onclick="removeLocation(${i})" title="Remove">×</button>
+          </span>`,
+          )
+          .join("");
+        updateActiveFiltersSummary();
+      }
+
+      function removeLocation(idx) {
+        selectedLocations.splice(idx, 1);
+        renderLocPills();
+      }
+
+      function addLocation(loc) {
+        if (!selectedLocations.some((l) => l.id === loc.id)) {
+          selectedLocations.push(loc);
+        }
+        renderLocPills();
+        closeLocDropdown();
+        document.getElementById("locSearch").value = "";
+      }
+
+      function openLocDropdown() {
+        document.getElementById("locDropdown").classList.add("open");
+      }
+
+      function closeLocDropdown() {
+        document.getElementById("locDropdown").classList.remove("open");
+        locActiveIdx = -1;
+      }
+
+      function onLocInput() {
+        const val = document.getElementById("locSearch").value.trim();
+        clearTimeout(locDebounceTimer);
+        if (!val) {
+          closeLocDropdown();
+          return;
+        }
+        locDebounceTimer = setTimeout(() => fetchLocations(val), 280);
+      }
+
+      async function fetchLocations(query) {
+        const dropdown = document.getElementById("locDropdown");
+        dropdown.innerHTML = `<div class="loc-loading">Searching…</div>`;
+        openLocDropdown();
+        try {
+          const url = `https://api.theirstack.com/v0/catalog/locations?name=${encodeURIComponent(query)}&limit=8&offset=0`;
+          const res = await fetch(url, {
+            headers: { Authorization: `Bearer ${API_KEY}` },
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const json = await res.json();
+          // API may return array or { data: [...] }
+          const items = Array.isArray(json) ? json : json.data || [];
+          locDropdownItems = items;
+          locActiveIdx = -1;
+          if (!items.length) {
+            dropdown.innerHTML = `<div class="loc-loading">No results found.</div>`;
+            return;
+          }
+          dropdown.innerHTML = items
+            .map(
+              (item, i) =>
+                `<div class="loc-option" data-idx="${i}" onmousedown="addLocation({id:${item.id},name:'${escHtml(item.name).replace(/'/g, "\\'")}',type:'${(item.type || "").replace(/'/g, "\\'")}'})">` +
+                `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="opacity:.4;flex-shrink:0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>` +
+                `<span>${escHtml(item.name)}${item.region_name ? `, <span style="opacity:.55">${escHtml(item.region_name)}</span>` : ""}</span>` +
+                `<span class="loc-type">${escHtml(item.type || "")}</span>` +
+                `</div>`,
+            )
+            .join("");
+        } catch (err) {
+          dropdown.innerHTML = `<div class="loc-loading">Error: ${err.message}</div>`;
+        }
+      }
+
+      function onLocKeydown(e) {
+        const dropdown = document.getElementById("locDropdown");
+        if (!dropdown.classList.contains("open")) return;
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          locActiveIdx = Math.min(
+            locActiveIdx + 1,
+            locDropdownItems.length - 1,
+          );
+          highlightLocOption();
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          locActiveIdx = Math.max(locActiveIdx - 1, 0);
+          highlightLocOption();
+        } else if (e.key === "Enter" && locActiveIdx >= 0) {
+          e.preventDefault();
+          const item = locDropdownItems[locActiveIdx];
+          if (item)
+            addLocation({
+              id: item.id,
+              name: item.name,
+              type: item.type || "",
+            });
+        } else if (e.key === "Escape") {
+          closeLocDropdown();
+        }
+      }
+
+      function highlightLocOption() {
+        document
+          .querySelectorAll(".loc-option")
+          .forEach((el, i) =>
+            el.classList.toggle("active", i === locActiveIdx),
+          );
+      }
+
+      // close dropdown when clicking outside
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".loc-wrap")) closeLocDropdown();
+      });
+
+      // ─── REMOTE STATE ────────────────────────────────────────────────────────
+      // "" = any, "true" = remote only, "false" = on-site only
+      let remoteFilter = "";
+
+      function setRemote(val) {
+        remoteFilter = val;
+        document.querySelectorAll("#remoteToggle button").forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.val === val);
+        });
+        updateActiveFiltersSummary();
+      }
+
       // ─── ACTIVE FILTER SUMMARY ───────────────────────────────────────────────
       function updateActiveFiltersSummary() {
         const row = document.getElementById("activeFiltersRow");
@@ -379,10 +655,30 @@
             ),
           );
 
+        // Location pills (skip if only default USA)
+        const nonDefault = selectedLocations.filter((l) => l.id !== 6254928);
+        const showAllLocs =
+          selectedLocations.length === 0 ||
+          (selectedLocations.length === 1 &&
+            selectedLocations[0].id === 6254928);
+        if (!showAllLocs) {
+          selectedLocations.forEach((l) =>
+            pills.push(
+              `<span class="af-pill neu">📍 ${escHtml(l.name)}</span>`,
+            ),
+          );
+        }
+
+        if (remoteFilter === "true")
+          pills.push(`<span class="af-pill inc">Remote</span>`);
+        if (remoteFilter === "false")
+          pills.push(`<span class="af-pill exc">On-site</span>`);
+
         add(tagState.titleInc, "inc", "title: ");
         add(tagState.titleExc, "exc", "−title: ");
         add(tagState.descInc, "inc", "desc: ");
         add(tagState.descExc, "exc", "−desc: ");
+
         const maxAge = document.getElementById("maxAgeDays").value;
         if (maxAge !== "30")
           pills.push(`<span class="af-pill neu">≤${maxAge}d</span>`);
@@ -395,12 +691,10 @@
           );
 
         row.innerHTML = pills.join("");
-        // update toggle button active state
         const btn = document.getElementById("filtersToggle");
-        const hasFilters = pills.length > 0;
         btn.classList.toggle(
           "active",
-          hasFilters || btn.classList.contains("open"),
+          pills.length > 0 || btn.classList.contains("open"),
         );
       }
 
@@ -414,7 +708,6 @@
         else btn.querySelector(".chev").style.transform = "";
       }
 
-      // wire change events to update summary
       document
         .querySelectorAll("[name=seniority],[name=work]")
         .forEach((el) =>
@@ -601,7 +894,6 @@
         Entry: "badge-junior",
         Manager: "badge-manager",
       };
-
       const badge = (label, cls) =>
         `<span class="badge ${cls} text-[9.5px] tracking-[0.1em] uppercase px-[7px] py-[3px] rounded-[3px]">${label}</span>`;
       const workBadge = (job) => {
@@ -713,16 +1005,26 @@
 
       // ─── BUILD API BODY FROM FILTERS ─────────────────────────────────────────
       function buildSearchBody(query, cachedIds) {
+        // Build location array from selected locations
+        const locationIds =
+          selectedLocations.length > 0
+            ? selectedLocations.map((l) => ({ id: l.id }))
+            : [{ id: 6254928 }]; // fallback to USA
+
         const body = {
           page: 0,
           limit: 25,
           job_title_or: [query],
-          job_location_or: [{ id: 6254928 }],
+          job_location_or: locationIds,
           posted_at_max_age_days:
             parseInt(document.getElementById("maxAgeDays").value) || 30,
           job_seniority_or: ["c_level", "junior", "mid_level"],
           company_country_code_or: ["US"],
         };
+
+        // Remote filter
+        if (remoteFilter === "true") body.remote = true;
+        else if (remoteFilter === "false") body.remote = false;
 
         // Title filters
         const titleInc = tagState.titleInc.map((t) => t.value);
@@ -848,7 +1150,9 @@
         }
       }
 
+      // ─── INIT ────────────────────────────────────────────────────────────────
       updateCacheStat();
+      renderLocPills(); // render the default USA pill
     </script>
   </body>
 </html>

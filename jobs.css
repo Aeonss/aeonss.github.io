@@ -86,7 +86,6 @@
     transform: translateY(-5px);
   }
 }
-/* dots: children 1-3 */
 .meta-dots-loader span:nth-child(1),
 .meta-dots-loader span:nth-child(2),
 .meta-dots-loader span:nth-child(3) {
@@ -104,7 +103,6 @@
 .meta-dots-loader span:nth-child(3) {
   animation-delay: 0.3s;
 }
-/* text label: 4th span — no dot styles, no animation */
 .meta-dots-loader span:nth-child(4) {
   color: var(--text3);
   font-family: "JetBrains Mono", monospace;
@@ -241,7 +239,6 @@
   max-height: 320px;
   overflow-y: auto;
 }
-
 .desc-toggle-btn {
   background: none;
   border: none;
@@ -385,7 +382,6 @@
 .tag-input-wrap:focus-within {
   border-color: var(--bord2);
 }
-
 .tag-pill {
   display: inline-flex;
   align-items: center;
@@ -421,7 +417,6 @@
 .tag-pill button:hover {
   opacity: 1;
 }
-
 .tag-ghost-input {
   background: transparent;
   border: none;
@@ -554,4 +549,122 @@
   background: var(--bg3);
   color: var(--text3);
   border: 1px solid var(--border);
+}
+
+/* ── LOCATION AUTOCOMPLETE ────────────────────────────────────────────────── */
+.loc-wrap {
+  position: relative;
+}
+.loc-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: var(--bg2, #1a1a1f);
+  border: 1px solid var(--border, #2e2e38);
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+.loc-dropdown.open {
+  display: block;
+}
+.loc-option {
+  padding: 8px 14px;
+  font-size: 12.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text2, #c0c0cc);
+  transition: background 120ms;
+}
+.loc-option:hover,
+.loc-option.active {
+  background: var(--bg3, #25252e);
+  color: var(--text, #f0f0f6);
+}
+.loc-option .loc-type {
+  font-size: 9.5px;
+  font-family: "JetBrains Mono", monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  margin-left: auto;
+}
+.loc-selected-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg3, #25252e);
+  border: 1px solid var(--border, #2e2e38);
+  border-radius: 4px;
+  padding: 3px 8px 3px 10px;
+  font-size: 12px;
+  color: var(--text2, #c0c0cc);
+  margin-top: 5px;
+}
+.loc-selected-pill button {
+  background: none;
+  border: none;
+  color: var(--text3, #606070);
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1;
+  margin-left: 2px;
+}
+.loc-selected-pill button:hover {
+  color: var(--red, #e05c5c);
+}
+.loc-loading {
+  padding: 10px 14px;
+  font-size: 11.5px;
+  font-family: "JetBrains Mono", monospace;
+  color: var(--text3, #606070);
+  letter-spacing: 0.06em;
+}
+
+/* ── REMOTE TOGGLE ────────────────────────────────────────────────────────── */
+.remote-toggle-group {
+  display: flex;
+  border: 1px solid var(--border, #2e2e38);
+  border-radius: 5px;
+  overflow: hidden;
+  width: fit-content;
+}
+.remote-toggle-group button {
+  padding: 6px 14px;
+  font-size: 10.5px;
+  font-family: "JetBrains Mono", monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: transparent;
+  border: none;
+  color: var(--text3, #606070);
+  cursor: pointer;
+  transition:
+    background 120ms,
+    color 120ms;
+  border-right: 1px solid var(--border, #2e2e38);
+}
+.remote-toggle-group button:last-child {
+  border-right: none;
+}
+.remote-toggle-group button:hover {
+  background: var(--bg3, #25252e);
+  color: var(--text2, #c0c0cc);
+}
+.remote-toggle-group button.active {
+  background: var(--bg3, #25252e);
+  color: var(--text, #f0f0f6);
+  box-shadow: inset 0 0 0 1px var(--border, #2e2e38);
+}
+.remote-toggle-group button.active.remote-yes {
+  color: #5fe8a0;
+}
+.remote-toggle-group button.active.remote-no {
+  color: #e89a5f;
 }

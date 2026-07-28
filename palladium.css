@@ -1,0 +1,396 @@
+/* ═══════════════════════════════════════════════════════
+   palladium.css  —  non-Tailwind styles only
+   All layout/spacing/typography utilities live in the
+   HTML as Tailwind classes. This file covers:
+   custom properties, reset, pseudo-elements,
+   vendor-prefixed rules, complex transitions,
+   keyframe animations, and component states that
+   Tailwind cannot express as single utility classes.
+═══════════════════════════════════════════════════════ */
+
+/* ── CSS CUSTOM PROPERTIES ── */
+:root {
+  --bg: #0a0a0b;
+  --bg1: #111113;
+  --bg2: #161618;
+  --bg3: #1c1c1f;
+  --border: #2a2a2e;
+  --bord2: #333338;
+  --gold: #c9a84c;
+  --gold-l: #e8c97a;
+  --gold-d: rgba(201, 168, 76, 0.12);
+  --gold-g: rgba(201, 168, 76, 0.06);
+  --text: #e8e8ec;
+  --text2: #9494a0;
+  --text3: #70707c;
+}
+
+/* ── RESET ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Barlow", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ── GRAIN OVERLAY  (pseudo-element — cannot be Tailwind) ── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.3;
+  z-index: 9999;
+}
+
+/* ── CUSTOM SCROLLBAR  (vendor-prefixed — cannot be Tailwind) ── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bord2);
+  border-radius: 2px;
+}
+
+/* ════════════════════════════════════════════════
+   KEYFRAME ANIMATIONS
+════════════════════════════════════════════════ */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes barSlide {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--bw);
+  }
+}
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+@keyframes rcIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes ringDraw {
+  from {
+    stroke-dashoffset: var(--ring-full);
+  }
+  to {
+    stroke-dashoffset: var(--ring-offset);
+  }
+}
+
+.fade-up {
+  animation: fadeUp 0.42s ease both;
+}
+.fade-in {
+  animation: fadeIn 0.35s ease both;
+}
+
+/* ════════════════════════════════════════════════
+   SCREEN TOGGLE
+   JS adds/removes .active; display:none → display:flex
+   cannot be toggled with a single Tailwind class
+════════════════════════════════════════════════ */
+.screen {
+  display: none;
+}
+.screen.active {
+  display: flex;
+}
+
+/* ════════════════════════════════════════════════
+   GOLD SHIMMER TEXT
+   Multi-property gradient + animation + vendor prefix
+   — cannot be expressed as Tailwind utilities
+════════════════════════════════════════════════ */
+.gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--gold) 0%,
+    var(--gold-l) 35%,
+    var(--gold) 55%,
+    var(--gold-l) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+}
+
+/* ════════════════════════════════════════════════
+   PROGRESS BAR
+   gradient fill + smooth transition
+════════════════════════════════════════════════ */
+.prog-track {
+  background: var(--border);
+}
+.prog-fill {
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-l) 100%);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ════════════════════════════════════════════════
+   LANDING — MODE / CATEGORY CARDS
+════════════════════════════════════════════════ */
+.mode-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  transition:
+    border-color 0.22s,
+    background 0.22s,
+    transform 0.22s,
+    box-shadow 0.22s;
+}
+.mode-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(201, 168, 76, 0.45);
+  background: rgba(201, 168, 76, 0.05);
+  box-shadow: 0 16px 48px rgba(201, 168, 76, 0.1);
+}
+
+/* ════════════════════════════════════════════════
+   START / RESULTS BUTTON
+════════════════════════════════════════════════ */
+.results-btn {
+  background: var(--gold);
+  color: #0a0a0b;
+  transition:
+    background 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+.results-btn:hover {
+  background: var(--gold-l);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(201, 168, 76, 0.28);
+}
+
+/* ════════════════════════════════════════════════
+   OPTION BUTTONS
+   Complex multi-property transitions + selected state
+════════════════════════════════════════════════ */
+.opt-btn {
+  width: 100%;
+  text-align: left;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-family: "Barlow", sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition:
+    border-color 0.18s,
+    color 0.18s,
+    background 0.18s,
+    transform 0.18s;
+}
+.opt-btn:not(.selected):hover {
+  border-color: var(--bord2);
+  color: var(--text);
+  background: var(--bg3);
+  transform: translateX(4px);
+}
+.opt-btn.selected {
+  border-color: var(--gold);
+  color: var(--text);
+  background: var(--gold-d);
+  transform: translateX(4px);
+}
+.opt-btn.selected .opt-key {
+  color: var(--gold);
+}
+
+/* ════════════════════════════════════════════════
+   ARROW NAV BUTTONS
+════════════════════════════════════════════════ */
+.arr-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text3);
+  transition:
+    color 0.18s,
+    border-color 0.18s,
+    background 0.18s;
+}
+.arr-btn:not(:disabled):hover {
+  color: var(--text2);
+  border-color: var(--bord2);
+  background: var(--bg2);
+}
+.arr-btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+/* ════════════════════════════════════════════════
+   QUESTION NAVIGATION DRAWER
+   opacity/transform transition on hidden state
+   + box-shadow  — both need CSS
+════════════════════════════════════════════════ */
+#nav-drawer {
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.65);
+  transition:
+    opacity 0.22s,
+    transform 0.22s;
+}
+#nav-drawer.drawer-hidden {
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+}
+
+.d-item {
+  transition: background 0.15s;
+}
+.d-item:hover {
+  background: var(--bg2);
+}
+.d-item.d-cur {
+  background: var(--bg2);
+  outline: 1px solid var(--border);
+}
+.d-item.d-locked {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ════════════════════════════════════════════════
+   RESULT CARD  (.rc)
+   staggered entrance animation
+════════════════════════════════════════════════ */
+.rc {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  animation: rcIn 0.5s ease both;
+}
+/* verdict card is the only .rc on this page — no nth-child needed,
+   but kept for extensibility */
+.rc:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.rc:nth-child(2) {
+  animation-delay: 0.18s;
+}
+.rc:nth-child(3) {
+  animation-delay: 0.31s;
+}
+
+/* ════════════════════════════════════════════════
+   STAT CARDS  (4-up grid inside .rc)
+════════════════════════════════════════════════ */
+.stat-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+}
+
+/* ════════════════════════════════════════════════
+   SCORE RING  (absolute-centered text overlay)
+   — position:absolute on a relative parent
+════════════════════════════════════════════════ */
+.score-ring-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ════════════════════════════════════════════════
+   CATEGORY BREAKDOWN BARS
+   JS-driven width transition via CSS custom property
+════════════════════════════════════════════════ */
+.bbar-track {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+}
+.bbar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-l));
+  width: 0;
+  transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ════════════════════════════════════════════════
+   ACTION BUTTONS  (Edit / Retake / Start Over)
+════════════════════════════════════════════════ */
+.action-btn {
+  color: var(--text3);
+  border: 1px solid var(--border);
+  background: transparent;
+  transition:
+    color 0.18s,
+    border-color 0.18s,
+    background 0.18s;
+}
+.action-btn:hover {
+  color: var(--text);
+  border-color: var(--bord2);
+  background: var(--bg2);
+}
+
+/* ════════════════════════════════════════════════
+   RESPONSIVE  — narrow mobile
+════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .opt-btn {
+    padding: 11px 13px;
+    font-size: 13px;
+  }
+}

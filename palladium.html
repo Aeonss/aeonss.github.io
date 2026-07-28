@@ -1,0 +1,1338 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bilt Palladium Card — Is It Worth It?</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;900&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="palladium.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Barlow", "sans-serif"],
+              display: ["Barlow Condensed", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <script src="navbar.js"></script>
+  </head>
+  <body>
+    <site-navbar></site-navbar>
+
+    <!-- ════════════════════════════════════════════════════
+     SCREEN: LANDING
+════════════════════════════════════════════════════ -->
+    <div
+      id="screen-landing"
+      class="screen active min-h-[calc(100vh-56px)] flex-col items-center justify-center px-6 py-[60px]"
+    >
+      <div class="w-full max-w-[640px] text-center fade-up">
+        <p
+          class="font-mono text-[10px] tracking-[0.3em] uppercase mb-[18px]"
+          style="color: var(--gold)"
+        >
+          25 Questions · Weighted Scoring · ~5 Minutes
+        </p>
+
+        <h1
+          class="font-display font-bold tracking-[0.04em] uppercase leading-[0.95] mb-4"
+          style="font-size: clamp(44px, 8vw, 72px)"
+        >
+          Is the <span class="gold-shimmer">Palladium Card</span><br />Worth It
+          for You?
+        </h1>
+
+        <p
+          class="text-sm font-light leading-[1.7] max-w-[420px] mx-auto mb-11"
+          style="color: var(--text3)"
+        >
+          Answer 25 weighted questions and get a precise, personalised verdict
+          on whether the $495/yr Bilt Palladium Card fits your lifestyle.
+        </p>
+
+        <!-- what we assess grid -->
+        <p
+          class="font-mono text-[10px] tracking-[0.25em] uppercase mb-3.5"
+          style="color: var(--text3)"
+        >
+          What we'll assess
+        </p>
+
+        <div
+          class="grid grid-cols-2 gap-3 max-[500px]:grid-cols-1 max-w-[480px] mx-auto mb-11"
+        >
+          <div class="mode-card rounded-md px-5 py-5 text-left">
+            <div
+              class="font-mono text-[9px] tracking-[0.2em] uppercase mb-2"
+              style="color: rgba(201, 168, 76, 0.65)"
+            >
+              Housing
+            </div>
+            <p
+              class="text-[13px] font-light leading-[1.6]"
+              style="color: var(--text3)"
+            >
+              Rent / mortgage spend &amp; goals
+            </p>
+          </div>
+          <div class="mode-card rounded-md px-5 py-5 text-left">
+            <div
+              class="font-mono text-[9px] tracking-[0.2em] uppercase mb-2"
+              style="color: rgba(201, 168, 76, 0.65)"
+            >
+              Travel
+            </div>
+            <p
+              class="text-[13px] font-light leading-[1.6]"
+              style="color: var(--text3)"
+            >
+              Frequency, lounges &amp; hotel habits
+            </p>
+          </div>
+          <div class="mode-card rounded-md px-5 py-5 text-left">
+            <div
+              class="font-mono text-[9px] tracking-[0.2em] uppercase mb-2"
+              style="color: rgba(201, 168, 76, 0.65)"
+            >
+              Points
+            </div>
+            <p
+              class="text-[13px] font-light leading-[1.6]"
+              style="color: var(--text3)"
+            >
+              Transfer partners &amp; redemption style
+            </p>
+          </div>
+          <div class="mode-card rounded-md px-5 py-5 text-left">
+            <div
+              class="font-mono text-[9px] tracking-[0.2em] uppercase mb-2"
+              style="color: rgba(201, 168, 76, 0.65)"
+            >
+              Fee Value
+            </div>
+            <p
+              class="text-[13px] font-light leading-[1.6]"
+              style="color: var(--text3)"
+            >
+              Credits, protections &amp; welcome bonus
+            </p>
+          </div>
+        </div>
+
+        <button
+          onclick="startQuiz()"
+          class="results-btn font-display text-[16px] font-semibold tracking-[0.12em] uppercase px-12 py-4 rounded border-none cursor-pointer"
+        >
+          Start the Quiz →
+        </button>
+
+        <p
+          class="font-mono text-[9.5px] tracking-[0.2em] uppercase mt-9 opacity-40"
+          style="color: var(--text3)"
+        >
+          Chase · Amex · Bilt · United · Hyatt · Alaska · JAL
+        </p>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════
+     SCREEN: QUIZ
+════════════════════════════════════════════════════ -->
+    <div
+      id="screen-quiz"
+      class="screen min-h-[calc(100vh-56px)] flex-col items-center justify-center px-6 py-10"
+    >
+      <div class="w-full max-w-[540px]">
+        <!-- top meta row -->
+        <div class="text-center mb-6">
+          <p
+            id="quiz-mode-label"
+            class="font-mono text-[9.5px] tracking-[0.28em] uppercase mb-1"
+            style="color: var(--text3)"
+          ></p>
+          <div
+            id="q-counter"
+            class="font-mono text-[10.5px] tracking-[0.2em]"
+            style="color: var(--text3)"
+          ></div>
+        </div>
+
+        <!-- progress bar -->
+        <div class="prog-track h-px rounded-full overflow-hidden mb-9 relative">
+          <div
+            id="prog-bar"
+            class="prog-fill absolute top-0 left-0 h-full rounded-full"
+            style="width: 0%"
+          ></div>
+        </div>
+
+        <!-- question + options -->
+        <div id="q-wrap">
+          <p
+            id="q-label"
+            class="font-mono text-[9.5px] tracking-[0.25em] uppercase mb-2.5"
+            style="color: var(--text3)"
+          ></p>
+          <h2
+            id="q-text"
+            class="font-display font-medium tracking-[0.02em] leading-[1.25] mb-6 min-h-[60px]"
+            style="font-size: clamp(22px, 4vw, 28px); color: var(--text)"
+          ></h2>
+          <div id="options" class="flex flex-col gap-2"></div>
+        </div>
+
+        <!-- arrow nav + dot row -->
+        <div class="mt-7 flex items-center gap-2.5">
+          <button
+            id="btn-prev"
+            class="arr-btn flex-shrink-0 w-9 h-9 rounded flex items-center justify-center font-mono text-[13px] cursor-pointer"
+            onclick="navTo(state.cur - 1)"
+          >
+            ⬅️
+          </button>
+
+          <div
+            class="flex-1 flex gap-[3px] items-center flex-wrap justify-center relative"
+            id="dots"
+          >
+            <!-- nav drawer injected here by JS -->
+            <div
+              id="nav-drawer"
+              class="drawer-hidden absolute left-0 right-0 z-50 max-h-[260px] overflow-y-auto rounded-md p-3"
+              style="bottom: calc(100% + 10px)"
+            >
+              <p
+                class="font-mono text-[9px] tracking-[0.25em] uppercase text-center mb-2.5"
+                style="color: var(--text3)"
+              >
+                Jump to Question
+              </p>
+              <div id="drawer-list"></div>
+            </div>
+          </div>
+
+          <button
+            id="btn-next"
+            class="arr-btn flex-shrink-0 w-9 h-9 rounded flex items-center justify-center font-mono text-[13px] cursor-pointer"
+            onclick="navTo(state.cur + 1)"
+          >
+            ➡️
+          </button>
+        </div>
+
+        <!-- see results (shown when all answered) -->
+        <div
+          id="results-btn-wrap"
+          style="display: none"
+          class="mt-6 text-center"
+        >
+          <button
+            class="results-btn font-display text-[15px] font-semibold tracking-[0.12em] uppercase px-9 py-[13px] rounded border-none cursor-pointer"
+            onclick="showResults()"
+          >
+            See My Results →
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════
+     SCREEN: RESULTS
+════════════════════════════════════════════════════ -->
+    <div
+      id="screen-results"
+      class="screen min-h-[calc(100vh-56px)] flex-col items-center px-6 pt-14 pb-20"
+    >
+      <div class="w-full max-w-[640px]">
+        <!-- heading -->
+        <div class="text-center mb-9 fade-in">
+          <p
+            class="font-mono text-[9.5px] tracking-[0.3em] uppercase mb-3"
+            style="color: var(--text3)"
+          >
+            Your Results
+          </p>
+          <h1
+            class="font-display text-[52px] font-bold tracking-[0.06em] uppercase mb-1.5"
+            style="color: var(--text)"
+          >
+            Your Verdict
+          </h1>
+          <p
+            id="winner-sub"
+            class="text-lg font-light italic"
+            style="color: var(--text3)"
+          ></p>
+        </div>
+
+        <!-- verdict card (score ring + body + stat grid) -->
+        <div id="verdict-section"></div>
+
+        <!-- key factors -->
+        <div id="why-section" class="mt-4"></div>
+
+        <!-- score by category bars -->
+        <div id="category-bars" class="mt-4"></div>
+
+        <!-- card facts footer -->
+        <div id="card-facts" class="mt-4"></div>
+
+        <!-- action row -->
+        <div class="flex gap-2 justify-center flex-wrap mt-8">
+          <button
+            class="action-btn font-mono text-[10px] tracking-[0.12em] uppercase px-5 py-2.5 rounded-[4px] cursor-pointer"
+            onclick="goEditAnswers()"
+          >
+            ← Edit Answers
+          </button>
+          <button
+            class="action-btn font-mono text-[10px] tracking-[0.12em] uppercase px-5 py-2.5 rounded-[4px] cursor-pointer"
+            onclick="goLanding()"
+          >
+            Change Mode
+          </button>
+          <button
+            class="action-btn font-mono text-[10px] tracking-[0.12em] uppercase px-5 py-2.5 rounded-[4px] cursor-pointer"
+            onclick="retake()"
+          >
+            Retake
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════ -->
+    <script>
+      /* ══════════════════════════════════════════════════════
+   QUESTIONS
+   weight = importance (1–10); score = answer value (0–4)
+   max per question = weight × 4
+══════════════════════════════════════════════════════ */
+      const QUESTIONS = [
+        /* ── HOUSING ─────────────────────────────────── */
+        {
+          id: 1,
+          category: "Housing Situation",
+          weight: 10,
+          text: "Do you currently pay rent or a mortgage?",
+          options: [
+            {
+              text: "Yes, I pay rent and it's my largest monthly expense",
+              score: 4,
+            },
+            { text: "Yes, I pay a mortgage", score: 4 },
+            { text: "I pay rent but it's small — under $800/month", score: 2 },
+            {
+              text: "No — I live with family, have no housing costs",
+              score: 0,
+            },
+          ],
+        },
+        {
+          id: 2,
+          category: "Housing Spend",
+          weight: 9,
+          text: "How much do you spend on rent or mortgage per month?",
+          options: [
+            { text: "$2,500 or more", score: 4 },
+            { text: "$1,500 – $2,499", score: 3 },
+            { text: "$800 – $1,499", score: 2 },
+            { text: "Under $800 or nothing", score: 0 },
+          ],
+        },
+        {
+          id: 3,
+          category: "Housing Goals",
+          weight: 7,
+          text: "Would earning rewards on your housing payment be a meaningful new perk for you?",
+          options: [
+            {
+              text: "Absolutely — I've never been able to earn rewards on rent/mortgage",
+              score: 4,
+            },
+            {
+              text: "Yes, it would be nice but I already have other rewards cards",
+              score: 2,
+            },
+            {
+              text: "I already earn rewards on housing through another card",
+              score: 1,
+            },
+            {
+              text: "No — housing rewards wouldn't change my spending habits",
+              score: 0,
+            },
+          ],
+        },
+
+        /* ── ANNUAL FEE & VALUE ───────────────────────── */
+        {
+          id: 4,
+          category: "Annual Fee Comfort",
+          weight: 9,
+          text: "The Bilt Palladium has a $495 annual fee. How do you feel about that?",
+          options: [
+            {
+              text: "Fine — I already have cards like Amex Platinum or Chase Sapphire Reserve",
+              score: 4,
+            },
+            {
+              text: "Willing to pay if I can clearly offset it with credits and rewards",
+              score: 3,
+            },
+            {
+              text: "Hesitant — I'd need to be very intentional about using every benefit",
+              score: 1,
+            },
+            {
+              text: "That's too high; I prefer no-fee or low-fee cards",
+              score: 0,
+            },
+          ],
+        },
+        {
+          id: 5,
+          category: "Credit Usage",
+          weight: 8,
+          text: "The card offers a $400 annual Bilt Travel hotel credit (2×$200 for 2-night+ stays). Can you realistically use both halves each year?",
+          options: [
+            {
+              text: "Yes — I travel enough to use both $200 credits every year",
+              score: 4,
+            },
+            {
+              text: "Probably — I can usually squeeze in two hotel stays",
+              score: 3,
+            },
+            { text: "Maybe one of them, but not always both", score: 1 },
+            { text: "Unlikely — I rarely stay in hotels", score: 0 },
+          ],
+        },
+        {
+          id: 6,
+          category: "Credit Usage",
+          weight: 6,
+          text: "The card provides $200 in annual Bilt Cash (usable for travel, housing, dining, fitness). How likely are you to use it?",
+          options: [
+            {
+              text: "Very likely — I'll use it to offset rent/mortgage or travel booking",
+              score: 4,
+            },
+            { text: "Likely — I'll find a use for it each year", score: 3 },
+            {
+              text: "Somewhat — only part of it would be valuable to me",
+              score: 1,
+            },
+            {
+              text: "Unlikely — the Bilt ecosystem doesn't match my spending",
+              score: 0,
+            },
+          ],
+        },
+
+        /* ── TRAVEL ──────────────────────────────────── */
+        {
+          id: 7,
+          category: "Travel Frequency",
+          weight: 8,
+          text: "How many times per year do you typically travel (flights + hotel stays)?",
+          options: [
+            { text: "5 or more trips per year", score: 4 },
+            { text: "2 – 4 trips per year", score: 3 },
+            { text: "1 trip per year", score: 1 },
+            { text: "I rarely or never travel", score: 0 },
+          ],
+        },
+        {
+          id: 8,
+          category: "Airport Lounges",
+          weight: 6,
+          text: "The Palladium includes Priority Pass lounge access (1,400+ lounges, 2 guests free). How often would you use airport lounges?",
+          options: [
+            { text: "Frequently — I fly often and love lounges", score: 4 },
+            { text: "Occasionally — a few times a year", score: 2 },
+            { text: "Rarely — maybe once a year", score: 1 },
+            { text: "Never — I don't value airport lounges", score: 0 },
+          ],
+        },
+        {
+          id: 9,
+          category: "Travel Booking Habits",
+          weight: 5,
+          text: "Would you book hotels through the Bilt Travel portal to access the $400 hotel credit?",
+          options: [
+            {
+              text: "Yes — I'm flexible about where I book as long as prices are competitive",
+              score: 4,
+            },
+            {
+              text: "Probably — if Bilt Travel has good inventory and pricing",
+              score: 3,
+            },
+            {
+              text: "Unsure — I prefer booking directly with chains for status benefits",
+              score: 1,
+            },
+            {
+              text: "No — I always book directly or through other loyalty portals",
+              score: 0,
+            },
+          ],
+        },
+
+        /* ── POINTS & REWARDS ────────────────────────── */
+        {
+          id: 10,
+          category: "Points Sophistication",
+          weight: 8,
+          text: "How comfortable are you with transferable travel points programs (e.g., transfer to airlines/hotels for outsized value)?",
+          options: [
+            {
+              text: "Very comfortable — I actively transfer points to partners for max value",
+              score: 4,
+            },
+            {
+              text: "Somewhat comfortable — I've done it before and see the value",
+              score: 3,
+            },
+            {
+              text: "Beginner — I prefer simple cash back, not complex systems",
+              score: 1,
+            },
+            {
+              text: "Not interested — rewards complexity is a turn-off",
+              score: 0,
+            },
+          ],
+        },
+        {
+          id: 11,
+          category: "Transfer Partners",
+          weight: 7,
+          text: "Bilt transfers 1:1 to 25 partners including United MileagePlus, World of Hyatt, Alaska Airlines, and Japan Airlines. Do any excite you?",
+          options: [
+            {
+              text: "Yes — I'm an active member of at least one of those programs",
+              score: 4,
+            },
+            {
+              text: "Yes — I'd start using those programs if I had more points",
+              score: 3,
+            },
+            {
+              text: "Somewhat — but I'd mostly use points through Bilt's portal",
+              score: 2,
+            },
+            {
+              text: "No — these programs don't match my travel style",
+              score: 0,
+            },
+          ],
+        },
+        {
+          id: 12,
+          category: "Everyday Spending",
+          weight: 7,
+          text: "The Palladium earns 2x Bilt Points on all non-housing purchases. How much do you spend on everyday purchases per month?",
+          options: [
+            { text: "Over $3,000/month", score: 4 },
+            { text: "$1,500 – $3,000/month", score: 3 },
+            { text: "$500 – $1,499/month", score: 2 },
+            { text: "Under $500/month", score: 0 },
+          ],
+        },
+        {
+          id: 13,
+          category: "Bilt Cash Option",
+          weight: 5,
+          text: "You can earn 4% Bilt Cash on everyday spending to unlock rewards on rent/mortgage. Would you find this mode valuable?",
+          options: [
+            {
+              text: "Yes — I'd love a way to essentially earn cash back on rent",
+              score: 4,
+            },
+            { text: "Possibly — I like flexibility between modes", score: 3 },
+            {
+              text: "I'd prefer points since I can transfer them for more value",
+              score: 2,
+            },
+            { text: "No — this is too complex to bother with", score: 0 },
+          ],
+        },
+
+        /* ── COMPLEXITY ──────────────────────────────── */
+        {
+          id: 14,
+          category: "Complexity Tolerance",
+          weight: 6,
+          text: "The Palladium uses two currencies (Bilt Points + Bilt Cash) with different rules. How do you feel about managing that?",
+          options: [
+            {
+              text: "Fine — I already manage multiple rewards currencies across cards",
+              score: 4,
+            },
+            {
+              text: "Okay — I'm willing to learn if it maximises value",
+              score: 3,
+            },
+            { text: "A bit annoying, but tolerable", score: 1 },
+            {
+              text: "I dislike complexity — I want one simple currency",
+              score: 0,
+            },
+          ],
+        },
+        {
+          id: 15,
+          category: "Complexity Tolerance",
+          weight: 4,
+          text: "Earning points on rent involves using Bilt Cash to unlock housing rewards monthly. Are you willing to do that mental work?",
+          options: [
+            {
+              text: "Yes — I enjoy optimising my credit card rewards",
+              score: 4,
+            },
+            {
+              text: "Probably — if there's a clear guide or app to follow",
+              score: 3,
+            },
+            { text: "Maybe — only if it's not too much hassle", score: 1 },
+            { text: "No — this sounds too time-consuming", score: 0 },
+          ],
+        },
+
+        /* ── PROTECTIONS ─────────────────────────────── */
+        {
+          id: 16,
+          category: "Cell Phone Protection",
+          weight: 5,
+          text: "The card covers your cell phone up to $800/claim (2 claims/year, $50 deductible) when you pay your phone bill with it. Is this valuable?",
+          options: [
+            {
+              text: "Very — I currently pay for phone insurance separately",
+              score: 4,
+            },
+            { text: "Somewhat — it's a nice safety net", score: 2 },
+            {
+              text: "A little — I already have phone coverage through another card",
+              score: 1,
+            },
+            { text: "Not really — I don't value phone protection", score: 0 },
+          ],
+        },
+        {
+          id: 17,
+          category: "Travel Protections",
+          weight: 5,
+          text: "The Palladium includes trip cancellation/interruption insurance, trip delay reimbursement, and baggage delay insurance. How important is this?",
+          options: [
+            {
+              text: "Very important — I travel often and want comprehensive protection",
+              score: 4,
+            },
+            { text: "Somewhat important — nice to have", score: 2 },
+            {
+              text: "Minor factor — I usually buy travel insurance separately anyway",
+              score: 1,
+            },
+            {
+              text: "Not important — I rarely travel enough to care",
+              score: 0,
+            },
+          ],
+        },
+        {
+          id: 18,
+          category: "Rental Car Insurance",
+          weight: 3,
+          text: "The card provides secondary rental car insurance (coverage up to 31 days). Do you frequently rent cars?",
+          options: [
+            { text: "Yes — I rent cars multiple times a year", score: 4 },
+            { text: "Occasionally — a few times a year", score: 2 },
+            { text: "Rarely — once a year or less", score: 1 },
+            { text: "Never — I don't rent cars", score: 0 },
+          ],
+        },
+
+        /* ── BILT ECOSYSTEM ──────────────────────────── */
+        {
+          id: 19,
+          category: "Bilt Neighbourhood Benefits",
+          weight: 4,
+          text: "Bilt partners with 50,000+ local restaurants and fitness studios (SoulCycle, CorePower Yoga) for bonus points. Would you use these?",
+          options: [
+            {
+              text: "Yes — I regularly dine out and/or do boutique fitness classes",
+              score: 4,
+            },
+            { text: "Sometimes — I'd use it when relevant", score: 2 },
+            {
+              text: "Rarely — those partners aren't near me or in my routine",
+              score: 1,
+            },
+            { text: "No — this is irrelevant to my lifestyle", score: 0 },
+          ],
+        },
+        {
+          id: 20,
+          category: "Bilt Gold Status",
+          weight: 5,
+          text: "The welcome bonus includes Bilt Gold Status (transfer bonuses, luxury hotel upgrades, breakfast). Do these elite-style perks appeal to you?",
+          options: [
+            {
+              text: "Very much — I love status perks and would leverage them fully",
+              score: 4,
+            },
+            { text: "Somewhat — they're a nice bonus", score: 2 },
+            {
+              text: "Not really — I don't chase hotel/loyalty status",
+              score: 1,
+            },
+            { text: "No interest at all", score: 0 },
+          ],
+        },
+        {
+          id: 21,
+          category: "Home Ownership Goals",
+          weight: 5,
+          text: "Bilt lets you put points toward a future home down payment. Is homeownership a financial goal you're actively working toward?",
+          options: [
+            { text: "Yes — I'm actively saving for a down payment", score: 4 },
+            { text: "Yes, long-term — but it's not imminent", score: 2 },
+            { text: "Already own my home — not relevant to me", score: 1 },
+            { text: "No — homeownership isn't on my radar", score: 0 },
+          ],
+        },
+
+        /* ── COMPETITION & CONTEXT ───────────────────── */
+        {
+          id: 22,
+          category: "Current Card Portfolio",
+          weight: 6,
+          text: "What premium travel cards do you currently hold?",
+          options: [
+            {
+              text: "None — the Palladium would be my first premium card",
+              score: 4,
+            },
+            {
+              text: "I have one (e.g., Chase Sapphire Reserve or Amex Gold)",
+              score: 3,
+            },
+            {
+              text: "I have multiple, but none that earn on rent/mortgage",
+              score: 3,
+            },
+            {
+              text: "I already have cards that beat the Palladium on all my top categories",
+              score: 0,
+            },
+          ],
+        },
+        {
+          id: 23,
+          category: "Competing Cards",
+          weight: 5,
+          text: "Are you considering competing premium cards (Amex Platinum $695/yr, Chase Sapphire Reserve $550/yr)?",
+          options: [
+            {
+              text: "Yes — and the Palladium's $495 fee looks better value for my needs",
+              score: 4,
+            },
+            {
+              text: "I'm comparing all of them — open to whichever wins",
+              score: 3,
+            },
+            {
+              text: "I prefer one of the other cards over the Palladium",
+              score: 1,
+            },
+            { text: "I'm not interested in any premium card", score: 0 },
+          ],
+        },
+        {
+          id: 24,
+          category: "Welcome Bonus",
+          weight: 6,
+          text: "Welcome offer: 50,000 Bilt Points + Bilt Gold Status after $4,000 spend in 90 days, plus $300 Bilt Cash on approval (~$1,400 total value). Can you hit $4,000?",
+          options: [
+            {
+              text: "Yes, easily — my normal spending far exceeds $4,000 in 90 days",
+              score: 4,
+            },
+            {
+              text: "Yes — I could hit it with some planning (bills, large purchases)",
+              score: 3,
+            },
+            {
+              text: "It would be tight — I'd have to stretch my spending",
+              score: 1,
+            },
+            {
+              text: "No — I can't realistically hit $4,000 in 90 days",
+              score: 0,
+            },
+          ],
+        },
+        {
+          id: 25,
+          category: "Overall Lifestyle Fit",
+          weight: 7,
+          text: "Honestly, how well does a premium travel-and-housing rewards card match your current lifestyle?",
+          options: [
+            {
+              text: "Very well — I travel frequently, pay significant housing costs, and love maximising rewards",
+              score: 4,
+            },
+            { text: "Reasonably well — I tick most of the boxes", score: 3 },
+            {
+              text: "Partially — a couple of the benefits fit me well, but not all",
+              score: 1,
+            },
+            {
+              text: "Poorly — this card isn't designed for my lifestyle",
+              score: 0,
+            },
+          ],
+        },
+      ];
+
+      const MAX_SCORE = QUESTIONS.reduce((s, q) => s + q.weight * 4, 0);
+
+      /* ══════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════ */
+      let state = {
+        answers: new Array(QUESTIONS.length).fill(null),
+        cur: 0,
+        drawerOpen: false,
+      };
+
+      /* ══════════════════════════════════════════════════════
+   SCREEN HELPERS
+══════════════════════════════════════════════════════ */
+      function show(id) {
+        document
+          .querySelectorAll(".screen")
+          .forEach((s) => s.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+        window.scrollTo(0, 0);
+      }
+      function goLanding() {
+        show("screen-landing");
+      }
+      function goEditAnswers() {
+        show("screen-quiz");
+        renderQ();
+      }
+      function retake() {
+        startQuiz();
+      }
+
+      function startQuiz() {
+        state.answers = new Array(QUESTIONS.length).fill(null);
+        state.cur = 0;
+        state.drawerOpen = false;
+        show("screen-quiz");
+        renderQ();
+      }
+
+      /* ══════════════════════════════════════════════════════
+   QUIZ RENDER
+══════════════════════════════════════════════════════ */
+      const LETTERS = ["A", "B", "C", "D"];
+
+      function renderQ() {
+        const { answers, cur } = state;
+        const q = QUESTIONS[cur];
+        const answered = answers.filter((a) => a !== null).length;
+        const progPct = (answered / QUESTIONS.length) * 100;
+
+        /* meta */
+        document.getElementById("quiz-mode-label").textContent =
+          "Bilt Palladium Card · 25 Questions · Weighted Analysis";
+        document.getElementById("q-counter").textContent =
+          `Question ${cur + 1} of ${QUESTIONS.length}`;
+        document.getElementById("prog-bar").style.width = progPct + "%";
+        document.getElementById("q-label").textContent = q.category;
+
+        /* fade animation on question swap */
+        const wrap = document.getElementById("q-wrap");
+        wrap.style.animation = "none";
+        wrap.offsetHeight; /* reflow */
+        wrap.style.animation = "fadeUp .38s ease both";
+
+        document.getElementById("q-text").textContent = q.text;
+
+        /* options */
+        const opts = document.getElementById("options");
+        opts.innerHTML = "";
+        q.options.forEach((opt, i) => {
+          const btn = document.createElement("button");
+          btn.className = "opt-btn" + (answers[cur] === i ? " selected" : "");
+          btn.innerHTML = `<span class="opt-key font-mono text-[9px] tracking-[0.12em] uppercase mt-0.5 flex-shrink-0"
+             style="color:var(--text3)">${LETTERS[i]}</span>
+       <span>${opt.text}</span>`;
+          btn.onclick = () => selectAnswer(i);
+          opts.appendChild(btn);
+        });
+
+        /* nav button states */
+        document.getElementById("btn-prev").disabled = cur === 0;
+        document.getElementById("btn-next").disabled =
+          cur >= QUESTIONS.length - 1 ||
+          (answers[cur + 1] === null && answers[cur] === null);
+
+        /* show "See Results" once every question is answered */
+        const allDone = answers.every((a) => a !== null);
+        document.getElementById("results-btn-wrap").style.display = allDone
+          ? "block"
+          : "none";
+
+        renderDots();
+        if (state.drawerOpen) renderDrawer();
+      }
+
+      function selectAnswer(idx) {
+        state.answers[state.cur] = idx;
+        renderQ();
+        /* auto-advance after a brief moment */
+        if (state.cur < QUESTIONS.length - 1) {
+          setTimeout(() => {
+            state.cur++;
+            renderQ();
+          }, 360);
+        }
+      }
+
+      function navTo(idx) {
+        if (idx < 0 || idx >= QUESTIONS.length) return;
+        const { answers } = state;
+        const firstUnanswered = answers.findIndex((a) => a === null);
+        const reachable =
+          answers[idx] !== null ||
+          idx ===
+            (firstUnanswered === -1 ? QUESTIONS.length - 1 : firstUnanswered);
+        if (!reachable) return;
+        state.cur = idx;
+        closeDrawer();
+        renderQ();
+      }
+
+      /* ── DOTS + DRAWER ─────────────────────────────── */
+      function renderDots() {
+        const { answers, cur } = state;
+        const container = document.getElementById("dots");
+        const drawer = document.getElementById("nav-drawer");
+        container.innerHTML = "";
+        container.appendChild(drawer); /* re-attach drawer */
+
+        const firstUnanswered = answers.findIndex((a) => a === null);
+
+        QUESTIONS.forEach((_, i) => {
+          const isAnswered = answers[i] !== null;
+          const isCur = i === cur;
+          const isReachable =
+            isAnswered ||
+            i ===
+              (firstUnanswered === -1 ? QUESTIONS.length - 1 : firstUnanswered);
+
+          const dot = document.createElement("div");
+          dot.className = "rounded-full flex-shrink-0";
+          dot.style.cssText =
+            `height:5px;` +
+            `width:${isCur ? "18px" : isAnswered ? "7px" : "4px"};` +
+            `opacity:${isReachable ? "1" : "0.22"};` +
+            `transition:width .28s ease,background .28s ease,opacity .28s ease;` +
+            `background:${
+              isCur
+                ? "rgba(201,168,76,0.6)"
+                : isAnswered
+                  ? `hsl(${Math.round((i / QUESTIONS.length) * 30 + 38)},70%,55%)`
+                  : "rgba(255,255,255,0.1)"
+            };`;
+          dot.title = `Q${i + 1}`;
+
+          if (isCur)
+            dot.onclick = (e) => {
+              e.stopPropagation();
+              toggleDrawer();
+            };
+          else if (isReachable)
+            dot.onclick = (e) => {
+              e.stopPropagation();
+              navTo(i);
+            };
+          container.appendChild(dot);
+        });
+
+        /* ≡ menu icon */
+        const menu = document.createElement("div");
+        Object.assign(menu.style, {
+          fontFamily: '"JetBrains Mono",monospace',
+          fontSize: "11px",
+          color: "var(--text3)",
+          marginLeft: "6px",
+          cursor: "pointer",
+          transition: "color .15s",
+          flexShrink: "0",
+        });
+        menu.textContent = "≡";
+        menu.title = "Browse all questions";
+        menu.onmouseenter = () => (menu.style.color = "var(--text2)");
+        menu.onmouseleave = () => (menu.style.color = "var(--text3)");
+        menu.onclick = (e) => {
+          e.stopPropagation();
+          toggleDrawer();
+        };
+        container.appendChild(menu);
+      }
+
+      function toggleDrawer() {
+        state.drawerOpen ? closeDrawer() : openDrawer();
+      }
+
+      function openDrawer() {
+        state.drawerOpen = true;
+        renderDrawer();
+        document.getElementById("nav-drawer").classList.remove("drawer-hidden");
+      }
+      function closeDrawer() {
+        state.drawerOpen = false;
+        document.getElementById("nav-drawer").classList.add("drawer-hidden");
+      }
+
+      function renderDrawer() {
+        const { answers, cur } = state;
+        const list = document.getElementById("drawer-list");
+        list.innerHTML = "";
+        const firstUnanswered = answers.findIndex((a) => a === null);
+
+        QUESTIONS.forEach((q, i) => {
+          const isAnswered = answers[i] !== null;
+          const isCur = i === cur;
+          const isReachable =
+            isAnswered ||
+            i ===
+              (firstUnanswered === -1 ? QUESTIONS.length - 1 : firstUnanswered);
+          const chosen = isAnswered ? LETTERS[answers[i]] : "—";
+
+          const item = document.createElement("div");
+          item.className =
+            "d-item flex items-center gap-2.5 px-2.5 py-2 rounded cursor-pointer" +
+            (isCur ? " d-cur" : "") +
+            (!isReachable ? " d-locked" : "");
+          item.innerHTML = `<span class="font-mono text-[9.5px] w-[18px] flex-shrink-0"
+             style="color:var(--text3)">${i + 1}</span>
+       <span class="text-[12.5px] font-light flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
+             style="color:var(--text2)">${q.text}</span>
+       <span class="font-mono text-[10px] flex-shrink-0"
+             style="color:var(--text3)">${chosen}</span>`;
+          if (isReachable) item.onclick = () => navTo(i);
+          list.appendChild(item);
+        });
+      }
+
+      /* close drawer when clicking outside */
+      document.addEventListener("click", (e) => {
+        if (
+          state.drawerOpen &&
+          !e.target.closest("#nav-drawer") &&
+          !e.target.closest("#dots")
+        )
+          closeDrawer();
+      });
+
+      /* ══════════════════════════════════════════════════════
+   RESULTS
+══════════════════════════════════════════════════════ */
+      function showResults() {
+        const { answers } = state;
+
+        /* ── score calculation ── */
+        let earned = 0;
+        const catScores = {},
+          catMax = {};
+        QUESTIONS.forEach((q, i) => {
+          const score = answers[i] !== null ? q.options[answers[i]].score : 0;
+          const pts = score * q.weight;
+          earned += pts;
+          catScores[q.category] = (catScores[q.category] || 0) + pts;
+          catMax[q.category] = (catMax[q.category] || 0) + q.weight * 4;
+        });
+        const pct = Math.round((earned / MAX_SCORE) * 100);
+
+        /* ── verdict tier ── */
+        let verdict, verdictSub, verdictBody, ringColor;
+        if (pct >= 78) {
+          verdict = "Strong Yes — Apply Now";
+          verdictSub = "This card is built for your lifestyle";
+          verdictBody = `You scored <strong>${pct}%</strong> — the Bilt Palladium Card aligns exceptionally well with how you live and spend. You pay significant housing costs, travel enough to use the lounges and hotel credits, and are comfortable extracting value from transferable points. At your spending level, the $495 annual fee should be more than offset by the $400 hotel credit, $200 Bilt Cash, and rewards earned on rent or mortgage. This card was designed for someone like you.`;
+          ringColor = "#2d9e6b";
+        } else if (pct >= 58) {
+          verdict = "Lean Yes — Worth Considering";
+          verdictSub = "The math works, but requires effort";
+          verdictBody = `You scored <strong>${pct}%</strong> — the Bilt Palladium Card likely works for you, but you'll need to be intentional about extracting its value. The card's complexity means passive holders won't recoup the $495 fee. If you actively use the $400 hotel credit, $200 Bilt Cash, and Priority Pass, you break even before earning a single reward point. Consider whether your lifestyle can reliably unlock those credits year after year.`;
+          ringColor = "#c9a84c";
+        } else if (pct >= 38) {
+          verdict = "Borderline — Proceed with Caution";
+          verdictSub = "Some benefits fit, but major gaps exist";
+          verdictBody = `You scored <strong>${pct}%</strong> — the Bilt Palladium Card has appealing elements for you, but key pillars of its value proposition don't match your lifestyle. If you rarely travel, don't pay much in housing costs, or prefer simpler rewards, you'll likely struggle to justify $495/year. Consider the Bilt Obsidian Card ($95/yr) or Bilt Blue Card ($0/yr) instead — they also earn on rent and mortgage at lower cost.`;
+          ringColor = "#c9a84c";
+        } else {
+          verdict = "Not For You — Skip It";
+          verdictSub = "A different card will serve you better";
+          verdictBody = `You scored <strong>${pct}%</strong> — the Bilt Palladium Card isn't the right fit for your current situation. Its value hinges on high housing costs, frequent travel, comfort with complex rewards, and a willingness to use two different currencies. You'd likely pay $495 for benefits you won't fully use. Look at simpler cash-back cards or a no-fee option until your lifestyle aligns better with premium travel cards.`;
+          ringColor = "#c0392b";
+        }
+
+        const matchLabel =
+          pct >= 78
+            ? "Excellent match"
+            : pct >= 58
+              ? "Strong match"
+              : pct >= 38
+                ? "Partial match"
+                : "Poor match";
+
+        document.getElementById("winner-sub").textContent = verdict;
+        document.getElementById("winner-sub").style.color = ringColor;
+
+        /* ── VERDICT CARD ── */
+        const r44 = 2 * Math.PI * 44;
+        document.getElementById("verdict-section").innerHTML = `
+    <div class="rc rounded-md p-6 relative overflow-hidden"
+         style="border-color:${ringColor}44;">
+
+      <!-- ring + title side by side -->
+      <div class="flex items-start gap-5 mb-5">
+        <div class="relative w-[110px] h-[110px] flex-shrink-0">
+          <svg width="110" height="110" viewBox="0 0 110 110"
+               style="transform:rotate(-90deg)">
+            <circle cx="55" cy="55" r="44" fill="none"
+                    stroke="var(--border)" stroke-width="7"/>
+            <circle cx="55" cy="55" r="44" fill="none"
+                    stroke="${ringColor}" stroke-width="7"
+                    stroke-dasharray="${r44}"
+                    stroke-dashoffset="${r44 * (1 - pct / 100)}"
+                    stroke-linecap="round"
+                    style="transition:stroke-dashoffset 1.5s cubic-bezier(0.16,1,0.3,1);"/>
+          </svg>
+          <div class="score-ring-text">
+            <span class="font-display font-bold leading-none"
+                  style="font-size:2rem;color:var(--text)">${pct}</span>
+            <span class="font-mono text-[9px] tracking-wider mt-0.5"
+                  style="color:var(--text3)">/ 100</span>
+          </div>
+        </div>
+        <div class="pt-1 min-w-0">
+          <p class="font-mono text-[9px] tracking-[0.25em] uppercase mb-1.5"
+             style="color:${ringColor}">${matchLabel}</p>
+          <h2 class="font-display font-bold text-[22px] tracking-[0.04em] uppercase leading-[1.15] mb-2"
+              style="color:${ringColor}">${verdict}</h2>
+          <p class="text-[13px] font-light italic"
+             style="color:var(--text3)">${verdictSub}</p>
+        </div>
+      </div>
+
+      <!-- verdict body text -->
+      <p class="text-[14px] font-light leading-[1.75] mb-5"
+         style="color:var(--text2)">${verdictBody}</p>
+
+      <!-- 4-up stat grid -->
+      <div class="grid grid-cols-2 gap-2.5">
+        <div class="stat-card rounded p-3.5">
+          <div class="font-mono text-[9px] tracking-[0.2em] uppercase mb-1.5"
+               style="color:var(--text3)">Weighted Score</div>
+          <div class="font-display font-bold text-[24px] tracking-wide"
+               style="color:${ringColor}">
+            ${earned}<span class="font-light text-[15px]"
+                           style="color:var(--text3)"> / ${MAX_SCORE}</span>
+          </div>
+        </div>
+        <div class="stat-card rounded p-3.5">
+          <div class="font-mono text-[9px] tracking-[0.2em] uppercase mb-1.5"
+               style="color:var(--text3)">Overall Match</div>
+          <div class="font-display font-bold text-[24px] tracking-wide"
+               style="color:${ringColor}">
+            ${pct}<span class="font-light text-[15px]"
+                        style="color:var(--text3)">%</span>
+          </div>
+        </div>
+        <div class="stat-card rounded p-3.5">
+          <div class="font-mono text-[9px] tracking-[0.2em] uppercase mb-1.5"
+               style="color:var(--text3)">Annual Fee</div>
+          <div class="font-display font-bold text-[24px] tracking-wide"
+               style="color:var(--text)">$495</div>
+        </div>
+        <div class="stat-card rounded p-3.5">
+          <div class="font-mono text-[9px] tracking-[0.2em] uppercase mb-1.5"
+               style="color:var(--text3)">Max Credit Value</div>
+          <div class="font-display font-bold text-[24px] tracking-wide"
+               style="color:#2d9e6b">$600+</div>
+        </div>
+      </div>
+    </div>`;
+
+        /* ── KEY FACTORS ── */
+        const whyLines = buildWhy(answers, pct);
+        document.getElementById("why-section").innerHTML = `
+    <div class="rounded-md px-5 py-5"
+         style="border:1px solid var(--border);background:rgba(255,255,255,0.015)">
+      <p class="font-mono text-[9px] tracking-[0.28em] uppercase mb-3"
+         style="color:var(--text3)">Key Factors</p>
+      <ul class="space-y-2.5">
+        ${whyLines
+          .map(
+            (l) => `
+          <li class="flex gap-3 text-[13px] font-light leading-[1.6]"
+              style="color:var(--text2)">
+            <span class="flex-shrink-0 mt-0.5" style="color:var(--gold)">›</span>
+            <span>${l}</span>
+          </li>`,
+          )
+          .join("")}
+      </ul>
+    </div>`;
+
+        /* ── CATEGORY BARS ── */
+        const catList = Object.keys(catScores)
+          .map((cat) => ({
+            cat,
+            pct: Math.round((catScores[cat] / catMax[cat]) * 100),
+          }))
+          .sort((a, b) => b.pct - a.pct);
+
+        document.getElementById("category-bars").innerHTML = `
+    <div class="rounded-md p-5"
+         style="background:var(--bg1);border:1px solid var(--border)">
+      <p class="font-mono text-[9px] tracking-[0.3em] uppercase mb-5"
+         style="color:var(--text3)">Score by Category</p>
+      <div class="flex flex-col gap-4">
+        ${catList
+          .map(
+            (item) => `
+          <div>
+            <div class="flex justify-between items-center mb-1.5">
+              <span class="text-[13px] font-light"
+                    style="color:var(--text2)">${item.cat}</span>
+              <span class="font-mono text-[10px]"
+                    style="color:var(--gold)">${item.pct}%</span>
+            </div>
+            <div class="bbar-track h-[3px] rounded-full overflow-hidden">
+              <div class="bbar-fill rounded-full"
+                   data-width="${item.pct}"
+                   style="--bw:${item.pct}%"></div>
+            </div>
+          </div>`,
+          )
+          .join("")}
+      </div>
+    </div>`;
+
+        /* ── CARD FACTS ── */
+        document.getElementById("card-facts").innerHTML = `
+    <div class="rounded-md p-4"
+         style="background:var(--bg2);border:1px solid var(--border)">
+      <p class="font-mono text-[9px] leading-[2] tracking-[0.06em]"
+         style="color:var(--text3)">
+        CARD FACTS — $495/yr fee · 2x pts everyday spend · 1.25x on rent/mortgage (no fee) ·
+        4% Bilt Cash mode · $400 Bilt Travel hotel credit · $200 annual Bilt Cash ·
+        Priority Pass + 2 guests · 25 transfer partners 1:1 · Cell phone up to $800 ·
+        Welcome: 50k pts + $300 Bilt Cash + Gold Status after $4k spend in 90 days
+      </p>
+    </div>`;
+
+        show("screen-results");
+
+        /* animate bars after DOM paint */
+        setTimeout(() => {
+          document.querySelectorAll(".bbar-fill").forEach((el) => {
+            el.style.width = el.dataset.width + "%";
+          });
+        }, 300);
+      }
+
+      /* ══════════════════════════════════════════════════════
+   WHY-TEXT GENERATOR
+   Produces up to 3 personalised bullet points based on
+   the user's answers, keyed to the card's value pillars.
+══════════════════════════════════════════════════════ */
+      function buildWhy(answers, pct) {
+        const lines = [];
+        const a = (i) => answers[i]; /* 0-indexed helper */
+
+        /* Housing: Q1 (idx 0) = housing type, Q2 (idx 1) = monthly amount */
+        if (a(0) !== null && a(0) <= 1 && a(1) !== null && a(1) >= 1)
+          lines.push(
+            "Your housing payment is substantial — earning 1.25x Bilt Points on rent or mortgage " +
+              "with no processing fee adds tens of thousands of points per year that no competing card offers.",
+          );
+
+        /* Hotel credit: Q5 (idx 4) */
+        if (a(4) !== null && a(4) >= 2)
+          lines.push(
+            "You can realistically use the $400 hotel credit each year — that single benefit alone " +
+              "covers 81% of the annual fee before you earn a single reward point.",
+          );
+        else if (a(4) !== null && a(4) <= 1)
+          lines.push(
+            "You're unlikely to fully use the $400 hotel credit. This is the card's single biggest " +
+              "value driver, and missing it significantly weakens the case for the $495 fee.",
+          );
+
+        /* Travel + lounges: Q7 (idx 6) + Q8 (idx 7) */
+        if (a(6) !== null && a(6) >= 2 && a(7) !== null && a(7) >= 1)
+          lines.push(
+            "You travel regularly and value lounge access — Priority Pass with 2 free guests is " +
+              "included on the Palladium, worth $429/yr if purchased separately.",
+          );
+
+        /* Transfer partners: Q10 (idx 9) */
+        if (a(9) !== null && a(9) >= 2)
+          lines.push(
+            "You're comfortable with transfer partners — Bilt's 1:1 transfers to Hyatt, United, " +
+              "Alaska, and Japan Airlines can yield 2–4× the value of fixed-rate portal redemptions.",
+          );
+
+        /* Fee comfort: Q4 (idx 3) */
+        if (a(3) !== null && a(3) >= 2)
+          lines.push(
+            "You're open to a premium annual fee when credits justify it — stacking the hotel credit " +
+              "+ Bilt Cash + Priority Pass typically yields $600–800+ in annual value against a $495 cost.",
+          );
+
+        /* Low scorer fallback */
+        if (pct < 58)
+          lines.push(
+            "Your answers suggest the Palladium's complexity and $495 fee may not be worth it for " +
+              "your current lifestyle. Consider a $0 Bilt card that still earns on rent without the " +
+              "premium tier commitment.",
+          );
+
+        /* Ensure at least one line */
+        if (lines.length === 0)
+          lines.push(
+            `Your overall score of ${pct}% reflects how well the Palladium's value proposition — ` +
+              "housing rewards, hotel credits, and transferable points — maps to your spending habits " +
+              "and travel patterns.",
+          );
+
+        return lines.slice(0, 3);
+      }
+    </script>
+  </body>
+</html>

@@ -31,6 +31,7 @@ class SiteNavbar extends HTMLElement {
           ${link("index.html#projects", "Projects", false)}
           ${link("jobs.html", "Jobs", currentPage.includes("jobs"))}
           ${link("travel-card-quiz.html", "Travel Cards", currentPage.includes("travel-card-quiz"))}
+          ${link("palladium.html", "Palladium Quiz", currentPage.includes("palladium"))}
           ${link("metro.html", "Metro", currentPage.includes("metro"))}
           ${link("grocery.html", "Grocery", currentPage.includes("grocery"))}
           <a href="https://github.com/aeonss"

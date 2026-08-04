@@ -34,6 +34,7 @@ class SiteNavbar extends HTMLElement {
           ${link("palladium.html", "Palladium Quiz", currentPage.includes("palladium"))}
           ${link("metro.html", "Metro", currentPage.includes("metro"))}
           ${link("grocery.html", "Grocery", currentPage.includes("grocery"))}
+          ${link("pokemon.html", "Pokémon", currentPage.includes("pokemon"))}
           <a href="https://github.com/aeonss"
              target="_blank"
              class="${navLinkBase} ${navLinkIdle} ml-auto">

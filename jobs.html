@@ -31,8 +31,8 @@
     <site-navbar></site-navbar>
 
     <!-- SEARCH -->
-    <div class="pt-[60px] px-8 max-w-[1400px] mx-auto mt-8">
-      <div class="flex gap-2.5">
+    <div class="pt-[180px] px-4 sm:px-8 max-w-[1400px] mx-auto mt-8 sm:pt-[60px]">
+      <div class="flex flex-col sm:flex-row gap-2.5">
         <input
           id="searchInput"
           class="search-input flex-1 text-[15px] px-[18px] py-3 rounded"
@@ -41,7 +41,7 @@
         />
         <button
           id="searchBtn"
-          class="search-btn font-display text-[15px] font-semibold tracking-[0.12em] uppercase px-8 py-3 rounded border-none text-white cursor-pointer whitespace-nowrap"
+          class="search-btn font-display text-[15px] font-semibold tracking-[0.12em] uppercase px-8 py-3 rounded border-none text-white cursor-pointer whitespace-nowrap w-full sm:w-auto"
           onclick="doSearch()"
         >
           Search
@@ -232,7 +232,7 @@
 
     <!-- CACHE TOOLBAR -->
     <div
-      class="max-w-[1400px] mx-auto mt-3 px-8 flex items-center gap-2 flex-wrap"
+      class="max-w-[1400px] mx-auto mt-3 px-4 sm:px-8 flex items-center gap-2 flex-wrap"
     >
       <span id="cacheStat" class="cache-stat font-mono text-[10px] flex-1"
         >Cache: loading…</span
@@ -271,12 +271,12 @@
     <!-- ERROR BOX -->
     <div
       id="errorBox"
-      class="error-box font-mono text-[11.5px] px-4 py-2.5 rounded mx-8 mt-3 max-w-[1400px]"
+      class="error-box font-mono text-[11.5px] px-4 py-2.5 rounded mx-4 sm:mx-8 mt-3 max-w-[1400px]"
     ></div>
 
     <!-- META BAR -->
     <div
-      class="flex items-center gap-2 px-8 pt-4 pb-2 font-mono text-[11px] min-h-[46px] max-w-[1400px] mx-auto"
+      class="flex items-center gap-2 px-4 sm:px-8 pt-4 pb-2 font-mono text-[11px] min-h-[46px] max-w-[1400px] mx-auto"
     >
       <div
         id="loader"
@@ -293,7 +293,7 @@
     <main>
       <div
         id="jobsGrid"
-        class="px-8 pb-20 grid grid-cols-3 gap-3 max-w-[1400px] mx-auto"
+        class="px-4 sm:px-8 pb-20 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 max-w-[1400px] mx-auto"
       >
         <div class="col-span-full text-center py-20 text-[color:var(--text3)]">
           <div class="text-[44px] mb-4 inline-block animate-bounce">🔍</div>

@@ -31,7 +31,7 @@
     <site-navbar></site-navbar>
 
     <!-- PAGE WRAP -->
-    <div class="max-w-[900px] mx-auto px-6 pt-16 pb-24 mt-8">
+    <div class="max-w-[900px] mx-auto px-6 pt-[180px] pb-24 mt-8 sm:pt-16">
       <p
         class="font-mono text-[9.5px] tracking-[0.3em] uppercase text-[color:var(--text3)] mb-2.5"
       >
@@ -58,10 +58,10 @@
         >
           Search Nearby Deals
         </label>
-        <div class="flex gap-2.5">
+        <div class="flex flex-col sm:flex-row gap-2.5">
           <input
             id="zipCodeInput"
-            class="grocery-input w-28 flex-shrink-0 font-sans text-sm px-4 py-[11px] rounded"
+            class="grocery-input w-full sm:w-28 flex-shrink-0 font-sans text-sm px-4 py-[11px] rounded"
             type="text"
             placeholder="Zip Code"
             maxlength="10"
@@ -73,7 +73,7 @@
             placeholder="Search for groceries…"
           />
           <button
-            class="grocery-btn font-display text-sm font-semibold tracking-[0.12em] uppercase px-7 py-[11px] rounded border-none text-white cursor-pointer whitespace-nowrap"
+            class="grocery-btn font-display text-sm font-semibold tracking-[0.12em] uppercase px-7 py-[11px] rounded border-none text-white cursor-pointer whitespace-nowrap w-full sm:w-auto"
             onclick="searchImages()"
           >
             Search

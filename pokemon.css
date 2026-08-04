@@ -1,0 +1,227 @@
+/* ── PANEL (upload / manual search) ─────────────────────────────────────── */
+.pk-panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+}
+
+/* ── INPUTS ──────────────────────────────────────────────────────────────── */
+.pk-input {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: "Barlow", sans-serif;
+  outline: none;
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s;
+}
+.pk-input::placeholder {
+  color: var(--text3);
+}
+.pk-input:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(224, 51, 51, 0.1);
+}
+
+/* ── BUTTON ──────────────────────────────────────────────────────────────── */
+.pk-btn {
+  background: var(--red);
+  transition:
+    background 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+.pk-btn:hover {
+  background: #c82828;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(224, 51, 51, 0.25);
+}
+.pk-btn:active {
+  transform: none;
+}
+.pk-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ── GHOST BUTTON (API key save) ────────────────────────────────────────── */
+.pk-ghost-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text3);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.pk-ghost-btn:hover {
+  border-color: var(--bord2);
+  color: var(--text2);
+}
+.pk-ghost-btn.saved {
+  border-color: rgba(95, 232, 160, 0.3);
+  color: #5fe8a0;
+}
+
+/* ── DROPZONE ───────────────────────────────────────────────────────────── */
+.pk-dropzone {
+  border: 1px dashed var(--bord2);
+  background: var(--bg3);
+  border-radius: 6px;
+  cursor: pointer;
+  min-height: 190px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+.pk-dropzone:hover,
+.pk-dropzone.dragover {
+  border-color: var(--red);
+  background: var(--bg2);
+}
+.pk-dropzone img {
+  max-height: 280px;
+  object-fit: contain;
+  display: block;
+}
+.pk-dz-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+}
+.pk-dz-empty .pk-dz-icon {
+  font-size: 34px;
+  filter: grayscale(0.3);
+}
+
+/* ── LOADER ─────────────────────────────────────────────────────────────── */
+.pk-loader {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10.5px;
+  color: var(--text3);
+}
+.pk-loader span:not(:last-child) {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--red);
+  animation: dotPulse 1.2s ease-in-out infinite;
+}
+.pk-loader span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.pk-loader span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes dotPulse {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* ── ERROR BOX ──────────────────────────────────────────────────────────── */
+.pk-error {
+  display: none;
+  background: rgba(224, 51, 51, 0.08);
+  border: 1px solid rgba(224, 51, 51, 0.2);
+  color: var(--red);
+}
+
+/* ── RESULT CARD ────────────────────────────────────────────────────────── */
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.pk-result {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  animation: cardIn 0.35s ease both;
+  transition:
+    border-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.pk-result:hover {
+  border-color: var(--bord2);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.45);
+}
+.pk-result:hover .pk-topbar {
+  opacity: 1;
+}
+
+/* ── RESULT TOP ACCENT BAR ──────────────────────────────────────────────── */
+.pk-topbar {
+  height: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* ── RESULT BADGES ──────────────────────────────────────────────────────── */
+.pk-badge {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text2);
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  padding: 3px 9px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+/* ── PRICE ──────────────────────────────────────────────────────────────── */
+.pk-price {
+  color: #5fe8a0;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 600;
+}
+
+/* ── RESULT LINK ────────────────────────────────────────────────────────── */
+.pk-link {
+  color: var(--text3);
+  text-decoration: none;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: color 0.15s;
+}
+.pk-link:hover {
+  color: var(--red);
+}
+
+/* ── RESULT FOOTER ──────────────────────────────────────────────────────── */
+.pk-footer {
+  border-top: 1px solid var(--border);
+  background: var(--bg3);
+}

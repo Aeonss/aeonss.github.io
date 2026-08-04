@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pokémon Card Identifier</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;900&family=Barlow:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Barlow", "sans-serif"],
+              display: ["Barlow Condensed", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="pokemon.css" />
+    <script src="navbar.js"></script>
+  </head>
+  <body>
+    <site-navbar></site-navbar>
+
+    <!-- PAGE WRAP -->
+    <div class="max-w-[900px] mx-auto px-6 pt-[180px] pb-24 mt-8 sm:pt-16">
+      <p
+        class="font-mono text-[9.5px] tracking-[0.3em] uppercase text-[color:var(--text3)] mb-2.5"
+      >
+        Vision AI · TCGdex API · Live Market Prices
+      </p>
+      <h1
+        class="font-display font-bold tracking-[0.06em] uppercase leading-none text-[color:var(--text)] mb-2"
+        style="font-size: clamp(40px, 7vw, 64px)"
+      >
+        Pokémon <em class="text-[color:var(--red)] not-italic">Card</em
+        ><br />Identifier
+      </h1>
+      <p
+        class="text-sm font-light text-[color:var(--text3)] mb-9 leading-relaxed"
+      >
+        Drop in a photo of any Pokémon TCG card — a vision model reads the name
+        and collector number, then we pull the exact print and its live market
+        prices from TCGdex.
+      </p>
+
+      <!-- ═══ UPLOAD PANEL ═══ -->
+      <div class="pk-panel rounded-md p-5 mb-6">
+        <label
+          class="font-mono text-[9.5px] tracking-[0.2em] uppercase text-[color:var(--text3)] mb-2.5 block"
+        >
+          Identify by Image
+        </label>
+
+        <!-- dropzone -->
+        <div
+          id="dropzone"
+          class="pk-dropzone rounded-md mb-4"
+          role="button"
+          tabindex="0"
+          title="Click, drop, or paste an image"
+        >
+          <input id="fileInput" type="file" accept="image/*" hidden />
+          <div id="dzEmpty" class="pk-dz-empty">
+            <div class="pk-dz-icon">🃏</div>
+            <div
+              class="font-display text-xl font-semibold tracking-[0.08em] uppercase text-[color:var(--text2)]"
+            >
+              Drop your card here
+            </div>
+            <div class="font-mono text-[10px] tracking-[0.12em] text-[color:var(--text3)]">
+              click · drop · or paste (Ctrl+V)
+            </div>
+          </div>
+          <img
+            id="dzPreview"
+            alt="Card preview"
+            class="w-full"
+            style="display: none"
+          />
+        </div>
+
+        <!-- api key -->
+        <div class="flex flex-col sm:flex-row gap-2.5 mb-4">
+          <input
+            id="apiKeyInput"
+            class="pk-input flex-1 font-mono text-[11px] px-4 py-[10px] rounded"
+            type="password"
+            placeholder="OPENCODE_API_KEY (optional, for AI vision)…"
+            autocomplete="off"
+          />
+          <button
+            id="keySave"
+            class="pk-ghost-btn rounded px-4 py-[10px] whitespace-nowrap"
+          >
+            Save Key
+          </button>
+        </div>
+
+        <button
+          id="identifyBtn"
+          class="pk-btn font-display text-sm font-semibold tracking-[0.12em] uppercase px-7 py-[11px] rounded border-none text-white cursor-pointer w-full"
+        >
+          Identify Card →
+        </button>
+      </div>
+
+      <!-- ═══ MANUAL SEARCH PANEL ═══ -->
+      <div class="pk-panel rounded-md p-5 mb-6">
+        <label
+          class="font-mono text-[9.5px] tracking-[0.2em] uppercase text-[color:var(--text3)] mb-2.5 block"
+        >
+          Or Search by Name
+        </label>
+        <div class="flex flex-col sm:flex-row gap-2.5">
+          <input
+            id="nameInput"
+            class="pk-input flex-1 font-sans text-sm px-4 py-[11px] rounded"
+            type="text"
+            placeholder="Card name (e.g. Charizard VMAX)…"
+          />
+          <input
+            id="collectorInput"
+            class="pk-input w-full sm:w-36 font-sans text-sm px-4 py-[11px] rounded"
+            type="text"
+            placeholder="No. e.g. 74/185"
+          />
+          <button
+            id="searchBtn"
+            class="pk-btn font-display text-sm font-semibold tracking-[0.12em] uppercase px-7 py-[11px] rounded border-none text-white cursor-pointer whitespace-nowrap w-full sm:w-auto"
+          >
+            Search
+          </button>
+        </div>
+      </div>
+
+      <!-- STATUS / META -->
+      <div
+        class="flex items-center gap-2 font-mono text-[10.5px] text-[color:var(--text3)] min-h-[32px] mb-2"
+      >
+        <div id="loader" class="pk-loader">
+          <span></span><span></span><span></span>
+          <span class="ml-1.5">Working…</span>
+        </div>
+        <span id="metaText"></span>
+      </div>
+
+      <!-- ERROR -->
+      <div
+        id="errorBox"
+        class="pk-error font-mono text-[11px] px-3.5 py-2.5 rounded mb-3"
+      ></div>
+
+      <!-- RESULTS -->
+      <div id="results" class="hidden"></div>
+    </div>
+    <!-- /page-wrap -->
+
+    <script src="pokemon.js"></script>
+  </body>
+</html>
